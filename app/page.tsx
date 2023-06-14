@@ -1,3 +1,4 @@
+import Navbar from '@/components/Navbar'
 import dynamic from 'next/dynamic'
 
 export default function Home() {
@@ -7,8 +8,13 @@ export default function Home() {
   })
 
   return (
-    <main>
-      <Map />
-    </main>
+    <>
+      <header>
+        <Navbar />
+      </header>
+      <main>
+        <Map />
+      </main>
+    </>
   )
 }
