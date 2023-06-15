@@ -1,19 +1,20 @@
 import Navbar from '@/components/Navbar'
-import dynamic from 'next/dynamic'
+import MapDashboard from './components/MapDashboard'
+import { getIslands, getProvinces } from '@/utils/data'
 
-export default function Home() {
-  const Map = dynamic(() => import('@/components/Map'), {
-    loading: () => <p>Loading the map...</p>,
-    ssr: false
-  })
+export default async function Home() {
+  const provincesData = getProvinces()
+
+  const [provinces] = await Promise.all([provincesData])
 
   return (
     <>
       <header>
-        <Navbar />
+        <Navbar position='sticky' maxWidth='xl' />
       </header>
+
       <main>
-        <Map />
+        <MapDashboard provinces={provinces} />
       </main>
     </>
   )
