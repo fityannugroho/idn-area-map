@@ -47,6 +47,7 @@ export default function MapDashboard({
           fullWidth
           options={provinces}
           getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option.code === value.code}
           renderOption={(props, option) => (
             <li {...props} key={option.code}>{option.name}</li>
           )}
@@ -67,6 +68,7 @@ export default function MapDashboard({
           fullWidth
           options={regencies}
           getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option.code === value.code}
           renderOption={(props, option) => (
             <li {...props} key={option.code}>{option.name}</li>
           )}
@@ -99,14 +101,23 @@ export default function MapDashboard({
           title: island.name,
           position: [island.latitude, island.longitude],
           children: <>
-            <b>{island.name}</b>
-            <p>{island.latitude}</p>
-            <p>{island.longitude}</p>
+            <b className='font-semibold text-blue-700 mb-2 block'>
+              {island.name}
+            </b>
+
+            <span className='text-xs text-gray-500 block'>
+              {island.coordinate}
+            </span>
+
             {island.isPopulated && (
-              <p>Populated</p>
+              <span className='bg-green-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 me-1 inline-block'>
+                Populated
+              </span>
             )}
             {island.isOutermostSmall && (
-              <p>Outermost Small Island</p>
+              <span className='bg-red-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 inline-block'>
+                Outermost Small Island
+              </span>
             )}
           </>,
         }))}
