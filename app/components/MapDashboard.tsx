@@ -3,7 +3,6 @@
 import { Island, Province, Regency, getIslands, getRegencies } from '@/utils/data'
 import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
-import Pagination from '@mui/material/Pagination'
 import TextField from '@mui/material/TextField'
 import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useState } from 'react'
@@ -17,8 +16,6 @@ export default function MapDashboard({
   const [regencies, setRegencies] = useState<Regency[]>([])
   const [selectedRegency, setRegency] = useState<Regency | null>(null)
   const [islands, setIslands] = useState<Island[]>([])
-  const [islandPage, setIslandPage] = useState<number>(1)
-  const islandsPerPage = 50
 
   const Map = useMemo(() => (
     dynamic(() => import('@/components/Map'), {
@@ -42,9 +39,6 @@ export default function MapDashboard({
       setIslands([])
     }
   }, [selectedRegency])
-
-  const firstIslandIndex = useMemo(() => (islandPage - 1) * islandsPerPage, [islandPage])
-  const lastIslandIndex = useMemo(() => islandPage * islandsPerPage, [islandPage])
 
   return (
     <>
@@ -85,48 +79,31 @@ export default function MapDashboard({
         />
       </Box>
 
-      {/* Islands Pagination */}
-      <Box className='flex px-4 py-2 w-full justify-center md:justify-between gap-3 flex-wrap'>
-        <Box className='flex gap-1 py-1 w-full md:w-fit justify-center'>
-          <span className='text-sm font-semibold text-blue-700 w-fit'>
-            {islands.length} islands found
-          </span>
-          {islands.length > islandsPerPage && (
-            <span className='text-sm text-gray-600 w-fit'>
-              (showing {firstIslandIndex + 1} to {Math.min(lastIslandIndex, islands.length)})
-            </span>
-          )}
-        </Box>
-
-        <Pagination
-          count={Math.ceil(islands.length / islandsPerPage)}
-          page={islandPage}
-          onChange={(event, page) => {
-            setIslandPage(page)
-          }}
-        />
+      {/* Islands info */}
+      <Box className='flex px-4 py-3 w-full justify-center text-gray-500 md:justify-between gap-3 flex-wrap'>
+        <span className='text-sm font-semibold text-blue-700 w-fit'>
+          {islands.length} islands found
+        </span>
       </Box>
 
+      {/* Map */}
       <Map
         className='h-[32rem]'
-        markers={islands
-          .slice(firstIslandIndex, lastIslandIndex)
-          .map((island) => ({
-            key: island.code,
-            position: [island.latitude, island.longitude],
-            children: <>
-              <b>{island.name}</b>
-              <p>{island.latitude}</p>
-              <p>{island.longitude}</p>
-              {island.isPopulated && (
-                <p>Populated</p>
-              )}
-              {island.isOutermostSmall && (
-                <p>Outermost Small Island</p>
-              )}
-            </>,
-          }))
-        }
+        markers={islands.map((island) => ({
+          key: island.code,
+          position: [island.latitude, island.longitude],
+          children: <>
+            <b>{island.name}</b>
+            <p>{island.latitude}</p>
+            <p>{island.longitude}</p>
+            {island.isPopulated && (
+              <p>Populated</p>
+            )}
+            {island.isOutermostSmall && (
+              <p>Outermost Small Island</p>
+            )}
+          </>,
+        }))}
       />
     </>
   )
