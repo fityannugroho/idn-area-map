@@ -47,6 +47,9 @@ export default function MapDashboard({
           fullWidth
           options={provinces}
           getOptionLabel={(option) => option.name}
+          renderOption={(props, option) => (
+            <li {...props} key={option.code}>{option.name}</li>
+          )}
           renderInput={(param) => (
             <TextField
               {...param}
@@ -64,6 +67,9 @@ export default function MapDashboard({
           fullWidth
           options={regencies}
           getOptionLabel={(option) => option.name}
+          renderOption={(props, option) => (
+            <li {...props} key={option.code}>{option.name}</li>
+          )}
           renderInput={(param) => (
             <TextField
               label='Regency'
@@ -90,7 +96,7 @@ export default function MapDashboard({
       <Map
         className='h-[32rem]'
         markers={islands.map((island) => ({
-          key: island.code,
+          title: island.name,
           position: [island.latitude, island.longitude],
           children: <>
             <b>{island.name}</b>

@@ -31,8 +31,8 @@ export default function Map({
       <MarkerClusterGroup
         chunkedLoading
       >
-        {markers.map(({ children, key, ...marker }) => (
-          <MapMarker key={key} {...marker}>
+        {markers.map(({ children, ...marker }, index) => (
+          <MapMarker {...marker} key={index}>
             {children}
           </MapMarker>
         ))}

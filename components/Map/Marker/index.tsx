@@ -7,7 +7,6 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 import { Marker, MarkerProps, Popup, PopupProps } from 'react-leaflet'
 
 export type MapMarkerProps = MarkerProps & {
-  key?: string
   PopupProps?: PopupProps
 }
 
