@@ -16,6 +16,7 @@ export default function MapDashboard({
   const [regencies, setRegencies] = useState<Regency[]>([])
   const [selectedRegency, setRegency] = useState<Regency | null>(null)
   const [islands, setIslands] = useState<Island[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
 
   const Map = useMemo(() => (
     dynamic(() => import('@/components/Map'), {
@@ -34,7 +35,9 @@ export default function MapDashboard({
 
   useEffect(() => {
     if (selectedRegency) {
+      setLoading(true)
       getIslands(selectedRegency.code).then(setIslands)
+        .finally(() => setLoading(false))
     } else {
       setIslands([])
     }
@@ -89,9 +92,15 @@ export default function MapDashboard({
 
       {/* Islands info */}
       <Box className='flex px-4 py-3 w-full justify-center text-gray-500 md:justify-between gap-3 flex-wrap'>
-        <span className='text-sm font-semibold text-blue-700 w-fit'>
-          {islands.length} islands found
-        </span>
+        {loading ? (
+          <span className='text-sm text-gray-500'>
+            Loading islands data...
+          </span>
+        ) : (
+          <span className='text-sm font-semibold text-blue-700 w-fit'>
+            {islands.length} islands found
+          </span>
+        )}
       </Box>
 
       {/* Map */}
