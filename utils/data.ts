@@ -1,15 +1,18 @@
 export type Province = {
+  id: string
   code: string
   name: string
 }
 
 export type Regency = {
+  id: string
   code: string
   name: string
   provinceCode: string
 }
 
 export type Island = {
+  id: string
   code: string
   name: string
   regencyCode: string
