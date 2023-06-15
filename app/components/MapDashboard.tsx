@@ -1,5 +1,7 @@
 'use client'
 
+import MapMarker from '@/components/Map/Marker'
+import MarkerClusterGroup from '@/components/Map/MarkerClusterGroup'
 import { Island, Province, Regency, getIslands, getRegencies } from '@/utils/data'
 import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
@@ -106,31 +108,36 @@ export default function MapDashboard({
       {/* Map */}
       <Map
         className='h-[32rem]'
-        markers={islands.map((island) => ({
-          title: island.name,
-          position: [island.latitude, island.longitude],
-          children: <>
-            <b className='font-semibold text-blue-700 mb-2 block'>
-              {island.name}
-            </b>
+      >
+        <MarkerClusterGroup chunkedLoading>
+          {islands.map((island) => (
+            <MapMarker
+              key={island.code}
+              position={[island.latitude, island.longitude]}
+              title={island.name}
+            >
+              <b className='font-semibold text-blue-700 mb-2 block'>
+                {island.name}
+              </b>
 
-            <span className='text-xs text-gray-500 block'>
-              {island.coordinate}
-            </span>
+              <span className='text-xs text-gray-500 block'>
+                {island.coordinate}
+              </span>
 
-            {island.isPopulated && (
-              <span className='bg-green-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 me-1 inline-block'>
-                Populated
-              </span>
-            )}
-            {island.isOutermostSmall && (
-              <span className='bg-red-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 inline-block'>
-                Outermost Small Island
-              </span>
-            )}
-          </>,
-        }))}
-      />
+              {island.isPopulated && (
+                <span className='bg-green-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 me-1 inline-block'>
+                  Populated
+                </span>
+              )}
+              {island.isOutermostSmall && (
+                <span className='bg-red-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 inline-block'>
+                  Outermost Small Island
+                </span>
+              )}
+            </MapMarker>
+          ))}
+        </MarkerClusterGroup>
+      </Map>
     </>
   )
 }
