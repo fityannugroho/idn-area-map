@@ -47,9 +47,10 @@ export default function MapDashboard({
 
   return (
     <>
-      <Box className='flex px-4 pt-4 pb-2 w-full gap-3 flex-wrap md:flex-nowrap'>
+      <Box className='flex px-4 pt-4 pb-2 w-full gap-4 flex-wrap md:flex-nowrap'>
         <Autocomplete
           fullWidth
+          size='small'
           options={provinces}
           getOptionLabel={(option) => option.name}
           isOptionEqualToValue={(option, value) => option.code === value.code}
@@ -71,6 +72,7 @@ export default function MapDashboard({
         />
         <Autocomplete
           fullWidth
+          size='small'
           options={regencies}
           getOptionLabel={(option) => option.name}
           isOptionEqualToValue={(option, value) => option.code === value.code}
@@ -93,7 +95,7 @@ export default function MapDashboard({
       </Box>
 
       {/* Islands info */}
-      <Box className='flex px-4 py-3 w-full justify-center text-gray-500 md:justify-between gap-3 flex-wrap'>
+      <Box className='flex px-4 py-2 w-full justify-center text-gray-500 md:justify-between gap-3 flex-wrap'>
         {loading ? (
           <span className='text-sm text-gray-500'>
             Loading islands data...
