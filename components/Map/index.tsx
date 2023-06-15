@@ -3,7 +3,7 @@
 import 'leaflet/dist/leaflet.css'
 import { MapContainer, MapContainerProps, TileLayer } from 'react-leaflet'
 import MapMarker, { MapMarkerProps } from './Marker'
-import MarkerClusterGroup from 'react-leaflet-cluster'
+import MarkerClusterGroup from './MarkerClusterGroup'
 
 export type MapProps = MapContainerProps & {
   markers?: MapMarkerProps[]
@@ -28,9 +28,7 @@ export default function Map({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      <MarkerClusterGroup
-        chunkedLoading
-      >
+      <MarkerClusterGroup>
         {markers.map(({ children, ...marker }, index) => (
           <MapMarker {...marker} key={index}>
             {children}
