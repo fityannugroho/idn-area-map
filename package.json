@@ -30,6 +30,7 @@
     "typescript": "5.1.3"
   },
   "devDependencies": {
-    "@types/leaflet": "^1.9.3"
+    "@types/leaflet": "^1.9.3",
+    "@types/leaflet.markercluster": "^1.5.1"
   }
 }
