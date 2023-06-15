@@ -5,8 +5,15 @@ import Leaflet from 'leaflet';
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/leaflet.markercluster";
+import { PropsWithChildren } from 'react';
 
-const MarkerClusterGroup = createPathComponent(({ children: _c, ...props }, ctx) => {
+export type MarkerClusterGroupProps = PropsWithChildren
+  & Leaflet.MarkerClusterGroupOptions;
+
+const MarkerClusterGroup = createPathComponent<
+  Leaflet.MarkerClusterGroup,
+  MarkerClusterGroupProps
+>(({ children: _c, ...props }, ctx) => {
   const clusterProps: Record<string, any> = {};
   const clusterEvents: Record<string, any> = {};
 
