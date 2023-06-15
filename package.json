@@ -1,13 +1,32 @@
 {
   "name": "idn-area-map",
   "version": "0.1.0",
-  "private": true,
+  "description": "Map of Indonesia's administrative area",
+  "main": "app/page.tsx",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fityannugroho/idn-area-map.git"
+  },
+  "keywords": [
+    "idn-area",
+    "indonesia",
+    "wilayah",
+    "area",
+    "data",
+    "map"
+  ],
+  "author": "fityannugroho <fityannugroho@gmail.com> (https://github.com/fityannugroho)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fityannugroho/idn-area-map/issues"
+  },
+  "homepage": "https://github.com/fityannugroho/idn-area-map#readme",
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
