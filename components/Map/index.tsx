@@ -1,10 +1,10 @@
 'use client'
 
 import 'leaflet/dist/leaflet.css'
-import { MapContainer, MapContainerProps, TileLayer } from 'react-leaflet'
 import { PropsWithChildren } from 'react'
+import { MapContainer, MapContainerProps, TileLayer } from 'react-leaflet'
 
-export type MapProps = MapContainerProps & PropsWithChildren;
+export type MapProps = MapContainerProps & PropsWithChildren
 
 export default function Map({
   center = [-3.028137, 119.764063],
@@ -22,7 +22,7 @@ export default function Map({
     >
       <TileLayer
         attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
       />
       {children}
     </MapContainer>

@@ -1,7 +1,7 @@
 import { config } from '@/utils/config'
-import './globals.css'
 import { Inter } from 'next/font/google'
 import { StrictMode } from 'react'
+import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <StrictMode>
-      <html lang="en">
+      <html lang='en'>
         <body className={inter.className}>{children}</body>
       </html>
     </StrictMode>

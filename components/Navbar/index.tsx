@@ -34,7 +34,7 @@ export default function Navbar({
         >
           {/* Brand */}
           <Link
-            href="/"
+            href='/'
             sx={{
               mr: 3.2,
               my: 2.4,
@@ -46,7 +46,7 @@ export default function Navbar({
             }}
           >
             <Typography
-              variant="h5"
+              variant='h5'
               noWrap
             >
               {appName}
