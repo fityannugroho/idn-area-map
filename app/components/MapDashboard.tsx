@@ -1,31 +1,36 @@
 'use client'
 
-import MapMarker from '@/components/Map/Marker'
-import MarkerClusterGroup from '@/components/Map/MarkerClusterGroup'
-import { Island, Province, Regency, getIslands, getRegencies } from '@/utils/data'
+import { Island, Province, Regency, getIslands, getProvinces, getRegencies } from '@/utils/data'
 import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import dynamic from 'next/dynamic'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-export default function MapDashboard({
-  provinces,
-}: {
-  provinces: Province[],
-}) {
+const Map = dynamic(() => import('@/components/Map'), {
+  loading: () => <p>Loading the map...</p>,
+  ssr: false,
+})
+
+const MarkerClusterGroup = dynamic(() => import('@/components/Map/MarkerClusterGroup'), {
+  ssr: false,
+})
+
+const MapMarker = dynamic(() => import('@/components/Map/Marker'), {
+  ssr: false,
+})
+
+export default function MapDashboard() {
+  const [provinces, setProvinces] = useState<Province[]>([])
   const [selectedProvince, setProvince] = useState<Province | null>(null)
   const [regencies, setRegencies] = useState<Regency[]>([])
   const [selectedRegency, setRegency] = useState<Regency | null>(null)
   const [islands, setIslands] = useState<Island[]>([])
   const [loading, setLoading] = useState<boolean>(false)
 
-  const Map = useMemo(() => (
-    dynamic(() => import('@/components/Map'), {
-      loading: () => <p>Loading the map...</p>,
-      ssr: false,
-    })
-  ), [])
+  useEffect(() => {
+    getProvinces().then(setProvinces)
+  }, [])
 
   useEffect(() => {
     if (selectedProvince) {
@@ -70,6 +75,7 @@ export default function MapDashboard({
             setProvince(newValue)
           }}
         />
+
         <Autocomplete
           fullWidth
           size='small'
@@ -111,34 +117,39 @@ export default function MapDashboard({
       <Map
         className='h-[32rem]'
       >
-        <MarkerClusterGroup chunkedLoading>
-          {islands.map((island) => (
-            <MapMarker
-              key={island.code}
-              position={[island.latitude, island.longitude]}
-              title={island.name}
-            >
-              <b className='font-semibold text-blue-700 mb-2 block'>
-                {island.name}
-              </b>
+        {islands.length && (
+          <MarkerClusterGroup
+            chunkedLoading
+            chunkProgress={(progress, total) => setLoading(progress < total)}
+          >
+            {islands.map((island) => (
+              <MapMarker
+                key={island.code}
+                position={[island.latitude, island.longitude]}
+                title={island.name}
+              >
+                <b className='font-semibold text-blue-700 mb-2 block'>
+                  {island.name}
+                </b>
 
-              <span className='text-xs text-gray-500 block'>
-                {island.coordinate}
-              </span>
+                <span className='text-xs text-gray-500 block'>
+                  {island.coordinate}
+                </span>
 
-              {island.isPopulated && (
-                <span className='bg-green-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 me-1 inline-block'>
-                  Populated
-                </span>
-              )}
-              {island.isOutermostSmall && (
-                <span className='bg-red-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 inline-block'>
-                  Outermost Small Island
-                </span>
-              )}
-            </MapMarker>
-          ))}
-        </MarkerClusterGroup>
+                {island.isPopulated && (
+                  <span className='bg-green-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 me-1 inline-block'>
+                    Populated
+                  </span>
+                )}
+                {island.isOutermostSmall && (
+                  <span className='bg-red-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 inline-block'>
+                    Outermost Small Island
+                  </span>
+                )}
+              </MapMarker>
+            ))}
+          </MarkerClusterGroup>
+        )}
       </Map>
     </>
   )

@@ -1,12 +1,7 @@
 import Navbar from '@/components/Navbar'
 import MapDashboard from './components/MapDashboard'
-import { getIslands, getProvinces } from '@/utils/data'
 
-export default async function Home() {
-  const provincesData = getProvinces()
-
-  const [provinces] = await Promise.all([provincesData])
-
+export default function Home() {
   return (
     <>
       <header>
@@ -14,7 +9,7 @@ export default async function Home() {
       </header>
 
       <main>
-        <MapDashboard provinces={provinces} />
+        <MapDashboard />
       </main>
     </>
   )
