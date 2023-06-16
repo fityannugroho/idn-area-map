@@ -3,12 +3,13 @@
 import { Island, Province, Regency, getIslands, getProvinces, getRegencies } from '@/utils/data'
 import Autocomplete from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
+import Skeleton from '@mui/material/Skeleton'
 import TextField from '@mui/material/TextField'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 
 const Map = dynamic(() => import('@/components/Map'), {
-  loading: () => <p>Loading the map...</p>,
+  loading: () => <Skeleton variant='rectangular' animation='wave' width='100%' height='32rem' />,
   ssr: false,
 })
 
