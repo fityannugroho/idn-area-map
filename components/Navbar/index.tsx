@@ -3,6 +3,8 @@
 import { config } from '@/utils/config'
 import AppBar, { AppBarProps } from '@mui/material/AppBar'
 import Container, { ContainerProps } from '@mui/material/Container'
+import IconButton from '@mui/material/IconButton'
+import GitHubIcon from '@mui/icons-material/GitHub'
 import Link from '@mui/material/Link'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
@@ -37,7 +39,7 @@ export default function Navbar({
             href='/'
             sx={{
               mr: 3.2,
-              my: 2.4,
+              my: 1.6,
               display: 'flex',
               alignItems: 'center',
               color: 'inherit',
@@ -46,12 +48,23 @@ export default function Navbar({
             }}
           >
             <Typography
-              variant='h5'
+              variant='h6'
+              component='h1'
               noWrap
             >
               {appName}
             </Typography>
           </Link>
+
+          <IconButton
+            aria-label='GitHub'
+            href='https://github.com/fityannugroho/idn-area-map'
+            target='_blank'
+            rel='noopener noreferrer'
+            color='inherit'
+          >
+            <GitHubIcon />
+          </IconButton>
         </Toolbar>
       </Container>
     </AppBar>
