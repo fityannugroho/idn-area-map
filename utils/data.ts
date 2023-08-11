@@ -23,7 +23,7 @@ export type Island = {
   longitude: number
 }
 
-const baseUrl = 'https://idn-area.up.railway.app'
+const baseUrl = 'https://idn-area.cyclic.app'
 
 export async function getProvinces(): Promise<Province[]> {
   const res = await fetch(`${baseUrl}/provinces?sortBy=name`)
