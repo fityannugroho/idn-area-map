@@ -2,12 +2,13 @@
 
 import { Island, Province, Regency, getIslands, getProvinces, getRegencies } from '@/utils/data'
 import dynamic from 'next/dynamic'
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { Combobox } from './combobox'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from './ui/resizable'
 import { Skeleton } from './ui/skeleton'
 
 const Map = dynamic(() => import('@/components/map'), {
-  loading: () => <Skeleton className='w-full h-[32rem] rounded-none' />,
+  loading: () => <Skeleton className='h-full rounded-none' />,
   ssr: false,
 })
 
@@ -26,6 +27,7 @@ export default function MapDashboard() {
   const [selectedRegency, setRegency] = useState<Regency | null>(null)
   const [islands, setIslands] = useState<Island[]>([])
   const [loading, setLoading] = useState<boolean>(false)
+  const [panelDirection, setPanelDirection] = useState<'horizontal' | 'vertical'>('horizontal')
 
   useEffect(() => {
     getProvinces().then(setProvinces)
@@ -49,9 +51,34 @@ export default function MapDashboard() {
     }
   }, [selectedRegency])
 
+  useLayoutEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setPanelDirection('vertical')
+      } else {
+        setPanelDirection('horizontal')
+      }
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   return (
-    <>
-      <div className='flex px-4 pt-4 pb-2 w-full gap-4 flex-wrap md:flex-nowrap'>
+    <ResizablePanelGroup
+      direction={panelDirection}
+      className='min-h-screen'
+    >
+      <ResizablePanel
+        defaultSize={25}
+        minSize={10}
+        className='h-full p-4 flex flex-col items-center gap-4'
+        style={{
+          overflowY: 'auto',
+        }}
+      >
         <Combobox
           options={provinces}
           label='Select Province'
@@ -79,59 +106,58 @@ export default function MapDashboard() {
           autoClose
           fullWidth
         />
-      </div>
 
-      {/* Islands info */}
-      <div className='flex px-4 py-2 w-full justify-center text-gray-500 md:justify-between gap-3 flex-wrap'>
+        {/* Islands info */}
         {loading ? (
           <span className='text-sm text-gray-500'>
             Loading islands data...
           </span>
         ) : (
-          <span className='text-sm font-semibold text-blue-700 w-fit'>
+          <span className='text-sm font-semibold w-fit'>
             {islands.length} islands found
           </span>
         )}
-      </div>
+      </ResizablePanel>
 
-      {/* Map */}
-      <Map
-        className='h-[32rem] z-0'
-      >
-        {islands.length && (
-          <MarkerClusterGroup
-            chunkedLoading
-            chunkProgress={(progress, total) => setLoading(progress < total)}
-          >
-            {islands.map((island) => (
-              <MapMarker
-                key={island.code}
-                position={[island.latitude, island.longitude]}
-                title={island.name}
-              >
-                <b className='font-semibold text-blue-700 mb-2 block'>
-                  {island.name}
-                </b>
+      <ResizableHandle withHandle />
 
-                <span className='text-xs text-gray-500 block'>
-                  {island.coordinate}
-                </span>
+      <ResizablePanel defaultSize={75}>
+        <Map className='h-full z-0'>
+          {islands.length && (
+            <MarkerClusterGroup
+              chunkedLoading
+              chunkProgress={(progress, total) => setLoading(progress < total)}
+            >
+              {islands.map((island) => (
+                <MapMarker
+                  key={island.code}
+                  position={[island.latitude, island.longitude]}
+                  title={island.name}
+                >
+                  <b className='font-semibold text-blue-700 mb-2 block'>
+                    {island.name}
+                  </b>
 
-                {island.isPopulated && (
-                  <span className='bg-green-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 me-1 inline-block'>
-                    Populated
+                  <span className='text-xs text-gray-500 block'>
+                    {island.coordinate}
                   </span>
-                )}
-                {island.isOutermostSmall && (
-                  <span className='bg-red-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 inline-block'>
-                    Outermost Small Island
-                  </span>
-                )}
-              </MapMarker>
-            ))}
-          </MarkerClusterGroup>
-        )}
-      </Map>
-    </>
+
+                  {island.isPopulated && (
+                    <span className='bg-green-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 me-1 inline-block'>
+                      Populated
+                    </span>
+                  )}
+                  {island.isOutermostSmall && (
+                    <span className='bg-red-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 inline-block'>
+                      Outermost Small Island
+                    </span>
+                  )}
+                </MapMarker>
+              ))}
+            </MarkerClusterGroup>
+          )}
+        </Map>
+      </ResizablePanel>
+    </ResizablePanelGroup>
   )
 }
