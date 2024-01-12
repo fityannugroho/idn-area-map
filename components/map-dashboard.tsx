@@ -1,23 +1,21 @@
 'use client'
 
 import { Island, Province, Regency, getIslands, getProvinces, getRegencies } from '@/utils/data'
-import Autocomplete from '@mui/material/Autocomplete'
-import Box from '@mui/material/Box'
-import Skeleton from '@mui/material/Skeleton'
-import TextField from '@mui/material/TextField'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
+import { Combobox } from './combobox'
+import { Skeleton } from './ui/skeleton'
 
-const Map = dynamic(() => import('@/components/Map'), {
-  loading: () => <Skeleton variant='rectangular' animation='wave' width='100%' height='32rem' />,
+const Map = dynamic(() => import('@/components/map'), {
+  loading: () => <Skeleton className='w-full h-[32rem] rounded-none' />,
   ssr: false,
 })
 
-const MarkerClusterGroup = dynamic(() => import('@/components/Map/MarkerClusterGroup'), {
+const MarkerClusterGroup = dynamic(() => import('@/components/map-marker-cluster-group'), {
   ssr: false,
 })
 
-const MapMarker = dynamic(() => import('@/components/Map/Marker'), {
+const MapMarker = dynamic(() => import('@/components/map-marker'), {
   ssr: false,
 })
 
@@ -53,56 +51,38 @@ export default function MapDashboard() {
 
   return (
     <>
-      <Box className='flex px-4 pt-4 pb-2 w-full gap-4 flex-wrap md:flex-nowrap'>
-        <Autocomplete
-          fullWidth
-          size='small'
+      <div className='flex px-4 pt-4 pb-2 w-full gap-4 flex-wrap md:flex-nowrap'>
+        <Combobox
           options={provinces}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option.code === value.code}
-          renderOption={(props, option) => (
-            <li {...props} key={option.code}>{option.name}</li>
-          )}
-          renderInput={(param) => (
-            <TextField
-              {...param}
-              label='Province'
-              placeholder='Select a province'
-              name='province'
-            />
-          )}
-          value={selectedProvince}
-          onChange={(event, newValue) => {
-            setProvince(newValue)
+          label='Select Province'
+          placeholder='Search Province'
+          onSelect={(province) => {
+            setProvince(province)
           }}
+          isOptionEqualToValue={(opt, val) => opt.code === val.code}
+          getOptionLabel={(opt) => opt.name}
+          width='240px'
+          autoClose
+          fullWidth
         />
 
-        <Autocomplete
-          fullWidth
-          size='small'
+        <Combobox
           options={regencies}
-          getOptionLabel={(option) => option.name}
-          isOptionEqualToValue={(option, value) => option.code === value.code}
-          renderOption={(props, option) => (
-            <li {...props} key={option.code}>{option.name}</li>
-          )}
-          renderInput={(param) => (
-            <TextField
-              label='Regency'
-              placeholder='Select a regency'
-              name='regency'
-              {...param}
-            />
-          )}
-          value={selectedRegency}
-          onChange={(event, newValue) => {
-            setRegency(newValue)
+          label='Select Regency'
+          placeholder='Search Regency'
+          onSelect={(regency) => {
+            setRegency(regency)
           }}
+          isOptionEqualToValue={(opt, val) => opt.code === val.code}
+          getOptionLabel={(opt) => opt.name}
+          width='240px'
+          autoClose
+          fullWidth
         />
-      </Box>
+      </div>
 
       {/* Islands info */}
-      <Box className='flex px-4 py-2 w-full justify-center text-gray-500 md:justify-between gap-3 flex-wrap'>
+      <div className='flex px-4 py-2 w-full justify-center text-gray-500 md:justify-between gap-3 flex-wrap'>
         {loading ? (
           <span className='text-sm text-gray-500'>
             Loading islands data...
@@ -112,11 +92,11 @@ export default function MapDashboard() {
             {islands.length} islands found
           </span>
         )}
-      </Box>
+      </div>
 
       {/* Map */}
       <Map
-        className='h-[32rem]'
+        className='h-[32rem] z-0'
       >
         {islands.length && (
           <MarkerClusterGroup

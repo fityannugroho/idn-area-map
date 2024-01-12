@@ -23,34 +23,34 @@ export type Island = {
   longitude: number
 }
 
-const baseUrl = 'https://idn-area.cyclic.app'
+const baseUrl = 'https://idn-area.up.railway.app'
 
 export async function getProvinces(): Promise<Province[]> {
-  const res = await fetch(`${baseUrl}/provinces?sortBy=name`)
+  const res = await fetch(`${baseUrl}/provinces?sortBy=name&limit=100`)
 
   if (!res.ok) {
     throw new Error('Failed to fetch provinces data')
   }
 
-  return res.json()
+  return (await res.json()).data
 }
 
 export async function getRegencies(provinceCode: string): Promise<Regency[]> {
-  const res = await fetch(`${baseUrl}/provinces/${provinceCode}/regencies?sortBy=name`)
+  const res = await fetch(`${baseUrl}/regencies?provinceCode=${provinceCode}&limit=100&sortBy=name`)
 
   if (!res.ok) {
     throw new Error('Failed to fetch regencies data')
   }
 
-  return res.json()
+  return (await res.json()).data
 }
 
 export async function getIslands(regencyCode: string): Promise<Island[]> {
-  const res = await fetch(`${baseUrl}/regencies/${regencyCode}/islands?sortBy=coordinate`)
+  const res = await fetch(`${baseUrl}/islands?regencyCode=${regencyCode}&limit=100&sortBy=coordinate`)
 
   if (!res.ok) {
     throw new Error('Failed to fetch islands data')
   }
 
-  return res.json()
+  return (await res.json()).data
 }

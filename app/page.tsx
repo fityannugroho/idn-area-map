@@ -1,11 +1,12 @@
-import Navbar from '@/components/Navbar'
-import MapDashboard from './components/MapDashboard'
+
+import { Navbar } from '@/components/navbar'
+import MapDashboard from '../components/map-dashboard'
 
 export default function Home() {
   return (
     <>
       <header>
-        <Navbar position='sticky' maxWidth='xl' />
+        <Navbar />
       </header>
 
       <main>
