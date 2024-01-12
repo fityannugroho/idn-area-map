@@ -1,3 +1,5 @@
+import { config } from './config'
+
 export type Province = {
   id: string
   code: string
@@ -23,7 +25,7 @@ export type Island = {
   longitude: number
 }
 
-const baseUrl = 'https://idn-area.up.railway.app'
+const baseUrl = config.dataSourceUrl
 
 export async function getProvinces(): Promise<Province[]> {
   const res = await fetch(`${baseUrl}/provinces?sortBy=name&limit=100`)
