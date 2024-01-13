@@ -17,7 +17,8 @@ import { cn } from '@/lib/utils'
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import * as React from 'react'
 
-type RequiredProperties<T, K extends keyof T> = Required<Pick<T, K>> & Omit<T, K>;
+type RequiredProperties<T, K extends keyof T> = Required<Pick<T, K>> &
+  Omit<T, K>
 
 type Props<T> = {
   autoClose?: boolean
@@ -61,9 +62,9 @@ type Props<T> = {
   width?: string
 }
 
-export type ComboboxProps<T> = T extends string ? Props<T> : RequiredProperties<
-  Props<T>, 'isOptionEqualToValue' | 'getOptionLabel'
->
+export type ComboboxProps<T> = T extends string
+  ? Props<T>
+  : RequiredProperties<Props<T>, 'isOptionEqualToValue' | 'getOptionLabel'>
 
 export function Combobox<T>({
   autoClose,
@@ -89,10 +90,7 @@ export function Combobox<T>({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn(
-            'justify-between',
-            fullWidth && 'w-full',
-          )}
+          className={cn('justify-between', fullWidth && 'w-full')}
           style={{
             width: fullWidth ? undefined : width,
           }}
@@ -104,10 +102,7 @@ export function Combobox<T>({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className={cn(
-          'p-0',
-          fullWidth && 'w-full',
-        )}
+        className={cn('p-0', fullWidth && 'w-full')}
         style={{
           width: fullWidth ? undefined : width,
         }}
@@ -120,9 +115,7 @@ export function Combobox<T>({
           />
           <CommandEmpty>{emptyMessage}</CommandEmpty>
           <CommandGroup
-            className={cn(
-              'overflow-y-auto',
-            )}
+            className={cn('overflow-y-auto')}
             style={{ maxHeight: maxHeight }}
           >
             {options.map((opt) => (
@@ -141,7 +134,9 @@ export function Combobox<T>({
                 <CheckIcon
                   className={cn(
                     'ml-auto h-4 w-4',
-                    selected && isOptionEqualToValue(selected, opt) ? 'opacity-100' : 'opacity-0'
+                    selected && isOptionEqualToValue(selected, opt)
+                      ? 'opacity-100'
+                      : 'opacity-0',
                   )}
                 />
               </CommandItem>

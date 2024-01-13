@@ -38,7 +38,9 @@ export async function getProvinces(): Promise<Province[]> {
 }
 
 export async function getRegencies(provinceCode: string): Promise<Regency[]> {
-  const res = await fetch(`${baseUrl}/regencies?provinceCode=${provinceCode}&limit=100&sortBy=name`)
+  const res = await fetch(
+    `${baseUrl}/regencies?provinceCode=${provinceCode}&limit=100&sortBy=name`,
+  )
 
   if (!res.ok) {
     throw new Error('Failed to fetch regencies data')
@@ -48,7 +50,9 @@ export async function getRegencies(provinceCode: string): Promise<Regency[]> {
 }
 
 export async function getIslands(regencyCode: string): Promise<Island[]> {
-  const res = await fetch(`${baseUrl}/islands?regencyCode=${regencyCode}&limit=100&sortBy=coordinate`)
+  const res = await fetch(
+    `${baseUrl}/islands?regencyCode=${regencyCode}&limit=100&sortBy=coordinate`,
+  )
 
   if (!res.ok) {
     throw new Error('Failed to fetch islands data')

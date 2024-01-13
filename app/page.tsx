@@ -1,4 +1,3 @@
-
 import { Navbar } from '@/components/navbar'
 import MapDashboard from '../components/map-dashboard'
 

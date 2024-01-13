@@ -22,16 +22,16 @@ export default function RootLayout({
 }) {
   return (
     <StrictMode>
-      <html lang='en' suppressHydrationWarning>
+      <html lang="en" suppressHydrationWarning>
         <body
           className={cn(
             'min-h-screen bg-background font-sans antialiased',
-            inter.variable
+            inter.variable,
           )}
         >
           <ThemeProvider
-            attribute='class'
-            defaultTheme='system'
+            attribute="class"
+            defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >

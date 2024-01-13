@@ -1,11 +1,4 @@
 {
-  "extends": [
-    "next/core-web-vitals"
-  ],
-  "rules": {
-    "semi": ["error", "never"],
-    "quotes": ["error", "single", { "avoidEscape": true }],
-    "operator-linebreak": ["error", "before"],
-    "comma-dangle": ["error", "always-multiline"]
-  }
+  "extends": ["next/core-web-vitals", "prettier"],
+  "rules": {}
 }

@@ -22,7 +22,7 @@ export default function Map({
     >
       <TileLayer
         attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {children}
     </MapContainer>

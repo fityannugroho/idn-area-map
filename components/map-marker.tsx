@@ -28,9 +28,7 @@ export default function MapMarker({
       })}
       {...markerProps}
     >
-      {children && (
-        <Popup {...PopupProps}>{children}</Popup>
-      )}
+      {children && <Popup {...PopupProps}>{children}</Popup>}
     </Marker>
   )
 }
