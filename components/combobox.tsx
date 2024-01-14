@@ -33,6 +33,14 @@ type Props<T> = {
    */
   fullWidth?: boolean
   /**
+   * Set the key of the option.
+   *
+   * The returned value must be unique.
+   *
+   * @default (option) => option
+   */
+  getOptionKey?: (option: T) => string
+  /**
    * Set the label of the option.
    *
    * @default (option) => option
@@ -60,6 +68,10 @@ type Props<T> = {
    * Provide the width with the unit, e.g. `240px`, `2rem`, etc.
    */
   width?: string
+  /**
+   * Set the value of the combobox.
+   */
+  value?: T | null
 }
 
 export type ComboboxProps<T> = T extends string
@@ -71,6 +83,7 @@ export function Combobox<T>({
   options,
   emptyMessage = 'Nothing found',
   fullWidth,
+  getOptionKey = (option) => option,
   getOptionLabel = (option) => option,
   maxHeight = '240px',
   isOptionEqualToValue = (option, value) => option === value,
@@ -79,9 +92,9 @@ export function Combobox<T>({
   placeholder,
   inputProps,
   width,
+  value,
 }: ComboboxProps<T>) {
   const [open, setOpen] = React.useState(false)
-  const [selected, setSelected] = React.useState<T>()
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -96,7 +109,7 @@ export function Combobox<T>({
           }}
         >
           <span className="truncate">
-            {selected ? getOptionLabel(selected) : label}
+            {value ? getOptionLabel(value) : label}
           </span>
           <CaretSortIcon className="ml-1 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -120,10 +133,9 @@ export function Combobox<T>({
           >
             {options.map((opt) => (
               <CommandItem
-                key={getOptionLabel(opt)}
+                key={getOptionKey(opt)}
                 value={getOptionLabel(opt)}
                 onSelect={() => {
-                  setSelected(opt)
                   if (autoClose) {
                     setOpen(false)
                   }
@@ -134,7 +146,7 @@ export function Combobox<T>({
                 <CheckIcon
                   className={cn(
                     'ml-auto h-4 w-4',
-                    selected && isOptionEqualToValue(selected, opt)
+                    value && isOptionEqualToValue(value, opt)
                       ? 'opacity-100'
                       : 'opacity-0',
                   )}

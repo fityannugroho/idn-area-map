@@ -1,62 +1,128 @@
 import { config } from './config'
 
 export type Province = {
-  id: string
   code: string
   name: string
 }
 
 export type Regency = {
-  id: string
   code: string
   name: string
   provinceCode: string
 }
 
-export type Island = {
-  id: string
+export type District = {
   code: string
   name: string
   regencyCode: string
+}
+
+export type Village = {
+  code: string
+  districtCode: string
+  name: string
+}
+
+export type Island = {
+  code: string
   coordinate: string
-  isPopulated: boolean
   isOutermostSmall: boolean
+  isPopulated: boolean
   latitude: number
   longitude: number
+  name: string
+  regencyCode: string | null
 }
+
+export type Areas =
+  | 'provinces'
+  | 'regencies'
+  | 'districts'
+  | 'villages'
+  | 'islands'
+
+export type GetArea<Area> = Area extends 'provinces'
+  ? Province
+  : Area extends 'regencies'
+    ? Regency
+    : Area extends 'islands'
+      ? Island
+      : Area extends 'districts'
+        ? District
+        : Area extends 'villages'
+          ? Village
+          : never
+
+export type Query<Area extends Areas> = {
+  limit?: number
+  name?: string
+  page?: number
+  parentCode?: Area extends 'provinces' ? never : string
+  sortBy?: keyof GetArea<Area>
+}
+
+const parentCodeQueryKey = {
+  regencies: 'provinceCode',
+  islands: 'regencyCode',
+  districts: 'regencyCode',
+  villages: 'districtCode',
+} as const
 
 const baseUrl = config.dataSourceUrl
 
-export async function getProvinces(): Promise<Province[]> {
-  const res = await fetch(`${baseUrl}/provinces?sortBy=name&limit=100`)
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch provinces data')
+type GetDataReturn<Area extends Areas> = {
+  statusCode: number
+  message: string
+  data: GetArea<Area>[]
+  meta: {
+    total: number
+    pagination: {
+      total: number
+      pages: {
+        first: number
+        last: number
+        current: number
+        previous: number | null
+        next: number | null
+      }
+    }
   }
-
-  return (await res.json()).data
 }
 
-export async function getRegencies(provinceCode: string): Promise<Regency[]> {
-  const res = await fetch(
-    `${baseUrl}/regencies?provinceCode=${provinceCode}&limit=100&sortBy=name`,
-  )
+export async function getData<Area extends Areas>(
+  area: Area,
+  query?: Query<Area>,
+): Promise<GetDataReturn<Area>> {
+  const url = new URL(`${baseUrl}/${area}`)
 
-  if (!res.ok) {
-    throw new Error('Failed to fetch regencies data')
+  if (query?.parentCode && area !== 'provinces') {
+    url.searchParams.append(
+      parentCodeQueryKey[area as Exclude<Areas, 'provinces'>],
+      query.parentCode,
+    )
   }
 
-  return (await res.json()).data
-}
-
-export async function getIslands(regencyCode: string): Promise<Island[]> {
-  const res = await fetch(
-    `${baseUrl}/islands?regencyCode=${regencyCode}&limit=100&sortBy=coordinate`,
-  )
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch islands data')
+  if (query?.name) {
+    url.searchParams.append('name', query.name)
   }
 
-  return (await res.json()).data
+  if (query?.sortBy) {
+    url.searchParams.append('sortBy', query.sortBy as string)
+  }
+
+  if (query?.limit) {
+    url.searchParams.append('limit', query.limit.toString())
+  }
+
+  if (query?.page) {
+    url.searchParams.append('page', query.page.toString())
+  }
+
+  const res = await fetch(url)
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${area} data`)
+  }
+
+  return await res.json()
 }

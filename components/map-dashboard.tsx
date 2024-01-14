@@ -1,12 +1,14 @@
 'use client'
 
 import {
+  Areas,
+  District,
   Island,
   Province,
+  Query,
   Regency,
-  getIslands,
-  getProvinces,
-  getRegencies,
+  Village,
+  getData,
 } from '@/utils/data'
 import dynamic from 'next/dynamic'
 import { useEffect, useLayoutEffect, useState } from 'react'
@@ -17,6 +19,8 @@ import {
   ResizablePanelGroup,
 } from './ui/resizable'
 import { Skeleton } from './ui/skeleton'
+import { Button } from './ui/button'
+import { Cross2Icon, ReloadIcon } from '@radix-ui/react-icons'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -34,39 +38,105 @@ const MapMarker = dynamic(() => import('@/components/map-marker'), {
   ssr: false,
 })
 
+type Selected = {
+  province?: Province
+  regency?: Regency
+  district?: District
+  village?: Village
+}
+
 export default function MapDashboard() {
   const [provinces, setProvinces] = useState<Province[]>([])
-  const [selectedProvince, setProvince] = useState<Province | null>(null)
   const [regencies, setRegencies] = useState<Regency[]>([])
-  const [selectedRegency, setRegency] = useState<Regency | null>(null)
   const [islands, setIslands] = useState<Island[]>([])
-  const [loading, setLoading] = useState<boolean>(false)
+  const [districts, setDistricts] = useState<District[]>([])
+  const [villages, setVillages] = useState<Village[]>([])
+  const [selected, setSelected] = useState<Selected>()
+  const [query, setQuery] = useState<{ [A in Areas]?: Query<A> }>()
+  const [loadingIslands, setLoadingIslands] = useState<boolean>(false)
   const [panelDirection, setPanelDirection] = useState<
     'horizontal' | 'vertical'
   >('horizontal')
 
+  // Province data
   useEffect(() => {
-    getProvinces().then(setProvinces)
-  }, [])
-
-  useEffect(() => {
-    if (selectedProvince) {
-      getRegencies(selectedProvince.code).then(setRegencies)
-    } else {
-      setRegencies([])
+    if (!provinces.length) {
+      getData('provinces', { sortBy: 'name', limit: 100 })
+        .then((res) => {
+          setProvinces(res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     }
-  }, [selectedProvince])
+  }, [provinces.length, query?.provinces])
 
+  // Regency data
   useEffect(() => {
-    if (selectedRegency) {
-      setLoading(true)
-      getIslands(selectedRegency.code)
-        .then(setIslands)
-        .finally(() => setLoading(false))
-    } else {
-      setIslands([])
+    if (!regencies.length || query?.regencies) {
+      getData('regencies', { ...query?.regencies, sortBy: 'name' })
+        .then((res) => {
+          setRegencies(res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     }
-  }, [selectedRegency])
+  }, [regencies.length, query?.regencies])
+
+  // District data
+  useEffect(() => {
+    if (!districts.length || query?.districts) {
+      getData('districts', { ...query?.districts, sortBy: 'name' })
+        .then((res) => {
+          setDistricts(res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+  }, [districts.length, query?.districts])
+
+  // Village data
+  useEffect(() => {
+    if (!villages.length || query?.villages) {
+      getData('villages', { ...query?.villages, sortBy: 'name' })
+        .then((res) => {
+          setVillages(res.data)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+  }, [villages.length, query?.villages])
+
+  // Island data
+  useEffect(() => {
+    async function fetchIslandsRecursively(page = 1, limit = 100) {
+      setLoadingIslands(true)
+
+      const res = await getData('islands', {
+        ...query?.islands,
+        page,
+        limit,
+      })
+
+      setIslands((current) => [...current, ...res.data])
+
+      if (res.meta.pagination.pages.next) {
+        await fetchIslandsRecursively(page + 1)
+        return
+      }
+
+      setLoadingIslands(false)
+    }
+
+    setIslands([])
+
+    if (query?.islands?.parentCode) {
+      fetchIslandsRecursively()
+    }
+  }, [query?.islands])
 
   useLayoutEffect(() => {
     const handleResize = () => {
@@ -95,40 +165,144 @@ export default function MapDashboard() {
       >
         <Combobox
           options={provinces}
-          label="Select Province"
+          label="Province"
           placeholder="Search Province"
+          value={selected?.province}
           onSelect={(province) => {
-            setProvince(province)
+            setSelected((current) => ({ ...current, province }))
+            if (province.code === query?.regencies?.parentCode) return
+            setQuery((current) => ({
+              ...current,
+              regencies: { parentCode: province.code },
+            }))
           }}
           isOptionEqualToValue={(opt, val) => opt.code === val.code}
+          getOptionKey={(opt) => opt.code}
           getOptionLabel={(opt) => opt.name}
-          width="240px"
           autoClose
           fullWidth
         />
 
         <Combobox
           options={regencies}
-          label="Select Regency"
+          label="Regency"
           placeholder="Search Regency"
+          value={selected?.regency}
           onSelect={(regency) => {
-            setRegency(regency)
+            setSelected((current) => ({ ...current, regency }))
+            if (regency.code === query?.districts?.parentCode) return
+            setQuery((current) => ({
+              ...current,
+              islands: { parentCode: regency.code },
+              districts: { parentCode: regency.code },
+            }))
+          }}
+          inputProps={{
+            onValueChange: (name) => {
+              if (name.length < 3) return
+              setQuery((current) => ({
+                ...current,
+                regencies: { ...current?.regencies, name },
+              }))
+            },
           }}
           isOptionEqualToValue={(opt, val) => opt.code === val.code}
+          getOptionKey={(opt) => opt.code}
           getOptionLabel={(opt) => opt.name}
-          width="240px"
           autoClose
           fullWidth
         />
 
+        <Combobox
+          options={districts}
+          label="District"
+          placeholder="Search District"
+          value={selected?.district}
+          onSelect={(district) => {
+            setSelected((current) => ({ ...current, district }))
+            if (district.code === query?.villages?.parentCode) return
+            setQuery((current) => ({
+              ...current,
+              villages: { parentCode: district.code },
+            }))
+          }}
+          inputProps={{
+            onValueChange: (name) => {
+              if (name.length < 3) return
+              setQuery((current) => ({
+                ...current,
+                districts: { ...current?.districts, name },
+              }))
+            },
+          }}
+          isOptionEqualToValue={(opt, val) => opt.code === val.code}
+          getOptionKey={(opt) => opt.code}
+          getOptionLabel={(opt) => opt.name}
+          autoClose
+          fullWidth
+        />
+
+        <Combobox
+          options={villages}
+          label="Village"
+          placeholder="Search village"
+          value={selected?.village}
+          onSelect={(village) => {
+            setSelected((current) => ({ ...current, village }))
+          }}
+          inputProps={{
+            onValueChange: (name) => {
+              if (name.length < 3) return
+              setQuery((current) => ({
+                ...current,
+                villages: { ...current?.villages, name },
+              }))
+            },
+          }}
+          isOptionEqualToValue={(opt, val) => opt.code === val.code}
+          getOptionKey={(opt) => opt.code}
+          getOptionLabel={(opt) => opt.name}
+          autoClose
+          fullWidth
+        />
+
+        <hr className="w-full " />
+
         {/* Islands info */}
-        {loading ? (
-          <span className="text-sm text-gray-500">Loading islands data...</span>
-        ) : (
-          <span className="text-sm font-semibold w-fit">
-            {islands.length} islands found
-          </span>
-        )}
+        <div className="w-full p-2 border rounded flex gap-2 justify-center items-center">
+          {query?.islands?.parentCode ? (
+            <>
+              {loadingIslands && (
+                <ReloadIcon className="h-4 w-4 animate-spin" />
+              )}
+              <span className="text-sm w-fit">
+                {islands.length} islands found
+              </span>
+            </>
+          ) : (
+            <span className="text-sm w-fit text-gray-500">
+              Select a regency to see islands
+            </span>
+          )}
+        </div>
+
+        <hr className="w-full " />
+
+        <Button
+          variant="outline"
+          className="mt-auto items-center gap-1"
+          onClick={() => {
+            setQuery(undefined)
+            setSelected(undefined)
+            setRegencies([])
+            setDistricts([])
+            setVillages([])
+            setIslands([])
+          }}
+        >
+          <Cross2Icon className="h-4 w-4" />
+          Clear All Data
+        </Button>
       </ResizablePanel>
 
       <ResizableHandle withHandle />
@@ -138,7 +312,9 @@ export default function MapDashboard() {
           {islands.length && (
             <MarkerClusterGroup
               chunkedLoading
-              chunkProgress={(progress, total) => setLoading(progress < total)}
+              chunkProgress={(progress, total) =>
+                setLoadingIslands(progress < total)
+              }
             >
               {islands.map((island) => (
                 <MapMarker
