@@ -1,4 +1,6 @@
-import { config } from './config'
+'use server'
+
+import { config } from '../utils/config'
 
 export type Province = {
   code: string

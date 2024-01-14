@@ -9,7 +9,7 @@ import {
   Regency,
   Village,
   getData,
-} from '@/utils/data'
+} from '@/lib/data'
 import dynamic from 'next/dynamic'
 import { useEffect, useLayoutEffect, useState } from 'react'
 import { Combobox } from './combobox'
