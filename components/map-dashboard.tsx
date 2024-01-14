@@ -60,55 +60,47 @@ export default function MapDashboard() {
 
   // Province data
   useEffect(() => {
-    if (!provinces.length) {
-      getData('provinces', { sortBy: 'name', limit: 100 })
-        .then((res) => {
-          setProvinces(res.data)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    }
-  }, [provinces.length, query?.provinces])
+    getData('provinces', { sortBy: 'name', limit: 100 })
+      .then((res) => {
+        setProvinces(res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }, [])
 
   // Regency data
   useEffect(() => {
-    if (!regencies.length || query?.regencies) {
-      getData('regencies', { ...query?.regencies, sortBy: 'name' })
-        .then((res) => {
-          setRegencies(res.data)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    }
-  }, [regencies.length, query?.regencies])
+    getData('regencies', { ...query?.regencies, sortBy: 'name' })
+      .then((res) => {
+        setRegencies(res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }, [query?.regencies])
 
   // District data
   useEffect(() => {
-    if (!districts.length || query?.districts) {
-      getData('districts', { ...query?.districts, sortBy: 'name' })
-        .then((res) => {
-          setDistricts(res.data)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    }
-  }, [districts.length, query?.districts])
+    getData('districts', { ...query?.districts, sortBy: 'name' })
+      .then((res) => {
+        setDistricts(res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }, [query?.districts])
 
   // Village data
   useEffect(() => {
-    if (!villages.length || query?.villages) {
-      getData('villages', { ...query?.villages, sortBy: 'name' })
-        .then((res) => {
-          setVillages(res.data)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    }
-  }, [villages.length, query?.villages])
+    getData('villages', { ...query?.villages, sortBy: 'name' })
+      .then((res) => {
+        setVillages(res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }, [query?.villages])
 
   // Island data
   useEffect(() => {
