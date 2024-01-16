@@ -12,7 +12,7 @@ import {
 } from '@/lib/data'
 import dynamic from 'next/dynamic'
 import { useEffect, useLayoutEffect, useState } from 'react'
-import { Combobox } from './combobox'
+import { Combobox, ComboboxProps } from './combobox'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -43,6 +43,23 @@ type Selected = {
   regency?: Regency
   district?: District
   village?: Village
+}
+
+function ComboboxArea<T extends { code: string; name: string }>(
+  props: Omit<
+    ComboboxProps<T>,
+    'autoClose' | 'fullWidth' | 'optionKey' | 'getOptionLabel'
+  >,
+) {
+  return (
+    <Combobox
+      {...(props as ComboboxProps<T>)}
+      optionKey="cod"
+      getOptionLabel={(opt) => opt}
+      autoClose
+      fullWidth
+    />
+  )
 }
 
 export default function MapDashboard() {
@@ -155,7 +172,7 @@ export default function MapDashboard() {
           overflowY: 'auto',
         }}
       >
-        <Combobox
+        <ComboboxArea
           options={provinces}
           label="Province"
           placeholder="Search Province"
@@ -168,14 +185,9 @@ export default function MapDashboard() {
               regencies: { parentCode: province.code },
             }))
           }}
-          isOptionEqualToValue={(opt, val) => opt.code === val.code}
-          getOptionKey={(opt) => opt.code}
-          getOptionLabel={(opt) => opt.name}
-          autoClose
-          fullWidth
         />
 
-        <Combobox
+        <ComboboxArea
           options={regencies}
           label="Regency"
           placeholder="Search Regency"
@@ -198,14 +210,9 @@ export default function MapDashboard() {
               }))
             },
           }}
-          isOptionEqualToValue={(opt, val) => opt.code === val.code}
-          getOptionKey={(opt) => opt.code}
-          getOptionLabel={(opt) => opt.name}
-          autoClose
-          fullWidth
         />
 
-        <Combobox
+        <ComboboxArea
           options={districts}
           label="District"
           placeholder="Search District"
@@ -227,14 +234,9 @@ export default function MapDashboard() {
               }))
             },
           }}
-          isOptionEqualToValue={(opt, val) => opt.code === val.code}
-          getOptionKey={(opt) => opt.code}
-          getOptionLabel={(opt) => opt.name}
-          autoClose
-          fullWidth
         />
 
-        <Combobox
+        <ComboboxArea
           options={villages}
           label="Village"
           placeholder="Search village"
@@ -251,11 +253,6 @@ export default function MapDashboard() {
               }))
             },
           }}
-          isOptionEqualToValue={(opt, val) => opt.code === val.code}
-          getOptionKey={(opt) => opt.code}
-          getOptionLabel={(opt) => opt.name}
-          autoClose
-          fullWidth
         />
 
         <hr className="w-full " />

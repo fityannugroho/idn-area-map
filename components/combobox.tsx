@@ -17,10 +17,9 @@ import { cn } from '@/lib/utils'
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import * as React from 'react'
 
-type RequiredProperties<T, K extends keyof T> = Required<Pick<T, K>> &
-  Omit<T, K>
+type Option = Record<keyof any, unknown> | string
 
-type Props<T> = {
+export type ComboboxProps<T extends Option> = {
   autoClose?: boolean
   options: readonly T[]
   emptyMessage?: string
@@ -33,31 +32,11 @@ type Props<T> = {
    */
   fullWidth?: boolean
   /**
-   * Set the key of the option.
-   *
-   * The returned value must be unique.
-   *
-   * @default (option) => option
-   */
-  getOptionKey?: (option: T) => string
-  /**
-   * Set the label of the option.
-   *
-   * @default (option) => option
-   */
-  getOptionLabel?: (option: T) => string
-  /**
    * Set the max height of the combobox.
    *
    * @default '240px'
    */
   maxHeight?: string
-  /**
-   * Used to determine if the option is equal to the value. Uses strict equality by default.
-   *
-   * @default (option, value) => option === value
-   */
-  isOptionEqualToValue?: (option: T, value: T) => boolean
   label?: string
   onSelect?: (option: T) => void
   placeholder?: string
@@ -72,21 +51,29 @@ type Props<T> = {
    * Set the value of the combobox.
    */
   value?: T | null
-}
+} & (T extends string
+  ? {}
+  : {
+      /**
+       * Set the key of the option.
+       */
+      optionKey: keyof T
+      /**
+       * Set the label of the option.
+       */
+      getOptionLabel: (option: T) => string
+    })
 
-export type ComboboxProps<T> = T extends string
-  ? Props<T>
-  : RequiredProperties<Props<T>, 'isOptionEqualToValue' | 'getOptionLabel'>
-
-export function Combobox<T>({
+export function Combobox<T extends Option>({
   autoClose,
   options,
   emptyMessage = 'Nothing found',
   fullWidth,
-  getOptionKey = (option) => option,
-  getOptionLabel = (option) => option,
+  // @ts-ignore
+  optionKey,
+  // @ts-ignore
+  getOptionLabel,
   maxHeight = '240px',
-  isOptionEqualToValue = (option, value) => option === value,
   label = 'Select',
   onSelect,
   placeholder,
@@ -109,7 +96,11 @@ export function Combobox<T>({
           }}
         >
           <span className="truncate">
-            {value ? getOptionLabel(value) : label}
+            {value
+              ? typeof value === 'string'
+                ? value
+                : getOptionLabel(value)
+              : label}
           </span>
           <CaretSortIcon className="ml-1 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -133,8 +124,12 @@ export function Combobox<T>({
           >
             {options.map((opt) => (
               <CommandItem
-                key={getOptionKey(opt)}
-                value={getOptionLabel(opt)}
+                key={typeof opt === 'string' ? opt : `${opt[optionKey]}`}
+                value={
+                  typeof opt === 'string'
+                    ? opt
+                    : `${opt[optionKey]}_${getOptionLabel(opt)}`
+                }
                 onSelect={() => {
                   if (autoClose) {
                     setOpen(false)
@@ -142,11 +137,14 @@ export function Combobox<T>({
                   onSelect?.(opt)
                 }}
               >
-                {getOptionLabel(opt)}
+                {typeof opt === 'string' ? opt : getOptionLabel(opt)}
                 <CheckIcon
                   className={cn(
                     'ml-auto h-4 w-4',
-                    value && isOptionEqualToValue(value, opt)
+                    value &&
+                      (typeof value === 'string'
+                        ? value === opt
+                        : value[optionKey] === opt[optionKey])
                       ? 'opacity-100'
                       : 'opacity-0',
                   )}
