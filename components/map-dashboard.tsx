@@ -54,8 +54,8 @@ function ComboboxArea<T extends { code: string; name: string }>(
   return (
     <Combobox
       {...(props as ComboboxProps<T>)}
-      optionKey="cod"
-      getOptionLabel={(opt) => opt}
+      optionKey="code"
+      getOptionLabel={(opt) => opt.name}
       autoClose
       fullWidth
     />
