@@ -1,9 +1,9 @@
-import { config } from '@/utils/config'
+import { ThemeProvider } from '@/components/theme-provider'
+import { config } from '@/lib/config'
+import { cn } from '@/lib/utils'
 import { Inter } from 'next/font/google'
 import { StrictMode } from 'react'
 import './globals.css'
-import { cn } from '@/lib/utils'
-import { ThemeProvider } from '@/components/theme-provider'
 
 const inter = Inter({
   subsets: ['latin'],

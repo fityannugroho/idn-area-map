@@ -1,12 +1,12 @@
 'use client'
 
+import { config } from '@/lib/config'
 import { cn } from '@/lib/utils'
-import { config } from '@/utils/config'
+import { GitHubLogoIcon } from '@radix-ui/react-icons'
 import Link from 'next/link'
 import * as React from 'react'
 import { ThemeToggle } from './theme-toggle'
 import { Button } from './ui/button'
-import { GitHubLogoIcon } from '@radix-ui/react-icons'
 
 export type NavbarProps = {
   className?: string

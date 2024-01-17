@@ -163,7 +163,10 @@ export default function MapDashboard() {
   }, [])
 
   return (
-    <ResizablePanelGroup direction={panelDirection} className="min-h-screen">
+    <ResizablePanelGroup
+      direction={panelDirection}
+      className="min-h-[calc(100vh-3.875rem)]"
+    >
       <ResizablePanel
         defaultSize={25}
         minSize={10}
