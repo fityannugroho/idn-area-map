@@ -20,7 +20,8 @@ import {
 } from './ui/resizable'
 import { Skeleton } from './ui/skeleton'
 import { Button } from './ui/button'
-import { Cross2Icon, ReloadIcon } from '@radix-ui/react-icons'
+import { Cross2Icon, ExternalLinkIcon, ReloadIcon } from '@radix-ui/react-icons'
+import Link from 'next/link'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -314,24 +315,41 @@ export default function MapDashboard() {
                   position={[island.latitude, island.longitude]}
                   title={island.name}
                 >
-                  <b className="font-semibold text-blue-700 mb-2 block">
-                    {island.name}
-                  </b>
+                  <div className="flex flex-col gap-2">
+                    <b className="font-bold block text-primary">
+                      {island.name}
+                    </b>
 
-                  <span className="text-xs text-gray-500 block">
-                    {island.coordinate}
-                  </span>
+                    <span className="text-xs text-gray-500 block">
+                      {island.coordinate}
+                    </span>
 
-                  {island.isPopulated && (
-                    <span className="bg-green-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 me-1 inline-block">
-                      Populated
-                    </span>
-                  )}
-                  {island.isOutermostSmall && (
-                    <span className="bg-red-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 inline-block">
-                      Outermost Small Island
-                    </span>
-                  )}
+                    <Link
+                      href={`https://www.google.com/maps/search/${island.coordinate}`}
+                      passHref
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs inline-flex items-center gap-1"
+                    >
+                      <ExternalLinkIcon className="h-4 w-4" />
+                      See on Google Maps
+                    </Link>
+
+                    {(island.isPopulated || island.isOutermostSmall) && (
+                      <div className="flex gap-1 mt-1">
+                        {island.isPopulated && (
+                          <span className="bg-green-500 text-white font-medium rounded-full px-2 py-1">
+                            Populated
+                          </span>
+                        )}
+                        {island.isOutermostSmall && (
+                          <span className="bg-red-500 text-white font-medium rounded-full px-2 py-1">
+                            Outermost Small Island
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </MapMarker>
               ))}
             </MarkerClusterGroup>
