@@ -23,6 +23,7 @@ import {
   ResizablePanelGroup,
 } from './ui/resizable'
 import { Skeleton } from './ui/skeleton'
+import { debounce } from '@/lib/utils'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -209,14 +210,14 @@ export default function MapDashboard() {
             }))
           }}
           inputProps={{
-            onValueChange: (name) => {
+            onValueChange: debounce((name) => {
               if (!selected?.province) {
                 setQuery((current) => ({
                   ...current,
                   regencies: { ...current?.regencies, name },
                 }))
               }
-            },
+            }, 500),
           }}
         />
 
@@ -234,14 +235,14 @@ export default function MapDashboard() {
             }))
           }}
           inputProps={{
-            onValueChange: (name) => {
+            onValueChange: debounce((name) => {
               if (!selected?.regency) {
                 setQuery((current) => ({
                   ...current,
                   districts: { ...current?.districts, name },
                 }))
               }
-            },
+            }, 500),
           }}
         />
 
@@ -254,14 +255,14 @@ export default function MapDashboard() {
             setSelected((current) => ({ ...current, village }))
           }}
           inputProps={{
-            onValueChange: (name) => {
+            onValueChange: debounce((name) => {
               if (!selected?.district) {
                 setQuery((current) => ({
                   ...current,
                   villages: { ...current?.villages, name },
                 }))
               }
-            },
+            }, 500),
           }}
         />
 
