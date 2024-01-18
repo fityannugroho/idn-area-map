@@ -8,7 +8,7 @@ export type MapProps = MapContainerProps & PropsWithChildren
 
 export default function Map({
   center = [-3.028137, 119.764063],
-  className = 'w-full h-96',
+  className = 'w-full h-full',
   zoom = 5,
   children,
   ...mapProps
@@ -23,6 +23,7 @@ export default function Map({
       <TileLayer
         attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        className="dark:hue-rotate-180 dark:invert dark:contrast-[.90] dark:brightness-90"
       />
       {children}
     </MapContainer>
