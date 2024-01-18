@@ -293,9 +293,6 @@ export default function MapDashboard() {
           onClick={() => {
             setQuery(undefined)
             setSelected(undefined)
-            setRegencies([])
-            setDistricts([])
-            setVillages([])
             setIslands([])
           }}
         >
