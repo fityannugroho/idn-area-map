@@ -1,5 +1,6 @@
 'use client'
 
+import { config } from '@/lib/config'
 import {
   Areas,
   District,
@@ -10,17 +11,18 @@ import {
   Village,
   getData,
 } from '@/lib/data'
+import { Cross2Icon, ExternalLinkIcon, ReloadIcon } from '@radix-ui/react-icons'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { useEffect, useLayoutEffect, useState } from 'react'
 import { Combobox, ComboboxProps } from './combobox'
+import { Button } from './ui/button'
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from './ui/resizable'
 import { Skeleton } from './ui/skeleton'
-import { Button } from './ui/button'
-import { Cross2Icon, ReloadIcon } from '@radix-ui/react-icons'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -62,6 +64,8 @@ function ComboboxArea<T extends { code: string; name: string }>(
   )
 }
 
+const MAX_PAGE_SIZE = config.dataSource.pagination.maxPageSize
+
 export default function MapDashboard() {
   const [provinces, setProvinces] = useState<Province[]>([])
   const [regencies, setRegencies] = useState<Regency[]>([])
@@ -77,7 +81,7 @@ export default function MapDashboard() {
 
   // Province data
   useEffect(() => {
-    getData('provinces', { sortBy: 'name', limit: 100 })
+    getData('provinces', { sortBy: 'name', limit: MAX_PAGE_SIZE })
       .then((res) => {
         setProvinces(res.data)
       })
@@ -121,7 +125,7 @@ export default function MapDashboard() {
 
   // Island data
   useEffect(() => {
-    async function fetchIslandsRecursively(page = 1, limit = 100) {
+    async function fetchIslandsRecursively(page = 1, limit = MAX_PAGE_SIZE) {
       setLoadingIslands(true)
 
       const res = await getData('islands', {
@@ -185,7 +189,7 @@ export default function MapDashboard() {
             if (province.code === query?.regencies?.parentCode) return
             setQuery((current) => ({
               ...current,
-              regencies: { parentCode: province.code },
+              regencies: { parentCode: province.code, limit: MAX_PAGE_SIZE },
             }))
           }}
         />
@@ -200,17 +204,18 @@ export default function MapDashboard() {
             if (regency.code === query?.districts?.parentCode) return
             setQuery((current) => ({
               ...current,
-              islands: { parentCode: regency.code },
-              districts: { parentCode: regency.code },
+              islands: { parentCode: regency.code, limit: MAX_PAGE_SIZE },
+              districts: { parentCode: regency.code, limit: MAX_PAGE_SIZE },
             }))
           }}
           inputProps={{
             onValueChange: (name) => {
-              if (name.length < 3) return
-              setQuery((current) => ({
-                ...current,
-                regencies: { ...current?.regencies, name },
-              }))
+              if (!selected?.province) {
+                setQuery((current) => ({
+                  ...current,
+                  regencies: { ...current?.regencies, name },
+                }))
+              }
             },
           }}
         />
@@ -225,16 +230,17 @@ export default function MapDashboard() {
             if (district.code === query?.villages?.parentCode) return
             setQuery((current) => ({
               ...current,
-              villages: { parentCode: district.code },
+              villages: { parentCode: district.code, limit: MAX_PAGE_SIZE },
             }))
           }}
           inputProps={{
             onValueChange: (name) => {
-              if (name.length < 3) return
-              setQuery((current) => ({
-                ...current,
-                districts: { ...current?.districts, name },
-              }))
+              if (!selected?.regency) {
+                setQuery((current) => ({
+                  ...current,
+                  districts: { ...current?.districts, name },
+                }))
+              }
             },
           }}
         />
@@ -249,11 +255,12 @@ export default function MapDashboard() {
           }}
           inputProps={{
             onValueChange: (name) => {
-              if (name.length < 3) return
-              setQuery((current) => ({
-                ...current,
-                villages: { ...current?.villages, name },
-              }))
+              if (!selected?.district) {
+                setQuery((current) => ({
+                  ...current,
+                  villages: { ...current?.villages, name },
+                }))
+              }
             },
           }}
         />
@@ -286,9 +293,6 @@ export default function MapDashboard() {
           onClick={() => {
             setQuery(undefined)
             setSelected(undefined)
-            setRegencies([])
-            setDistricts([])
-            setVillages([])
             setIslands([])
           }}
         >
@@ -314,24 +318,41 @@ export default function MapDashboard() {
                   position={[island.latitude, island.longitude]}
                   title={island.name}
                 >
-                  <b className="font-semibold text-blue-700 mb-2 block">
-                    {island.name}
-                  </b>
+                  <div className="flex flex-col gap-2">
+                    <b className="font-bold block text-primary">
+                      {island.name}
+                    </b>
 
-                  <span className="text-xs text-gray-500 block">
-                    {island.coordinate}
-                  </span>
+                    <span className="text-xs text-gray-500 block">
+                      {island.coordinate}
+                    </span>
 
-                  {island.isPopulated && (
-                    <span className="bg-green-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 me-1 inline-block">
-                      Populated
-                    </span>
-                  )}
-                  {island.isOutermostSmall && (
-                    <span className="bg-red-500 text-white font-semibold text-xs rounded-full px-2 py-1 mt-2 inline-block">
-                      Outermost Small Island
-                    </span>
-                  )}
+                    <Link
+                      href={`https://www.google.com/maps/search/${island.coordinate}`}
+                      passHref
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs inline-flex items-center gap-1"
+                    >
+                      <ExternalLinkIcon className="h-4 w-4" />
+                      See on Google Maps
+                    </Link>
+
+                    {(island.isPopulated || island.isOutermostSmall) && (
+                      <div className="flex gap-1 mt-1">
+                        {island.isPopulated && (
+                          <span className="bg-green-500 text-white font-medium rounded-full px-2 py-1">
+                            Populated
+                          </span>
+                        )}
+                        {island.isOutermostSmall && (
+                          <span className="bg-red-500 text-white font-medium rounded-full px-2 py-1">
+                            Outermost Small Island
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </MapMarker>
               ))}
             </MarkerClusterGroup>
