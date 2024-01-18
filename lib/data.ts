@@ -70,7 +70,7 @@ const parentCodeQueryKey = {
   villages: 'districtCode',
 } as const
 
-const baseUrl = config.dataSourceUrl
+const { url: baseUrl } = config.dataSource
 
 type GetDataReturn<Area extends Areas> = {
   statusCode: number

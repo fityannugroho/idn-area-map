@@ -1,5 +1,6 @@
 'use client'
 
+import { config } from '@/lib/config'
 import {
   Areas,
   District,
@@ -10,18 +11,18 @@ import {
   Village,
   getData,
 } from '@/lib/data'
+import { Cross2Icon, ExternalLinkIcon, ReloadIcon } from '@radix-ui/react-icons'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { useEffect, useLayoutEffect, useState } from 'react'
 import { Combobox, ComboboxProps } from './combobox'
+import { Button } from './ui/button'
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from './ui/resizable'
 import { Skeleton } from './ui/skeleton'
-import { Button } from './ui/button'
-import { Cross2Icon, ExternalLinkIcon, ReloadIcon } from '@radix-ui/react-icons'
-import Link from 'next/link'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -63,6 +64,8 @@ function ComboboxArea<T extends { code: string; name: string }>(
   )
 }
 
+const MAX_PAGE_SIZE = config.dataSource.pagination.maxPageSize
+
 export default function MapDashboard() {
   const [provinces, setProvinces] = useState<Province[]>([])
   const [regencies, setRegencies] = useState<Regency[]>([])
@@ -78,7 +81,7 @@ export default function MapDashboard() {
 
   // Province data
   useEffect(() => {
-    getData('provinces', { sortBy: 'name', limit: 100 })
+    getData('provinces', { sortBy: 'name', limit: MAX_PAGE_SIZE })
       .then((res) => {
         setProvinces(res.data)
       })
@@ -122,7 +125,7 @@ export default function MapDashboard() {
 
   // Island data
   useEffect(() => {
-    async function fetchIslandsRecursively(page = 1, limit = 100) {
+    async function fetchIslandsRecursively(page = 1, limit = MAX_PAGE_SIZE) {
       setLoadingIslands(true)
 
       const res = await getData('islands', {
@@ -186,7 +189,7 @@ export default function MapDashboard() {
             if (province.code === query?.regencies?.parentCode) return
             setQuery((current) => ({
               ...current,
-              regencies: { parentCode: province.code },
+              regencies: { parentCode: province.code, limit: MAX_PAGE_SIZE },
             }))
           }}
         />
@@ -201,17 +204,18 @@ export default function MapDashboard() {
             if (regency.code === query?.districts?.parentCode) return
             setQuery((current) => ({
               ...current,
-              islands: { parentCode: regency.code },
-              districts: { parentCode: regency.code },
+              islands: { parentCode: regency.code, limit: MAX_PAGE_SIZE },
+              districts: { parentCode: regency.code, limit: MAX_PAGE_SIZE },
             }))
           }}
           inputProps={{
             onValueChange: (name) => {
-              if (name.length < 3) return
-              setQuery((current) => ({
-                ...current,
-                regencies: { ...current?.regencies, name },
-              }))
+              if (!selected?.province) {
+                setQuery((current) => ({
+                  ...current,
+                  regencies: { ...current?.regencies, name },
+                }))
+              }
             },
           }}
         />
@@ -226,16 +230,17 @@ export default function MapDashboard() {
             if (district.code === query?.villages?.parentCode) return
             setQuery((current) => ({
               ...current,
-              villages: { parentCode: district.code },
+              villages: { parentCode: district.code, limit: MAX_PAGE_SIZE },
             }))
           }}
           inputProps={{
             onValueChange: (name) => {
-              if (name.length < 3) return
-              setQuery((current) => ({
-                ...current,
-                districts: { ...current?.districts, name },
-              }))
+              if (!selected?.regency) {
+                setQuery((current) => ({
+                  ...current,
+                  districts: { ...current?.districts, name },
+                }))
+              }
             },
           }}
         />
@@ -250,11 +255,12 @@ export default function MapDashboard() {
           }}
           inputProps={{
             onValueChange: (name) => {
-              if (name.length < 3) return
-              setQuery((current) => ({
-                ...current,
-                villages: { ...current?.villages, name },
-              }))
+              if (!selected?.district) {
+                setQuery((current) => ({
+                  ...current,
+                  villages: { ...current?.villages, name },
+                }))
+              }
             },
           }}
         />
