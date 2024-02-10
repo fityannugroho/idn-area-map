@@ -91,10 +91,16 @@ type GetDataReturn<Area extends Areas> = {
   }
 }
 
+type GetDataReturnError = {
+  statusCode: number
+  message: string[]
+  error: string
+}
+
 export async function getData<Area extends Areas>(
   area: Area,
   query?: Query<Area>,
-): Promise<GetDataReturn<Area>> {
+): Promise<GetDataReturn<Area> | GetDataReturnError> {
   const url = new URL(`${baseUrl}/${area}`)
 
   if (query?.parentCode && area !== 'provinces') {
@@ -121,10 +127,6 @@ export async function getData<Area extends Areas>(
   }
 
   const res = await fetch(url)
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${area} data`)
-  }
 
   return await res.json()
 }

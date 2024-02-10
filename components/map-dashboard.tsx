@@ -24,6 +24,7 @@ import {
 } from './ui/resizable'
 import { Skeleton } from './ui/skeleton'
 import { debounce } from '@/lib/utils'
+import { toast } from 'sonner'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -84,10 +85,14 @@ export default function MapDashboard() {
   useEffect(() => {
     getData('provinces', { sortBy: 'name', limit: MAX_PAGE_SIZE })
       .then((res) => {
-        setProvinces(res.data)
+        if ('data' in res) return setProvinces(res.data)
+        throw new Error(res.message[0])
       })
       .catch((err) => {
-        console.log(err)
+        toast.error('Failed to fetch province data', {
+          description: err.message,
+          closeButton: true,
+        })
       })
   }, [])
 
@@ -95,10 +100,14 @@ export default function MapDashboard() {
   useEffect(() => {
     getData('regencies', { ...query?.regencies, sortBy: 'name' })
       .then((res) => {
-        setRegencies(res.data)
+        if ('data' in res) return setRegencies(res.data)
+        throw new Error(res.message[0])
       })
       .catch((err) => {
-        console.log(err)
+        toast.error('Failed to fetch regency data', {
+          description: err.message,
+          closeButton: true,
+        })
       })
   }, [query?.regencies])
 
@@ -106,10 +115,14 @@ export default function MapDashboard() {
   useEffect(() => {
     getData('districts', { ...query?.districts, sortBy: 'name' })
       .then((res) => {
-        setDistricts(res.data)
+        if ('data' in res) return setDistricts(res.data)
+        throw new Error(res.message[0])
       })
       .catch((err) => {
-        console.log(err)
+        toast.error('Failed to fetch district data', {
+          description: err.message,
+          closeButton: true,
+        })
       })
   }, [query?.districts])
 
@@ -117,10 +130,14 @@ export default function MapDashboard() {
   useEffect(() => {
     getData('villages', { ...query?.villages, sortBy: 'name' })
       .then((res) => {
-        setVillages(res.data)
+        if ('data' in res) return setVillages(res.data)
+        throw new Error(res.message[0])
       })
       .catch((err) => {
-        console.log(err)
+        toast.error('Failed to fetch village data', {
+          description: err.message,
+          closeButton: true,
+        })
       })
   }, [query?.villages])
 
@@ -135,11 +152,13 @@ export default function MapDashboard() {
         limit,
       })
 
-      setIslands((current) => [...current, ...res.data])
+      if ('data' in res) {
+        setIslands((current) => [...current, ...res.data])
 
-      if (res.meta.pagination.pages.next) {
-        await fetchIslandsRecursively(page + 1)
-        return
+        if (res.meta.pagination.pages.next) {
+          await fetchIslandsRecursively(page + 1)
+          return
+        }
       }
 
       setLoadingIslands(false)
