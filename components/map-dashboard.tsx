@@ -24,6 +24,7 @@ import {
 } from './ui/resizable'
 import { Skeleton } from './ui/skeleton'
 import { debounce } from '@/lib/utils'
+import ComboboxArea from './combobox-area'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -48,81 +49,21 @@ type Selected = {
   village?: Village
 }
 
-function ComboboxArea<T extends { code: string; name: string }>(
-  props: Omit<
-    ComboboxProps<T>,
-    'autoClose' | 'fullWidth' | 'optionKey' | 'getOptionLabel'
-  >,
-) {
-  return (
-    <Combobox
-      {...(props as ComboboxProps<T>)}
-      optionKey="code"
-      getOptionLabel={(opt) => opt.name}
-      autoClose
-      fullWidth
-    />
-  )
-}
-
 const MAX_PAGE_SIZE = config.dataSource.pagination.maxPageSize
 
+const provinceQuery: Query<'provinces'> = {
+  limit: MAX_PAGE_SIZE,
+}
+
 export default function MapDashboard() {
-  const [provinces, setProvinces] = useState<Province[]>([])
-  const [regencies, setRegencies] = useState<Regency[]>([])
   const [islands, setIslands] = useState<Island[]>([])
-  const [districts, setDistricts] = useState<District[]>([])
-  const [villages, setVillages] = useState<Village[]>([])
   const [selected, setSelected] = useState<Selected>()
-  const [query, setQuery] = useState<{ [A in Areas]?: Query<A> }>()
+  const [query, setQuery] =
+    useState<{ [A in Exclude<Areas, 'provinces'>]?: Query<A> }>()
   const [loadingIslands, setLoadingIslands] = useState<boolean>(false)
   const [panelDirection, setPanelDirection] = useState<
     'horizontal' | 'vertical'
   >('horizontal')
-
-  // Province data
-  useEffect(() => {
-    getData('provinces', { sortBy: 'name', limit: MAX_PAGE_SIZE })
-      .then((res) => {
-        setProvinces(res.data)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  }, [])
-
-  // Regency data
-  useEffect(() => {
-    getData('regencies', { ...query?.regencies, sortBy: 'name' })
-      .then((res) => {
-        setRegencies(res.data)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  }, [query?.regencies])
-
-  // District data
-  useEffect(() => {
-    getData('districts', { ...query?.districts, sortBy: 'name' })
-      .then((res) => {
-        setDistricts(res.data)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  }, [query?.districts])
-
-  // Village data
-  useEffect(() => {
-    getData('villages', { ...query?.villages, sortBy: 'name' })
-      .then((res) => {
-        setVillages(res.data)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  }, [query?.villages])
 
   // Island data
   useEffect(() => {
@@ -135,11 +76,13 @@ export default function MapDashboard() {
         limit,
       })
 
-      setIslands((current) => [...current, ...res.data])
+      if ('data' in res) {
+        setIslands((current) => [...current, ...res.data])
 
-      if (res.meta.pagination.pages.next) {
-        await fetchIslandsRecursively(page + 1)
-        return
+        if (res.meta.pagination.pages.next) {
+          await fetchIslandsRecursively(page + 1)
+          return
+        }
       }
 
       setLoadingIslands(false)
@@ -181,10 +124,9 @@ export default function MapDashboard() {
         }}
       >
         <ComboboxArea
-          options={provinces}
-          label="Province"
-          placeholder="Search Province"
+          area="provinces"
           value={selected?.province}
+          query={provinceQuery}
           onSelect={(province) => {
             setSelected((current) => ({ ...current, province }))
             if (province.code === query?.regencies?.parentCode) return
@@ -196,10 +138,9 @@ export default function MapDashboard() {
         />
 
         <ComboboxArea
-          options={regencies}
-          label="Regency"
-          placeholder="Search Regency"
+          area="regencies"
           value={selected?.regency}
+          query={query?.regencies}
           onSelect={(regency) => {
             setSelected((current) => ({ ...current, regency }))
             if (regency.code === query?.districts?.parentCode) return
@@ -222,10 +163,9 @@ export default function MapDashboard() {
         />
 
         <ComboboxArea
-          options={districts}
-          label="District"
-          placeholder="Search District"
+          area="districts"
           value={selected?.district}
+          query={query?.districts}
           onSelect={(district) => {
             setSelected((current) => ({ ...current, district }))
             if (district.code === query?.villages?.parentCode) return
@@ -247,10 +187,9 @@ export default function MapDashboard() {
         />
 
         <ComboboxArea
-          options={villages}
-          label="Village"
-          placeholder="Search village"
+          area="villages"
           value={selected?.village}
+          query={query?.villages}
           onSelect={(village) => {
             setSelected((current) => ({ ...current, village }))
           }}

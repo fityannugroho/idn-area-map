@@ -25,3 +25,10 @@ export function debounce<T extends any[]>(
     }, delay)
   }
 }
+
+/**
+ * Set the first letter of string into upper-case.
+ */
+export function ucFirstStr(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
