@@ -35,13 +35,15 @@ export default function GeoJsonArea<A extends Areas>({
     useState<GeoJSON.Feature<GeoJSON.MultiPolygon>>()
 
   useEffect(() => {
-    if (!code) return
+    setGeoJson(undefined)
 
-    getBoundary(area, code)
-      .then((res) => setGeoJson(res))
-      .catch((err) => {
-        console.error(err)
-      })
+    if (code) {
+      getBoundary(area, code)
+        .then((res) => setGeoJson(res))
+        .catch((err) => {
+          console.error(err)
+        })
+    }
   }, [area, code])
 
   return geoJson ? (
