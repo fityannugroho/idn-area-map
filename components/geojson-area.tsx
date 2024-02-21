@@ -1,3 +1,5 @@
+'use client'
+
 import { Areas as BaseAreas } from '@/lib/data'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
