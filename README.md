@@ -1,6 +1,11 @@
 # idn-area Map
 
-The map of Indonesia's administrative areas. The data is fetched from [idn-area API](https://github.com/fityannugroho/idn-area).
+The map of Indonesia's administrative areas.
+
+## Data Source
+
+- Main data: [idn-area API](https://github.com/fityannugroho/idn-area)
+- Boundary data: [idn-area-boundary](https://github.com/fityannugroho/idn-area-boundary)
 
 [![screenshot](public/screenshot.png)](https://idn-area-map.vercel.app)
 
@@ -11,6 +16,7 @@ The map of Indonesia's administrative areas. The data is fetched from [idn-area 
 - [x] **Get the islands by regency and show its coordinates on the map**
 - [x] Dark mode
 - [x] Responsive design (works on mobile)
+- [x] Boundaries of provinces and regencies (districts and villages soon)
 
 > Suggestions and contributions are welcome!
 
