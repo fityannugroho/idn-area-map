@@ -60,12 +60,12 @@ export async function GET(
   try {
     validatedParams = paramSchema.parse(params)
   } catch (error) {
-    return Response.json(
-      {
+    return new Response(
+      JSON.stringify({
         statusCode: 400,
         message: 'Bad Request',
         ...(error instanceof z.ZodError && { error: error.errors }),
-      },
+      }),
       { status: 400 },
     )
   }
@@ -94,11 +94,11 @@ export async function GET(
       res.on('error', (error) => {
         writer.close()
         reject(
-          Response.json(
-            {
+          new Response(
+            JSON.stringify({
               statusCode: 500,
               message: 'Internal Server Error',
-            },
+            }),
             { status: 500 },
           ),
         )
