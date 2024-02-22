@@ -15,7 +15,6 @@ import { Cross2Icon, ExternalLinkIcon, ReloadIcon } from '@radix-ui/react-icons'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useEffect, useLayoutEffect, useState } from 'react'
-import { Combobox, ComboboxProps } from './combobox'
 import { Button } from './ui/button'
 import {
   ResizableHandle,
@@ -25,6 +24,7 @@ import {
 import { Skeleton } from './ui/skeleton'
 import { debounce } from '@/lib/utils'
 import ComboboxArea from './combobox-area'
+import GeoJsonArea from './geojson-area'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -245,6 +245,14 @@ export default function MapDashboard() {
 
       <ResizablePanel defaultSize={75}>
         <Map className="h-full z-0">
+          <GeoJsonArea area="provinces" code={selected?.province?.code} />
+
+          <GeoJsonArea
+            area="regencies"
+            code={selected?.regency?.code}
+            pathOptions={{ color: 'green' }}
+          />
+
           {islands.length && (
             <MarkerClusterGroup
               chunkedLoading
