@@ -38,7 +38,7 @@ export default function GeoJsonArea<A extends Areas>({
     setGeoJson(undefined)
 
     if (code) {
-      fetch(`/api/area-boundary/${area}/${code}`)
+      fetch(`/api/${area}/${code}/boundary`)
         .then((res) => res.json())
         .then((res) => setGeoJson(res))
         .catch((err) => {

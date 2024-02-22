@@ -1,38 +1,10 @@
 import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { get } from 'https'
+import { Params, paramSchema } from './schema'
 
 const ghRawBaseUrl =
   'https://raw.githubusercontent.com/fityannugroho/idn-area-boundary/main/data'
-
-const areas = ['provinces', 'regencies', 'districts', 'villages'] as const
-
-const paramSchema = z
-  .object({
-    /**
-     * Area type
-     */
-    area: z.enum(areas),
-    /**
-     * Area code (numeric string)
-     */
-    code: z.string().regex(/^\d+$/),
-  })
-  .refine(
-    (data) => {
-      // Validate code length based on area type
-      if (data.area === 'provinces') return data.code.length === 2
-      if (data.area === 'regencies') return data.code.length === 4
-      if (data.area === 'districts') return data.code.length === 6
-      if (data.area === 'villages') return data.code.length === 10
-      return false
-    },
-    {
-      message: 'Invalid code length',
-    },
-  )
-
-type Params = z.infer<typeof paramSchema>
 
 /**
  * Add dot separator to the code.
@@ -40,7 +12,7 @@ type Params = z.infer<typeof paramSchema>
  * - 6 digits (e.g. 960301) becomes 8 digits (e.g. 96.03.01)
  * - 10 digits (e.g. 9603011001) becomes 12 digits (e.g. 96.03.01.1001)
  */
-function addDotSeparator(code: string) {
+export function addDotSeparator(code: string) {
   const codeLength = code.length
 
   if (codeLength === 4) return `${code.slice(0, 2)}.${code.slice(2)}`
