@@ -82,6 +82,18 @@ export async function GET(
     const writer = stream.writable.getWriter()
 
     get(url, (res) => {
+      if (res.statusCode !== 200) {
+        resolve(
+          new Response(
+            JSON.stringify({
+              statusCode: res.statusCode,
+              message: res.statusMessage,
+            }),
+            { status: res.statusCode },
+          ),
+        )
+      }
+
       res.on('data', (chunk) => {
         writer.write(encoder.encode(chunk))
       })
@@ -93,15 +105,7 @@ export async function GET(
 
       res.on('error', (error) => {
         writer.close()
-        reject(
-          new Response(
-            JSON.stringify({
-              statusCode: 500,
-              message: 'Internal Server Error',
-            }),
-            { status: 500 },
-          ),
-        )
+        reject('Error occurred while fetching data')
       })
     })
   })
