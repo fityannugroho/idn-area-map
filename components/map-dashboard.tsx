@@ -125,7 +125,7 @@ export default function MapDashboard() {
       >
         <ComboboxArea
           area="provinces"
-          value={selected?.province}
+          selected={selected?.province}
           query={provinceQuery}
           onSelect={(province) => {
             setSelected((current) => ({ ...current, province }))
@@ -139,7 +139,7 @@ export default function MapDashboard() {
 
         <ComboboxArea
           area="regencies"
-          value={selected?.regency}
+          selected={selected?.regency}
           query={query?.regencies}
           onSelect={(regency) => {
             setSelected((current) => ({ ...current, regency }))
@@ -164,7 +164,7 @@ export default function MapDashboard() {
 
         <ComboboxArea
           area="districts"
-          value={selected?.district}
+          selected={selected?.district}
           query={query?.districts}
           onSelect={(district) => {
             setSelected((current) => ({ ...current, district }))
@@ -188,7 +188,7 @@ export default function MapDashboard() {
 
         <ComboboxArea
           area="villages"
-          value={selected?.village}
+          selected={selected?.village}
           query={query?.villages}
           onSelect={(village) => {
             setSelected((current) => ({ ...current, village }))

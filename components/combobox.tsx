@@ -17,11 +17,21 @@ import { cn } from '@/lib/utils'
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import * as React from 'react'
 
-type Option = Record<keyof any, unknown> | string
+export type ComboboxOption = {
+  /**
+   * The `key` must be unique.
+   */
+  key: string
+  label: string
+  /**
+   * If `value` not set, `label` will be used instead.
+   */
+  value?: string | undefined
+}
 
-export type ComboboxProps<T extends Option> = {
+export type ComboboxProps = {
   autoClose?: boolean
-  options: readonly T[]
+  options: readonly ComboboxOption[]
   emptyMessage?: string
   /**
    * Set the width of the combobox match its parent width.
@@ -38,7 +48,7 @@ export type ComboboxProps<T extends Option> = {
    */
   maxHeight?: string
   label?: string
-  onSelect?: (option: T) => void
+  onSelect?: (option: ComboboxOption) => void
   placeholder?: string
   inputProps?: React.ComponentPropsWithoutRef<typeof CommandInput>
   /**
@@ -48,39 +58,24 @@ export type ComboboxProps<T extends Option> = {
    */
   width?: string
   /**
-   * Set the value of the combobox.
+   * The selected option.
    */
-  value?: T | null
-} & (T extends string
-  ? {}
-  : {
-      /**
-       * Set the key of the option.
-       */
-      optionKey: keyof T
-      /**
-       * Set the label of the option.
-       */
-      getOptionLabel: (option: T) => string
-    })
+  selected?: ComboboxOption | null
+}
 
-export function Combobox<T extends Option>({
+export function Combobox({
   autoClose,
   options,
   emptyMessage = 'Nothing found',
   fullWidth,
-  // @ts-ignore
-  optionKey,
-  // @ts-ignore
-  getOptionLabel,
   maxHeight = '240px',
   label = 'Select',
   onSelect,
   placeholder,
   inputProps,
   width,
-  value,
-}: ComboboxProps<T>) {
+  selected,
+}: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -95,13 +90,7 @@ export function Combobox<T extends Option>({
             width: fullWidth ? undefined : width,
           }}
         >
-          <span className="truncate">
-            {value
-              ? typeof value === 'string'
-                ? value
-                : getOptionLabel(value)
-              : label}
-          </span>
+          <span className="truncate">{selected?.label ?? label}</span>
           <CaretSortIcon className="ml-1 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -124,12 +113,8 @@ export function Combobox<T extends Option>({
           >
             {options.map((opt) => (
               <CommandItem
-                key={typeof opt === 'string' ? opt : `${opt[optionKey]}`}
-                value={
-                  typeof opt === 'string'
-                    ? opt
-                    : `${opt[optionKey]}_${getOptionLabel(opt)}`
-                }
+                key={opt.key}
+                value={opt.value ?? opt.label}
                 onSelect={() => {
                   if (autoClose) {
                     setOpen(false)
@@ -137,14 +122,11 @@ export function Combobox<T extends Option>({
                   onSelect?.(opt)
                 }}
               >
-                {typeof opt === 'string' ? opt : getOptionLabel(opt)}
+                {opt.label}
                 <CheckIcon
                   className={cn(
                     'ml-auto h-4 w-4',
-                    value &&
-                      (typeof value === 'string'
-                        ? value === opt
-                        : value[optionKey] === opt[optionKey])
+                    selected && selected.key === opt.key
                       ? 'opacity-100'
                       : 'opacity-0',
                   )}
