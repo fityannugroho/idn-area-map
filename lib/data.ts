@@ -1,7 +1,6 @@
 'use server'
 
 import { config } from './config'
-import { addDotSeparator } from './utils'
 
 export type Province = {
   code: string
@@ -128,23 +127,6 @@ export async function getData<Area extends Areas>(
   }
 
   const res = await fetch(url)
-
-  return await res.json()
-}
-
-export async function getBoundary(area: Areas, code: string) {
-  const ghRawBaseUrl =
-    'https://raw.githubusercontent.com/fityannugroho/idn-area-boundary/main/data'
-
-  const url = `${ghRawBaseUrl}/${area}/${addDotSeparator(code)}.geojson`
-
-  const res = await fetch(url, {
-    headers: {
-      'User-Agent': 'idn-area-boundary',
-      Accept: 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    },
-  })
 
   return await res.json()
 }

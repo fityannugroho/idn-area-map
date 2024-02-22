@@ -1,6 +1,6 @@
 'use client'
 
-import { Areas as BaseAreas, getBoundary } from '@/lib/data'
+import { Areas as BaseAreas } from '@/lib/data'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { GeoJSONProps } from 'react-leaflet'
@@ -38,7 +38,8 @@ export default function GeoJsonArea<A extends Areas>({
     setGeoJson(undefined)
 
     if (code) {
-      getBoundary(area, code)
+      fetch(`/api/area-boundary/${area}/${code}`)
+        .then((res) => res.json())
         .then((res) => setGeoJson(res))
         .catch((err) => {
           console.error(err)
