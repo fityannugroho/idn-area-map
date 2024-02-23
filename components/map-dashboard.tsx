@@ -1,16 +1,7 @@
 'use client'
 
 import { config } from '@/lib/config'
-import {
-  Areas,
-  District,
-  Island,
-  Province,
-  Query,
-  Regency,
-  Village,
-  getData,
-} from '@/lib/data'
+import { Query, getData } from '@/lib/data'
 import { Cross2Icon, ExternalLinkIcon, ReloadIcon } from '@radix-ui/react-icons'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
@@ -25,6 +16,14 @@ import { Skeleton } from './ui/skeleton'
 import { debounce } from '@/lib/utils'
 import ComboboxArea from './combobox-area'
 import GeoJsonArea from './geojson-area'
+import {
+  Province,
+  Regency,
+  District,
+  Village,
+  Island,
+  Areas,
+} from '@/lib/const'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,

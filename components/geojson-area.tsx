@@ -1,6 +1,6 @@
 'use client'
 
-import { Areas as BaseAreas } from '@/lib/data'
+import { Areas as BaseAreas } from '@/lib/const'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { GeoJSONProps } from 'react-leaflet'
