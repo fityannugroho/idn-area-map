@@ -1,6 +1,6 @@
 'use client'
 
-import { Areas as BaseAreas } from '@/lib/const'
+import { Areas as BaseAreas, singletonArea } from '@/lib/const'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { GeoJSONProps } from 'react-leaflet'
@@ -42,15 +42,16 @@ export default function GeoJsonArea<A extends Areas>({
       fetch(`/api/${area}/${code}/boundary`)
         .then((res) => {
           if (!res.ok) {
-            throw new Error(
-              `Failed to fetch boundary: ${res.status} ${res.statusText}`,
-            )
+            throw new Error(`${res.status} ${res.statusText}`)
           }
           return res.json()
         })
         .then((res) => setGeoJson(res))
         .catch((err) => {
-          console.error(err)
+          toast.error(`Failed to fetch ${singletonArea[area]} boundary data`, {
+            description: err.message,
+            closeButton: true,
+          })
         })
     }
   }, [area, code])
