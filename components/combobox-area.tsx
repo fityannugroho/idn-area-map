@@ -1,10 +1,11 @@
 'use client'
 
-import { Areas as BaseAreas, GetArea, Query, getData } from '@/lib/data'
+import { Query, getData } from '@/lib/data'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Combobox, ComboboxOption, ComboboxProps } from './combobox'
 import { ucFirstStr } from '@/lib/utils'
+import { Areas as BaseAreas, GetArea, singletonArea } from '@/lib/const'
 
 type Areas = Exclude<BaseAreas, 'islands'>
 
@@ -24,13 +25,6 @@ export type ComboboxAreaProps<A extends Areas> = Omit<
   query?: Query<A>
   onSelect?: (option: GetArea<A>) => void
   selected?: GetArea<A> | null
-}
-
-const singletonArea: { [A in Areas]: string } = {
-  provinces: 'province',
-  regencies: 'regency',
-  districts: 'district',
-  villages: 'village',
 }
 
 export default function ComboboxArea<A extends Areas>({
