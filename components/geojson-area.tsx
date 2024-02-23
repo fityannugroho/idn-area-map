@@ -4,6 +4,7 @@ import { Areas as BaseAreas } from '@/lib/data'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { GeoJSONProps } from 'react-leaflet'
+import { toast } from 'sonner'
 
 const GeoJSON = dynamic(
   () => import('react-leaflet').then((mod) => mod.GeoJSON),
@@ -39,7 +40,14 @@ export default function GeoJsonArea<A extends Areas>({
 
     if (code) {
       fetch(`/api/${area}/${code}/boundary`)
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(
+              `Failed to fetch boundary: ${res.status} ${res.statusText}`,
+            )
+          }
+          return res.json()
+        })
         .then((res) => setGeoJson(res))
         .catch((err) => {
           console.error(err)

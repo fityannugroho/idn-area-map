@@ -250,7 +250,13 @@ export default function MapDashboard() {
           <GeoJsonArea
             area="regencies"
             code={selected?.regency?.code}
-            pathOptions={{ color: 'green' }}
+            pathOptions={{ color: 'blue' }}
+          />
+
+          <GeoJsonArea
+            area="districts"
+            code={selected?.district?.code}
+            pathOptions={{ color: 'yellow' }}
           />
 
           {islands.length && (
