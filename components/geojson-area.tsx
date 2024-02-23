@@ -42,7 +42,10 @@ export default function GeoJsonArea<A extends Areas>({
       fetch(`/api/${area}/${code}/boundary`)
         .then((res) => {
           if (!res.ok) {
-            throw new Error(`Data not found for ${singletonArea[area]} ${code}`)
+            if (res.status === 404) {
+              throw new Error(`Data not found for ${singletonArea[area]} ${code}`)
+            }
+            throw new Error(`Unexpected status code: ${res.status}`)
           }
           return res.json()
         })
