@@ -258,6 +258,12 @@ export default function MapDashboard() {
             pathOptions={{ color: 'yellow' }}
           />
 
+          <GeoJsonArea
+            area="villages"
+            code={selected?.village?.code}
+            pathOptions={{ color: 'red' }}
+          />
+
           {islands.length && (
             <MarkerClusterGroup
               chunkedLoading

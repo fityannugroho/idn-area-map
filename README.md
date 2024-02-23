@@ -16,7 +16,7 @@ The map of Indonesia's administrative areas.
 - [x] **Get the islands by regency and show its coordinates on the map**
 - [x] Dark mode
 - [x] Responsive design (works on mobile)
-- [x] Boundaries of provinces, regencies, and districts (villages soon)
+- [x] Boundaries of provinces, regencies, districts, and villages
 
 > Suggestions and contributions are welcome!
 
