@@ -25,11 +25,16 @@ export type GeoJsonAreaProps<A extends Areas> = Omit<
 > & {
   area: A
   code?: string
+  /**
+   * Hide the area
+   */
+  hide?: boolean
 }
 
 export default function GeoJsonArea<A extends Areas>({
   area,
   code,
+  hide,
   ...props
 }: GeoJsonAreaProps<A>) {
   const [geoJson, setGeoJson] =
@@ -43,7 +48,9 @@ export default function GeoJsonArea<A extends Areas>({
         .then((res) => {
           if (!res.ok) {
             if (res.status === 404) {
-              throw new Error(`Data not found for ${singletonArea[area]} ${code}`)
+              throw new Error(
+                `Data not found for ${singletonArea[area]} ${code}`,
+              )
             }
             throw new Error(`Unexpected status code: ${res.status}`)
           }
@@ -59,16 +66,16 @@ export default function GeoJsonArea<A extends Areas>({
     }
   }, [area, code])
 
-  return geoJson ? (
-    <GeoJSON key={geoJson.properties?.code} data={geoJson} {...props}>
+  return geoJson && !hide ? (
+    <GeoJSON key={code} data={geoJson} {...props}>
       <Popup>
-        <div>
-          <b className="mb-2">{geoJson.properties?.name}</b>
-          <span className="block text-gray-500">
-            Code: {geoJson.properties?.code}
-          </span>
-        </div>
+        <b className="mb-2">{geoJson.properties?.name}</b>
+        <span className="block text-gray-500">
+          Code: {geoJson.properties?.code}
+        </span>
       </Popup>
     </GeoJSON>
-  ) : null
+  ) : (
+    <></>
+  )
 }

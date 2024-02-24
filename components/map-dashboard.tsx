@@ -13,7 +13,7 @@ import {
   ResizablePanelGroup,
 } from './ui/resizable'
 import { Skeleton } from './ui/skeleton'
-import { debounce } from '@/lib/utils'
+import { cn, debounce, ucFirstStr } from '@/lib/utils'
 import ComboboxArea from './combobox-area'
 import GeoJsonArea from './geojson-area'
 import {
@@ -23,7 +23,9 @@ import {
   Village,
   Island,
   Areas,
+  singletonArea,
 } from '@/lib/const'
+import { Switch } from './ui/switch'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -40,6 +42,17 @@ const MarkerClusterGroup = dynamic(
 const MapMarker = dynamic(() => import('@/components/map-marker'), {
   ssr: false,
 })
+
+type FeatureAreas = Exclude<Areas, 'islands'>
+
+const featureConfig: {
+  readonly [A in FeatureAreas]: { color?: string }
+} = {
+  provinces: { color: '#2563eb' },
+  regencies: { color: '#16a34a' },
+  districts: { color: '#facc15' },
+  villages: { color: '#ef4444' },
+} as const
 
 type Selected = {
   province?: Province
@@ -60,6 +73,9 @@ export default function MapDashboard() {
   const [query, setQuery] =
     useState<{ [A in Exclude<Areas, 'provinces'>]?: Query<A> }>()
   const [loadingIslands, setLoadingIslands] = useState<boolean>(false)
+  const [hideBoundary, setHideBoundary] = useState<{
+    [A in FeatureAreas]?: boolean
+  }>()
   const [panelDirection, setPanelDirection] = useState<
     'horizontal' | 'vertical'
   >('horizontal')
@@ -204,8 +220,6 @@ export default function MapDashboard() {
           }}
         />
 
-        <hr className="w-full " />
-
         {/* Islands info */}
         <div className="w-full p-2 border rounded flex gap-2 justify-center items-center">
           {query?.islands?.parentCode ? (
@@ -224,7 +238,43 @@ export default function MapDashboard() {
           )}
         </div>
 
-        <hr className="w-full " />
+        {/* Boundary settings */}
+        <div className="w-full p-2 flex flex-col gap-2">
+          <h3 className="font-semibold">Show Boundary</h3>
+          {Object.entries(featureConfig).map(([area, config]) => (
+            <div key={area} className="flex items-center space-x-2">
+              <Switch
+                id={`${area}Boundary`}
+                // @ts-expect-error
+                disabled={!selected?.[singletonArea[area]]}
+                defaultChecked
+                onCheckedChange={(checked) => {
+                  setHideBoundary((current) => ({
+                    ...current,
+                    [area]: !checked,
+                  }))
+                }}
+              />
+              <label
+                htmlFor={`${area}Boundary`}
+                className={cn(
+                  'flex items-center gap-2',
+                  // @ts-expect-error
+                  !selected?.[singletonArea[area]] && 'text-gray-400',
+                )}
+              >
+                <div
+                  className="w-4 h-4 rounded"
+                  style={{
+                    backgroundColor: config.color,
+                  }}
+                />
+                {/* @ts-expect-error */}
+                {ucFirstStr(singletonArea[area])}
+              </label>
+            </div>
+          ))}
+        </div>
 
         <Button
           variant="outline"
@@ -244,25 +294,16 @@ export default function MapDashboard() {
 
       <ResizablePanel defaultSize={75}>
         <Map className="h-full z-0">
-          <GeoJsonArea area="provinces" code={selected?.province?.code} />
-
-          <GeoJsonArea
-            area="regencies"
-            code={selected?.regency?.code}
-            pathOptions={{ color: 'blue' }}
-          />
-
-          <GeoJsonArea
-            area="districts"
-            code={selected?.district?.code}
-            pathOptions={{ color: 'yellow' }}
-          />
-
-          <GeoJsonArea
-            area="villages"
-            code={selected?.village?.code}
-            pathOptions={{ color: 'red' }}
-          />
+          {Object.entries(featureConfig).map(([area, config]) => (
+            <GeoJsonArea
+              key={area}
+              area={area as FeatureAreas}
+              // @ts-expect-error
+              code={selected?.[singletonArea[area]]?.code}
+              pathOptions={{ color: config.color, fillOpacity: 0.08 }}
+              hide={hideBoundary?.[area as FeatureAreas]}
+            />
+          ))}
 
           {islands.length && (
             <MarkerClusterGroup
