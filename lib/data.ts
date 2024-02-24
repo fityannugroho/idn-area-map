@@ -41,7 +41,7 @@ type GetDataReturn<Area extends Areas> = {
 
 type GetDataReturnError = {
   statusCode: number
-  message: string[]
+  message: string | string[]
   error: string
 }
 

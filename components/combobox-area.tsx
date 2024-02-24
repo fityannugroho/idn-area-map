@@ -40,7 +40,9 @@ export default function ComboboxArea<A extends Areas>({
     getData(area, { ...query, sortBy: 'name' })
       .then((res) => {
         if ('data' in res) return setAreas(res.data)
-        throw new Error(res.message[0])
+        throw new Error(
+          Array.isArray(res.message) ? res.message[0] : res.message,
+        )
       })
       .catch((err) => {
         toast.error(`Failed to fetch ${singletonArea[area]} data`, {
