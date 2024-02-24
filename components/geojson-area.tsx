@@ -66,17 +66,16 @@ export default function GeoJsonArea<A extends Areas>({
     }
   }, [area, code])
 
-  return (
-    geoJson &&
-    !hide && (
-      <GeoJSON key={code} data={geoJson} {...props}>
-        <Popup>
-          <b className="mb-2">{geoJson.properties?.name}</b>
-          <span className="block text-gray-500">
-            Code: {geoJson.properties?.code}
-          </span>
-        </Popup>
-      </GeoJSON>
-    )
+  return geoJson && !hide ? (
+    <GeoJSON key={code} data={geoJson} {...props}>
+      <Popup>
+        <b className="mb-2">{geoJson.properties?.name}</b>
+        <span className="block text-gray-500">
+          Code: {geoJson.properties?.code}
+        </span>
+      </Popup>
+    </GeoJSON>
+  ) : (
+    <></>
   )
 }
