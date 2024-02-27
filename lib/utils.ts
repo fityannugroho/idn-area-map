@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { Areas, parentArea } from './const'
 
 /**
  * Add dot separator for the area code.
@@ -49,4 +50,15 @@ export function debounce<T extends any[]>(
  */
 export function ucFirstStr(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+/**
+ * Get all parents of an area.
+ */
+export function getAllParents<Area extends Areas>(area: Area): Areas[] {
+  const parent = parentArea[area]
+
+  if (!parent) return []
+
+  return [parent, ...getAllParents(parent)]
 }

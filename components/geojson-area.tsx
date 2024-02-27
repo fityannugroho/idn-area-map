@@ -1,6 +1,8 @@
 'use client'
 
 import { Areas as BaseAreas, singletonArea } from '@/lib/const'
+import { GetSpecificDataReturn, getSpecificData } from '@/lib/data'
+import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { GeoJSONProps } from 'react-leaflet'
@@ -39,6 +41,8 @@ export default function GeoJsonArea<A extends Areas>({
 }: GeoJsonAreaProps<A>) {
   const [geoJson, setGeoJson] =
     useState<GeoJSON.Feature<GeoJSON.MultiPolygon>>()
+  const [areaData, setAreaData] = useState<GetSpecificDataReturn<A>['data']>()
+  const parents = getAllParents(area)
 
   useEffect(() => {
     setGeoJson(undefined)
@@ -63,16 +67,50 @@ export default function GeoJsonArea<A extends Areas>({
             closeButton: true,
           })
         })
+
+      getSpecificData(area, code)
+        .then((res) => {
+          if ('data' in res) return setAreaData(res.data)
+          throw new Error(
+            Array.isArray(res.message) ? res.message[0] : res.message,
+          )
+        })
+        .catch((err) => {
+          toast.error(`Failed to fetch ${singletonArea[area]} data`, {
+            description: err.message,
+            closeButton: true,
+          })
+        })
     }
   }, [area, code])
 
   return geoJson && !hide ? (
     <GeoJSON key={code} data={geoJson} {...props}>
       <Popup>
-        <b className="mb-2">{geoJson.properties?.name}</b>
-        <span className="block text-gray-500">
-          Code: {geoJson.properties?.code}
-        </span>
+        {areaData ? (
+          <>
+            <span className="block font-bold text-sm">{areaData.name}</span>
+            <span className="text-sm">{addDotSeparator(areaData.code)}</span>
+
+            {parents.map((parent) => {
+              const parentData = areaData.parent[singletonArea[parent]]
+
+              if (!parentData) return null
+
+              return (
+                <div key={parent} className="mt-1">
+                  <span className="text-xs text-gray-500">
+                    {ucFirstStr(singletonArea[parent])} :
+                  </span>
+                  <br />
+                  <span className="text-xs">{parentData.name}</span>
+                </div>
+              )
+            })}
+          </>
+        ) : (
+          <span className="block text-gray-500">Loading...</span>
+        )}
       </Popup>
     </GeoJSON>
   ) : (

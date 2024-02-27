@@ -69,3 +69,22 @@ export async function getData<Area extends Areas>(
 
   return await res.json()
 }
+
+export type GetSpecificDataReturn<Area extends Areas> = {
+  statusCode: number
+  message: string
+  data: GetArea<Area> & {
+    parent: {
+      [P in Areas as (typeof singletonArea)[P]]?: GetArea<P>
+    }
+  }
+}
+
+export async function getSpecificData<Area extends Areas>(
+  area: Area,
+  code: string,
+): Promise<GetSpecificDataReturn<Area> | GetDataReturnError> {
+  const res = await fetch(`${baseUrl}/${area}/${code}`)
+
+  return await res.json()
+}
