@@ -58,3 +58,10 @@ export const singletonArea: { readonly [A in Areas]: string } = {
   districts: 'district',
   villages: 'village',
 } as const
+
+export const parentArea: { readonly [A in Areas]?: Areas } = {
+  regencies: 'provinces',
+  islands: 'regencies',
+  districts: 'regencies',
+  villages: 'districts',
+} as const

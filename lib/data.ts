@@ -1,7 +1,7 @@
 'use server'
 
 import { config } from './config'
-import { Areas, GetArea } from './const'
+import { Areas, GetArea, parentArea, singletonArea } from './const'
 
 export type Query<Area extends Areas> = {
   limit?: number
@@ -10,13 +10,6 @@ export type Query<Area extends Areas> = {
   parentCode?: Area extends 'provinces' ? never : string
   sortBy?: keyof GetArea<Area>
 }
-
-const parentCodeQueryKey = {
-  regencies: 'provinceCode',
-  islands: 'regencyCode',
-  districts: 'regencyCode',
-  villages: 'districtCode',
-} as const
 
 const { url: baseUrl } = config.dataSource
 
@@ -50,12 +43,10 @@ export async function getData<Area extends Areas>(
   query?: Query<Area>,
 ): Promise<GetDataReturn<Area> | GetDataReturnError> {
   const url = new URL(`${baseUrl}/${area}`)
+  const parent = parentArea[area]
 
-  if (query?.parentCode && area !== 'provinces') {
-    url.searchParams.append(
-      parentCodeQueryKey[area as Exclude<Areas, 'provinces'>],
-      query.parentCode,
-    )
+  if (query?.parentCode && parent) {
+    url.searchParams.append(`${singletonArea[parent]}Code`, query.parentCode)
   }
 
   if (query?.name) {
