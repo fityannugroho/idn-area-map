@@ -3,7 +3,9 @@
 import { Areas as BaseAreas, singletonArea } from '@/lib/const'
 import { GetSpecificDataReturn, getSpecificData } from '@/lib/data'
 import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
+import { ExternalLinkIcon } from '@radix-ui/react-icons'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { GeoJSONProps } from 'react-leaflet'
 import { toast } from 'sonner'
@@ -23,7 +25,7 @@ type Areas = Exclude<BaseAreas, 'islands'>
 
 export type GeoJsonAreaProps<A extends Areas> = Omit<
   GeoJSONProps,
-  'key' | 'data'
+  'key' | 'data' | 'children'
 > & {
   area: A
   code?: string
@@ -37,11 +39,13 @@ export default function GeoJsonArea<A extends Areas>({
   area,
   code,
   hide,
+  eventHandlers,
   ...props
 }: GeoJsonAreaProps<A>) {
   const [geoJson, setGeoJson] =
     useState<GeoJSON.Feature<GeoJSON.MultiPolygon>>()
   const [areaData, setAreaData] = useState<GetSpecificDataReturn<A>['data']>()
+  const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()
   const parents = getAllParents(area)
 
   useEffect(() => {
@@ -85,7 +89,18 @@ export default function GeoJsonArea<A extends Areas>({
   }, [area, code])
 
   return geoJson && !hide ? (
-    <GeoJSON key={code} data={geoJson} {...props}>
+    <GeoJSON
+      key={code}
+      data={geoJson}
+      eventHandlers={{
+        ...eventHandlers,
+        click: (e) => {
+          setLatLng(e.latlng)
+          eventHandlers?.click?.(e)
+        },
+      }}
+      {...props}
+    >
       <Popup>
         {areaData ? (
           <>
@@ -107,6 +122,18 @@ export default function GeoJsonArea<A extends Areas>({
                 </div>
               )
             })}
+
+            <Link
+              href={`https://www.google.com/maps/search/${latLng?.lat},${latLng?.lng}`}
+              passHref
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs flex items-center gap-1 mt-3"
+              title={`Coordinate: ${latLng?.lat}, ${latLng?.lng}`}
+            >
+              <ExternalLinkIcon className="h-4 w-4" />
+              See on Google Maps
+            </Link>
           </>
         ) : (
           <span className="block text-gray-500">Loading...</span>
