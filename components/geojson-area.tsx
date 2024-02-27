@@ -40,6 +40,7 @@ export default function GeoJsonArea<A extends Areas>({
   code,
   hide,
   eventHandlers,
+  pathOptions,
   ...props
 }: GeoJsonAreaProps<A>) {
   const [geoJson, setGeoJson] =
@@ -82,7 +83,7 @@ export default function GeoJsonArea<A extends Areas>({
       })
   }, [area, code])
 
-  return geoJson && !hide ? (
+  return geoJson ? (
     <GeoJSON
       key={code}
       data={geoJson}
@@ -92,6 +93,10 @@ export default function GeoJsonArea<A extends Areas>({
           setLatLng(e.latlng)
           eventHandlers?.click?.(e)
         },
+      }}
+      pathOptions={{
+        ...pathOptions,
+        ...(hide ? { fillOpacity: 0, color: 'transparent' } : {}),
       }}
       {...props}
     >
