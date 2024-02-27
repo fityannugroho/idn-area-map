@@ -5,7 +5,7 @@ import { Query, getData } from '@/lib/data'
 import { Cross2Icon, ExternalLinkIcon, ReloadIcon } from '@radix-ui/react-icons'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { Button } from './ui/button'
 import {
   ResizableHandle,
@@ -26,6 +26,8 @@ import {
   singletonArea,
 } from '@/lib/const'
 import { Switch } from './ui/switch'
+import { LatLngBounds } from 'leaflet'
+import { useMap } from 'react-leaflet'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -67,6 +69,16 @@ const provinceQuery: Query<'provinces'> = {
   limit: MAX_PAGE_SIZE,
 }
 
+function MapFlyToBounds({ bounds }: { bounds: LatLngBounds }) {
+  const map = useMap()
+
+  useEffect(() => {
+    map.flyToBounds(bounds)
+  }, [map, bounds])
+
+  return null
+}
+
 export default function MapDashboard() {
   const [islands, setIslands] = useState<Island[]>([])
   const [selected, setSelected] = useState<Selected>()
@@ -76,6 +88,7 @@ export default function MapDashboard() {
   const [hideBoundary, setHideBoundary] = useState<{
     [A in FeatureAreas]?: boolean
   }>()
+  const [areaBounds, setAreaBounds] = useState<LatLngBounds>()
   const [panelDirection, setPanelDirection] = useState<
     'horizontal' | 'vertical'
   >('horizontal')
@@ -294,16 +307,34 @@ export default function MapDashboard() {
 
       <ResizablePanel defaultSize={75}>
         <Map className="h-full z-0">
-          {Object.entries(featureConfig).map(([area, config]) => (
-            <GeoJsonArea
-              key={area}
-              area={area as FeatureAreas}
-              // @ts-expect-error
-              code={selected?.[singletonArea[area]]?.code}
-              pathOptions={{ color: config.color, fillOpacity: 0.08 }}
-              hide={hideBoundary?.[area as FeatureAreas]}
-            />
-          ))}
+          {areaBounds && <MapFlyToBounds bounds={areaBounds} />}
+
+          {Object.entries(featureConfig).map(([area, config]) => {
+            // @ts-expect-error
+            const selectedArea = selected?.[singletonArea[area]]
+
+            if (!selectedArea) {
+              return null
+            }
+
+            return (
+              <GeoJsonArea
+                key={selectedArea.code}
+                area={area as FeatureAreas}
+                code={selectedArea.code}
+                pathOptions={{
+                  color: config.color,
+                  fillOpacity: 0.08,
+                }}
+                hide={hideBoundary?.[area as FeatureAreas]}
+                eventHandlers={{
+                  add: (e) => {
+                    setAreaBounds(e.target.getBounds())
+                  },
+                }}
+              />
+            )
+          })}
 
           {islands.length && (
             <MarkerClusterGroup
