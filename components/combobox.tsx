@@ -31,6 +31,7 @@ export type ComboboxOption = {
 
 export type ComboboxProps = {
   autoClose?: boolean
+  disabled?: boolean
   options: readonly ComboboxOption[]
   emptyMessage?: string
   /**
@@ -65,6 +66,7 @@ export type ComboboxProps = {
 
 export function Combobox({
   autoClose,
+  disabled,
   options,
   emptyMessage = 'Nothing found',
   fullWidth,
@@ -80,7 +82,7 @@ export function Combobox({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild disabled={disabled}>
         <Button
           variant="outline"
           role="combobox"
