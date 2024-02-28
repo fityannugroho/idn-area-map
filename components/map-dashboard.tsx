@@ -26,6 +26,8 @@ import {
   singletonArea,
 } from '@/lib/const'
 import { Switch } from './ui/switch'
+import { LatLngBounds } from 'leaflet'
+import { useMap } from 'react-leaflet'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -67,15 +69,28 @@ const provinceQuery: Query<'provinces'> = {
   limit: MAX_PAGE_SIZE,
 }
 
+function MapFlyToBounds({ bounds }: { bounds: LatLngBounds }) {
+  const map = useMap()
+
+  useEffect(() => {
+    map.flyToBounds(bounds)
+  }, [map, bounds])
+
+  return null
+}
+
 export default function MapDashboard() {
   const [islands, setIslands] = useState<Island[]>([])
   const [selected, setSelected] = useState<Selected>()
   const [query, setQuery] =
     useState<{ [A in Exclude<Areas, 'provinces'>]?: Query<A> }>()
-  const [loadingIslands, setLoadingIslands] = useState<boolean>(false)
+  const [isLoading, setLoading] = useState<{
+    [A in Areas]?: boolean
+  }>()
   const [hideBoundary, setHideBoundary] = useState<{
     [A in FeatureAreas]?: boolean
   }>()
+  const [areaBounds, setAreaBounds] = useState<LatLngBounds>()
   const [panelDirection, setPanelDirection] = useState<
     'horizontal' | 'vertical'
   >('horizontal')
@@ -83,7 +98,7 @@ export default function MapDashboard() {
   // Island data
   useEffect(() => {
     async function fetchIslandsRecursively(page = 1, limit = MAX_PAGE_SIZE) {
-      setLoadingIslands(true)
+      setLoading((current) => ({ ...current, islands: true }))
 
       const res = await getData('islands', {
         ...query?.islands,
@@ -100,7 +115,7 @@ export default function MapDashboard() {
         }
       }
 
-      setLoadingIslands(false)
+      setLoading((current) => ({ ...current, islands: false }))
     }
 
     setIslands([])
@@ -175,6 +190,7 @@ export default function MapDashboard() {
               }
             }, 500),
           }}
+          disabled={isLoading?.provinces}
         />
 
         <ComboboxArea
@@ -199,6 +215,7 @@ export default function MapDashboard() {
               }
             }, 500),
           }}
+          disabled={isLoading?.regencies}
         />
 
         <ComboboxArea
@@ -218,13 +235,14 @@ export default function MapDashboard() {
               }
             }, 500),
           }}
+          disabled={isLoading?.districts}
         />
 
         {/* Islands info */}
         <div className="w-full p-2 border rounded flex gap-2 justify-center items-center">
           {query?.islands?.parentCode ? (
             <>
-              {loadingIslands && (
+              {isLoading?.islands && (
                 <ReloadIcon className="h-4 w-4 animate-spin" />
               )}
               <span className="text-sm w-fit">
@@ -245,8 +263,11 @@ export default function MapDashboard() {
             <div key={area} className="flex items-center space-x-2">
               <Switch
                 id={`${area}Boundary`}
-                // @ts-expect-error
-                disabled={!selected?.[singletonArea[area]]}
+                disabled={
+                  !selected?.[
+                    singletonArea[area as FeatureAreas] as keyof Selected
+                  ]
+                }
                 defaultChecked
                 onCheckedChange={(checked) => {
                   setHideBoundary((current) => ({
@@ -259,8 +280,9 @@ export default function MapDashboard() {
                 htmlFor={`${area}Boundary`}
                 className={cn(
                   'flex items-center gap-2',
-                  // @ts-expect-error
-                  !selected?.[singletonArea[area]] && 'text-gray-400',
+                  !selected?.[
+                    singletonArea[area as FeatureAreas] as keyof Selected
+                  ] && 'text-gray-400',
                 )}
               >
                 <div
@@ -269,8 +291,12 @@ export default function MapDashboard() {
                     backgroundColor: config.color,
                   }}
                 />
-                {/* @ts-expect-error */}
-                {ucFirstStr(singletonArea[area])}
+
+                {ucFirstStr(singletonArea[area as FeatureAreas])}
+
+                {isLoading?.[area as FeatureAreas] && (
+                  <ReloadIcon className="h-4 w-4 animate-spin" />
+                )}
               </label>
             </div>
           ))}
@@ -294,22 +320,49 @@ export default function MapDashboard() {
 
       <ResizablePanel defaultSize={75}>
         <Map className="h-full z-0">
-          {Object.entries(featureConfig).map(([area, config]) => (
-            <GeoJsonArea
-              key={area}
-              area={area as FeatureAreas}
-              // @ts-expect-error
-              code={selected?.[singletonArea[area]]?.code}
-              pathOptions={{ color: config.color, fillOpacity: 0.08 }}
-              hide={hideBoundary?.[area as FeatureAreas]}
-            />
-          ))}
+          {areaBounds && <MapFlyToBounds bounds={areaBounds} />}
+
+          {Object.entries(featureConfig).map(([area, config]) => {
+            const selectedArea =
+              selected?.[singletonArea[area as FeatureAreas] as keyof Selected]
+
+            if (!selectedArea) {
+              return null
+            }
+
+            return (
+              <GeoJsonArea
+                key={selectedArea.code}
+                area={area as FeatureAreas}
+                code={selectedArea.code}
+                pathOptions={{
+                  color: config.color,
+                  fillOpacity: 0.08,
+                }}
+                hide={hideBoundary?.[area as FeatureAreas]}
+                eventHandlers={{
+                  add: (e) => {
+                    setAreaBounds(e.target.getBounds())
+                  },
+                }}
+                onLoading={() => {
+                  setLoading((current) => ({ ...current, [area]: true }))
+                }}
+                onLoaded={() => {
+                  setLoading((current) => ({ ...current, [area]: false }))
+                }}
+              />
+            )
+          })}
 
           {islands.length && (
             <MarkerClusterGroup
               chunkedLoading
               chunkProgress={(progress, total) =>
-                setLoadingIslands(progress < total)
+                setLoading((current) => ({
+                  ...current,
+                  islands: progress < total,
+                }))
               }
             >
               {islands.map((island) => (

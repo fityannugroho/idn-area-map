@@ -28,11 +28,13 @@ export type GeoJsonAreaProps<A extends Areas> = Omit<
   'key' | 'data' | 'children'
 > & {
   area: A
-  code?: string
+  code: string
   /**
    * Hide the area
    */
   hide?: boolean
+  onLoading?: () => void
+  onLoaded?: () => void
 }
 
 export default function GeoJsonArea<A extends Areas>({
@@ -40,6 +42,9 @@ export default function GeoJsonArea<A extends Areas>({
   code,
   hide,
   eventHandlers,
+  onLoading,
+  onLoaded,
+  pathOptions,
   ...props
 }: GeoJsonAreaProps<A>) {
   const [geoJson, setGeoJson] =
@@ -49,46 +54,46 @@ export default function GeoJsonArea<A extends Areas>({
   const parents = getAllParents(area)
 
   useEffect(() => {
-    setGeoJson(undefined)
+    onLoading?.()
 
-    if (code) {
-      fetch(`/api/${area}/${code}/boundary`)
-        .then((res) => {
-          if (!res.ok) {
-            if (res.status === 404) {
-              throw new Error(
-                `Data not found for ${singletonArea[area]} ${code}`,
-              )
-            }
-            throw new Error(`Unexpected status code: ${res.status}`)
+    fetch(`/api/${area}/${code}/boundary`)
+      .then((res) => {
+        if (!res.ok) {
+          if (res.status === 404) {
+            throw new Error(`Data not found for ${singletonArea[area]} ${code}`)
           }
-          return res.json()
+          throw new Error(`Unexpected status code: ${res.status}`)
+        }
+        return res.json()
+      })
+      .then((res) => {
+        setGeoJson(res)
+        onLoaded?.()
+      })
+      .catch((err) => {
+        toast.error(`Failed to fetch ${singletonArea[area]} boundary data`, {
+          description: err.message,
+          closeButton: true,
         })
-        .then((res) => setGeoJson(res))
-        .catch((err) => {
-          toast.error(`Failed to fetch ${singletonArea[area]} boundary data`, {
-            description: err.message,
-            closeButton: true,
-          })
-        })
+      })
 
-      getSpecificData(area, code)
-        .then((res) => {
-          if ('data' in res) return setAreaData(res.data)
-          throw new Error(
-            Array.isArray(res.message) ? res.message[0] : res.message,
-          )
+    getSpecificData(area, code)
+      .then((res) => {
+        if ('data' in res) return setAreaData(res.data)
+        throw new Error(
+          Array.isArray(res.message) ? res.message[0] : res.message,
+        )
+      })
+      .catch((err) => {
+        toast.error(`Failed to fetch ${singletonArea[area]} data`, {
+          description: err.message,
+          closeButton: true,
         })
-        .catch((err) => {
-          toast.error(`Failed to fetch ${singletonArea[area]} data`, {
-            description: err.message,
-            closeButton: true,
-          })
-        })
-    }
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [area, code])
 
-  return geoJson && !hide ? (
+  return geoJson ? (
     <GeoJSON
       key={code}
       data={geoJson}
@@ -98,6 +103,10 @@ export default function GeoJsonArea<A extends Areas>({
           setLatLng(e.latlng)
           eventHandlers?.click?.(e)
         },
+      }}
+      pathOptions={{
+        ...pathOptions,
+        ...(hide ? { fillOpacity: 0, color: 'transparent' } : {}),
       }}
       {...props}
     >
@@ -140,7 +149,5 @@ export default function GeoJsonArea<A extends Areas>({
         )}
       </Popup>
     </GeoJSON>
-  ) : (
-    <></>
-  )
+  ) : null
 }
