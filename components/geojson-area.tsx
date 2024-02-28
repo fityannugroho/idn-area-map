@@ -33,6 +33,8 @@ export type GeoJsonAreaProps<A extends Areas> = Omit<
    * Hide the area
    */
   hide?: boolean
+  onLoading?: () => void
+  onLoaded?: () => void
 }
 
 export default function GeoJsonArea<A extends Areas>({
@@ -40,6 +42,8 @@ export default function GeoJsonArea<A extends Areas>({
   code,
   hide,
   eventHandlers,
+  onLoading,
+  onLoaded,
   pathOptions,
   ...props
 }: GeoJsonAreaProps<A>) {
@@ -50,6 +54,8 @@ export default function GeoJsonArea<A extends Areas>({
   const parents = getAllParents(area)
 
   useEffect(() => {
+    onLoading?.()
+
     fetch(`/api/${area}/${code}/boundary`)
       .then((res) => {
         if (!res.ok) {
@@ -60,7 +66,10 @@ export default function GeoJsonArea<A extends Areas>({
         }
         return res.json()
       })
-      .then((res) => setGeoJson(res))
+      .then((res) => {
+        setGeoJson(res)
+        onLoaded?.()
+      })
       .catch((err) => {
         toast.error(`Failed to fetch ${singletonArea[area]} boundary data`, {
           description: err.message,
@@ -81,6 +90,7 @@ export default function GeoJsonArea<A extends Areas>({
           closeButton: true,
         })
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [area, code])
 
   return geoJson ? (

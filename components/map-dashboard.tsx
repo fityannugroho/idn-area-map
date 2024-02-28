@@ -5,7 +5,7 @@ import { Query, getData } from '@/lib/data'
 import { Cross2Icon, ExternalLinkIcon, ReloadIcon } from '@radix-ui/react-icons'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { Button } from './ui/button'
 import {
   ResizableHandle,
@@ -84,7 +84,9 @@ export default function MapDashboard() {
   const [selected, setSelected] = useState<Selected>()
   const [query, setQuery] =
     useState<{ [A in Exclude<Areas, 'provinces'>]?: Query<A> }>()
-  const [loadingIslands, setLoadingIslands] = useState<boolean>(false)
+  const [isLoading, setLoading] = useState<{
+    [A in Areas]?: boolean
+  }>()
   const [hideBoundary, setHideBoundary] = useState<{
     [A in FeatureAreas]?: boolean
   }>()
@@ -96,7 +98,7 @@ export default function MapDashboard() {
   // Island data
   useEffect(() => {
     async function fetchIslandsRecursively(page = 1, limit = MAX_PAGE_SIZE) {
-      setLoadingIslands(true)
+      setLoading((current) => ({ ...current, islands: true }))
 
       const res = await getData('islands', {
         ...query?.islands,
@@ -113,7 +115,7 @@ export default function MapDashboard() {
         }
       }
 
-      setLoadingIslands(false)
+      setLoading((current) => ({ ...current, islands: false }))
     }
 
     setIslands([])
@@ -188,6 +190,7 @@ export default function MapDashboard() {
               }
             }, 500),
           }}
+          disabled={isLoading?.provinces}
         />
 
         <ComboboxArea
@@ -212,6 +215,7 @@ export default function MapDashboard() {
               }
             }, 500),
           }}
+          disabled={isLoading?.regencies}
         />
 
         <ComboboxArea
@@ -231,13 +235,14 @@ export default function MapDashboard() {
               }
             }, 500),
           }}
+          disabled={isLoading?.districts}
         />
 
         {/* Islands info */}
         <div className="w-full p-2 border rounded flex gap-2 justify-center items-center">
           {query?.islands?.parentCode ? (
             <>
-              {loadingIslands && (
+              {isLoading?.islands && (
                 <ReloadIcon className="h-4 w-4 animate-spin" />
               )}
               <span className="text-sm w-fit">
@@ -284,6 +289,10 @@ export default function MapDashboard() {
                 />
                 {/* @ts-expect-error */}
                 {ucFirstStr(singletonArea[area])}
+
+                {isLoading?.[area as FeatureAreas] && (
+                  <ReloadIcon className="h-4 w-4 animate-spin" />
+                )}
               </label>
             </div>
           ))}
@@ -332,6 +341,12 @@ export default function MapDashboard() {
                     setAreaBounds(e.target.getBounds())
                   },
                 }}
+                onLoading={() => {
+                  setLoading((current) => ({ ...current, [area]: true }))
+                }}
+                onLoaded={() => {
+                  setLoading((current) => ({ ...current, [area]: false }))
+                }}
               />
             )
           })}
@@ -340,7 +355,10 @@ export default function MapDashboard() {
             <MarkerClusterGroup
               chunkedLoading
               chunkProgress={(progress, total) =>
-                setLoadingIslands(progress < total)
+                setLoading((current) => ({
+                  ...current,
+                  islands: progress < total,
+                }))
               }
             >
               {islands.map((island) => (
