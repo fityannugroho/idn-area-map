@@ -263,8 +263,11 @@ export default function MapDashboard() {
             <div key={area} className="flex items-center space-x-2">
               <Switch
                 id={`${area}Boundary`}
-                // @ts-expect-error
-                disabled={!selected?.[singletonArea[area]]}
+                disabled={
+                  !selected?.[
+                    singletonArea[area as FeatureAreas] as keyof Selected
+                  ]
+                }
                 defaultChecked
                 onCheckedChange={(checked) => {
                   setHideBoundary((current) => ({
@@ -277,8 +280,9 @@ export default function MapDashboard() {
                 htmlFor={`${area}Boundary`}
                 className={cn(
                   'flex items-center gap-2',
-                  // @ts-expect-error
-                  !selected?.[singletonArea[area]] && 'text-gray-400',
+                  !selected?.[
+                    singletonArea[area as FeatureAreas] as keyof Selected
+                  ] && 'text-gray-400',
                 )}
               >
                 <div
@@ -287,8 +291,8 @@ export default function MapDashboard() {
                     backgroundColor: config.color,
                   }}
                 />
-                {/* @ts-expect-error */}
-                {ucFirstStr(singletonArea[area])}
+
+                {ucFirstStr(singletonArea[area as FeatureAreas])}
 
                 {isLoading?.[area as FeatureAreas] && (
                   <ReloadIcon className="h-4 w-4 animate-spin" />
@@ -319,8 +323,8 @@ export default function MapDashboard() {
           {areaBounds && <MapFlyToBounds bounds={areaBounds} />}
 
           {Object.entries(featureConfig).map(([area, config]) => {
-            // @ts-expect-error
-            const selectedArea = selected?.[singletonArea[area]]
+            const selectedArea =
+              selected?.[singletonArea[area as FeatureAreas] as keyof Selected]
 
             if (!selectedArea) {
               return null
