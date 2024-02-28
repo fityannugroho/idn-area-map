@@ -7,17 +7,18 @@ The map of Indonesia's administrative areas.
 - Main data: [idn-area API](https://github.com/fityannugroho/idn-area)
 - Boundary data: [idn-area-boundary](https://github.com/fityannugroho/idn-area-boundary)
 
-[![screenshot](public/screenshot.png)](https://idn-area-map.vercel.app)
+[![screenshot](app/opengraph-image.png)](https://idn-area-map.vercel.app)
 
 ## Features
 
 - [x] Search provinces, regencies, districts, and villages by name
 - [x] Get regencies by province, districts by regency, and villages by district
-- [x] **Get the islands by regency and show its coordinates on the map**
+- [x] Get the islands by regency and show its coordinates on the map
+- [x] Show the area boundaries on the map
+- [x] Toggle the visibility of the boundaries
+- [x] Button to see the area on Google Maps by coordinates
 - [x] Dark mode
 - [x] Responsive design (works on mobile)
-- [x] Boundaries of provinces, regencies, districts, and villages
-- [x] Toggle the visibility of the boundaries
 
 > Suggestions and contributions are welcome!
 
