@@ -2,12 +2,12 @@
 
 The map of Indonesia's administrative areas.
 
+[![screenshot](app/opengraph-image.png)](https://idn-area-map.vercel.app)
+
 ## Data Source
 
 - Main data: [idn-area API](https://github.com/fityannugroho/idn-area)
 - Boundary data: [idn-area-boundary](https://github.com/fityannugroho/idn-area-boundary)
-
-[![screenshot](app/opengraph-image.png)](https://idn-area-map.vercel.app)
 
 ## Features
 
