@@ -33,8 +33,15 @@ export type GeoJsonAreaProps<A extends Areas> = Omit<
    * Hide the area
    */
   hide?: boolean
+  /**
+   * Called when the data is being fetched.
+   */
   onLoading?: () => void
-  onLoaded?: () => void
+  /**
+   * Called when the data is loaded successfully or not.
+   * @param success Whether the data is loaded successfully or not.
+   */
+  onLoaded?: (success: boolean) => void
 }
 
 export default function GeoJsonArea<A extends Areas>({
@@ -68,13 +75,14 @@ export default function GeoJsonArea<A extends Areas>({
       })
       .then((res) => {
         setGeoJson(res)
-        onLoaded?.()
+        onLoaded?.(true)
       })
       .catch((err) => {
         toast.error(`Failed to fetch ${singletonArea[area]} boundary data`, {
           description: err.message,
           closeButton: true,
         })
+        onLoaded?.(false)
       })
 
     getSpecificData(area, code)

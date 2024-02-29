@@ -1,6 +1,6 @@
 {
   "name": "idn-area-map",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Map of Indonesia's administrative area",
   "main": "app/page.tsx",
   "scripts": {
@@ -47,12 +47,12 @@
     "leaflet.markercluster": "^1.5.3",
     "next": "^14.1.0",
     "next-themes": "^0.2.1",
-    "postcss": "^8.4.34",
+    "postcss": "^8.4.35",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-leaflet": "^4.2.1",
-    "react-resizable-panels": "^2.0.3",
-    "sonner": "^1.4.0",
+    "react-resizable-panels": "^2.0.11",
+    "sonner": "^1.4.2",
     "tailwind-merge": "^2.2.1",
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
@@ -62,10 +62,10 @@
   "devDependencies": {
     "@types/leaflet": "^1.9.8",
     "@types/leaflet.markercluster": "^1.5.4",
-    "@types/node": "^20.11.16",
-    "@types/react": "^18.2.54",
-    "@types/react-dom": "^18.2.18",
-    "eslint": "^8.56.0",
+    "@types/node": "^20.11.22",
+    "@types/react": "^18.2.60",
+    "@types/react-dom": "^18.2.19",
+    "eslint": "^8.57.0",
     "eslint-config-next": "^14.1.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.2.5"
