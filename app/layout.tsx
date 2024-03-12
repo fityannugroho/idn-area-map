@@ -5,15 +5,36 @@ import { Inter } from 'next/font/google'
 import { StrictMode } from 'react'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
+import { Metadata } from 'next'
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
 })
 
-export const metadata = {
-  title: config.appName,
-  description: config.appDescription,
+const title = config.appName
+const description = config.appDescription
+
+export const metadata: Metadata = {
+  title,
+  description,
+  robots: {
+    index: true,
+    follow: true,
+  },
+  generator: 'Next.js',
+  applicationName: config.appName,
+  openGraph: {
+    siteName: config.appName,
+    title,
+    description,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    site: config.appName,
+    title,
+    description,
+  },
 }
 
 export default function RootLayout({

@@ -38,13 +38,13 @@ export default function Error({
               </div>
             </AlertDialogTitle>
             <AlertDialogDescription>
-              <p className="mb-2">
+              <span className="block mb-2">
                 This can happen due to <b>connection issues</b> or the{' '}
                 <b>area code</b> provided is invalid or does not exist.
-              </p>
-              <p>
+              </span>
+              <span>
                 Please try again or search the data manually in the Main Page.
-              </p>
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

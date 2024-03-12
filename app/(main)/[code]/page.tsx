@@ -1,7 +1,9 @@
 import MapDashboard from '@/components/map-dashboard'
+import { config } from '@/lib/config'
 import { Areas, singletonArea } from '@/lib/const'
 import { getSpecificData } from '@/lib/data'
 import { areaCodeSchema, determineAreaByCode } from '@/lib/utils'
+import { Metadata, ResolvingMetadata } from 'next'
 import { ZodError } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 
@@ -22,6 +24,40 @@ async function getAreaData(area: Areas, areaCode: string) {
   }
 
   return res.data
+}
+
+export async function generateMetadata(
+  { params: { code } }: Props,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  const areaData = await getAreaData(determineAreaByCode(code), code)
+
+  // optionally access and extend (rather than replace) parent metadata
+  const parentMetadata = await parent
+  const previousImages = parentMetadata.openGraph?.images || []
+
+  const url = `${config.appUrl}/${areaData.code}`
+  const title = `${areaData.name} | ${config.appName}`
+  const description = `${areaData.name}, ${Object.entries(areaData.parent)
+    .map(([, data]) => data?.name)
+    .join(', ')}, Indonesia`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [...previousImages],
+      url,
+    },
+    twitter: {
+      title,
+      description,
+      images: [...previousImages],
+      site: url,
+    },
+  }
 }
 
 export default async function DetailAreaPage({ params }: Props) {
