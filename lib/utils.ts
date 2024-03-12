@@ -68,9 +68,14 @@ export function getAllParents<Area extends Areas>(area: Area): Areas[] {
  * Schema for area code, either province, regency, district, or village.
  * The code can be separated by dot (.) or not.
  */
-export const areaCodeSchema = z.string().refine((code) => {
-  return /^\d{2}(?:\.?\d{2})?(?:\.?\d{2})?(?:\.?\d{4})?$/.test(code)
-})
+export const areaCodeSchema = z.string().refine(
+  (code) => {
+    return /^\d{2}(?:\.?\d{2})?(?:\.?\d{2})?(?:\.?\d{4})?$/.test(code)
+  },
+  {
+    message: 'Invalid area code',
+  },
+)
 
 /**
  * Determine the area of the given code.

@@ -1,10 +1,20 @@
 'use client'
 
+import MapDashboard from '@/components/map-dashboard'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
 import { useEffect } from 'react'
 
 export default function Error({
   error,
-  reset,
 }: {
   error: Error & { digest?: string }
   reset: () => void
@@ -15,8 +25,24 @@ export default function Error({
   }, [error])
 
   return (
-    <div>
-      <h2>Area not found</h2>
-    </div>
+    <>
+      <MapDashboard />
+      <AlertDialog defaultOpen>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              <div className="flex gap-2 items-center">
+                <ExclamationTriangleIcon className="h-5 w-5" />
+                Error!
+              </div>
+            </AlertDialogTitle>
+            <AlertDialogDescription>{error.message}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>Okay</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }
