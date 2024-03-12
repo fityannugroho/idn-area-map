@@ -1,9 +1,9 @@
 'use client'
 
-import MapDashboard from '@/components/map-dashboard'
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -11,10 +11,12 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
+import Link from 'next/link'
 import { useEffect } from 'react'
 
 export default function Error({
   error,
+  reset,
 }: {
   error: Error & { digest?: string }
   reset: () => void
@@ -26,7 +28,6 @@ export default function Error({
 
   return (
     <>
-      <MapDashboard />
       <AlertDialog defaultOpen>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -36,10 +37,24 @@ export default function Error({
                 Error!
               </div>
             </AlertDialogTitle>
-            <AlertDialogDescription>{error.message}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {'name' in error ? (
+                error.message
+              ) : (
+                <>
+                  This can be caused by <b>connection issues</b> or the{' '}
+                  <b>area code</b> provided is invalid or does not exist.
+                  <br />
+                  Try again or search the data manually at the Main Page.
+                </>
+              )}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction>Okay</AlertDialogAction>
+            <AlertDialogCancel asChild>
+              <Link href="/">Go to Main Page</Link>
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={reset}>Try Again</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
