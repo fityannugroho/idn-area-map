@@ -38,16 +38,13 @@ export default function Error({
               </div>
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {'name' in error ? (
-                error.message
-              ) : (
-                <>
-                  This can be caused by <b>connection issues</b> or the{' '}
-                  <b>area code</b> provided is invalid or does not exist.
-                  <br />
-                  Try again or search the data manually at the Main Page.
-                </>
-              )}
+              <p className="mb-2">
+                This can happen due to <b>connection issues</b> or the{' '}
+                <b>area code</b> provided is invalid or does not exist.
+              </p>
+              <p>
+                Please try again or search the data manually in the Main Page.
+              </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
