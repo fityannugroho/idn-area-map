@@ -49,12 +49,12 @@ const MapMarker = dynamic(() => import('@/components/map-marker'), {
 type FeatureAreas = Exclude<Areas, 'islands'>
 
 const featureConfig: {
-  readonly [A in FeatureAreas]: { color?: string }
+  readonly [A in FeatureAreas]: { color?: string; order: number }
 } = {
-  provinces: { color: '#2563eb' },
-  regencies: { color: '#16a34a' },
-  districts: { color: '#facc15' },
-  villages: { color: '#ef4444' },
+  provinces: { color: '#2563eb', order: 0 },
+  regencies: { color: '#16a34a', order: 1 },
+  districts: { color: '#facc15', order: 2 },
+  villages: { color: '#ef4444', order: 3 },
 } as const
 
 type Selected = {
@@ -383,6 +383,7 @@ export default function MapDashboard({ defaultSelected }: Props) {
                 onLoaded={() => {
                   setLoading((current) => ({ ...current, [area]: false }))
                 }}
+                order={config.order}
               />
             )
           })}
