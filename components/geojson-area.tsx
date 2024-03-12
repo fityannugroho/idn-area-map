@@ -21,11 +21,22 @@ const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), {
   ssr: false,
 })
 
+const Pane = dynamic(() => import('react-leaflet').then((mod) => mod.Pane), {
+  ssr: false,
+})
+
+const FeatureGroup = dynamic(
+  () => import('react-leaflet').then((mod) => mod.FeatureGroup),
+  {
+    ssr: false,
+  },
+)
+
 type Areas = Exclude<BaseAreas, 'islands'>
 
 export type GeoJsonAreaProps<A extends Areas> = Omit<
   GeoJSONProps,
-  'key' | 'data' | 'children'
+  'key' | 'data' | 'children' | 'pane'
 > & {
   area: A
   code: string
@@ -42,7 +53,18 @@ export type GeoJsonAreaProps<A extends Areas> = Omit<
    * @param success Whether the data is loaded successfully or not.
    */
   onLoaded?: (success: boolean) => void
+  /**
+   * The pane order.
+   */
+  order?: number
 }
+
+/**
+ * The default overlay pane for the GeoJsonArea component.
+ *
+ * @link https://leafletjs.com/reference.html#map-pane
+ */
+const defaultOverlayPaneZIndex = 400
 
 export default function GeoJsonArea<A extends Areas>({
   area,
@@ -51,6 +73,7 @@ export default function GeoJsonArea<A extends Areas>({
   eventHandlers,
   onLoading,
   onLoaded,
+  order,
   pathOptions,
   ...props
 }: GeoJsonAreaProps<A>) {
@@ -101,61 +124,72 @@ export default function GeoJsonArea<A extends Areas>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [area, code])
 
-  return geoJson ? (
-    <GeoJSON
-      key={code}
-      data={geoJson}
-      eventHandlers={{
-        ...eventHandlers,
-        click: (e) => {
-          setLatLng(e.latlng)
-          eventHandlers?.click?.(e)
-        },
-      }}
-      pathOptions={{
-        ...pathOptions,
-        ...(hide ? { fillOpacity: 0, color: 'transparent' } : {}),
-      }}
-      {...props}
+  return (
+    <Pane
+      name={area}
+      style={{ zIndex: order ? defaultOverlayPaneZIndex + order : undefined }}
     >
-      <Popup>
-        {areaData ? (
-          <>
-            <span className="block font-bold text-sm">{areaData.name}</span>
-            <span className="text-sm">{addDotSeparator(areaData.code)}</span>
-
-            {parents.map((parent) => {
-              const parentData = areaData.parent[singletonArea[parent]]
-
-              if (!parentData) return null
-
-              return (
-                <div key={parent} className="mt-1">
-                  <span className="text-xs text-gray-500">
-                    {ucFirstStr(singletonArea[parent])} :
-                  </span>
-                  <br />
-                  <span className="text-xs">{parentData.name}</span>
-                </div>
-              )
-            })}
-
-            <Link
-              href={`https://www.google.com/maps/search/${latLng?.lat},${latLng?.lng}`}
-              passHref
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs flex items-center gap-1 mt-3"
-              title={`Coordinate: ${latLng?.lat}, ${latLng?.lng}`}
-            >
-              <ExternalLinkIcon className="h-4 w-4" />
-              See on Google Maps
-            </Link>
-          </>
-        ) : (
-          <span className="block text-gray-500">Loading...</span>
+      <FeatureGroup>
+        {geoJson && (
+          <GeoJSON
+            key={code}
+            data={geoJson}
+            eventHandlers={{
+              ...eventHandlers,
+              click: (e) => {
+                setLatLng(e.latlng)
+                eventHandlers?.click?.(e)
+              },
+            }}
+            pathOptions={{
+              ...pathOptions,
+              ...(hide ? { fillOpacity: 0, color: 'transparent' } : {}),
+            }}
+            {...props}
+          />
         )}
-      </Popup>
-    </GeoJSON>
-  ) : null
+
+        {/* Render Popup inside the default `popupPane`.
+            See https://leafletjs.com/reference.html#map-pane */}
+        <Popup pane="popupPane">
+          {areaData ? (
+            <>
+              <span className="block font-bold text-sm">{areaData.name}</span>
+              <span className="text-sm">{addDotSeparator(areaData.code)}</span>
+
+              {parents.map((parent) => {
+                const parentData = areaData.parent[singletonArea[parent]]
+
+                if (!parentData) return null
+
+                return (
+                  <div key={parent} className="mt-1">
+                    <span className="text-xs text-gray-500">
+                      {ucFirstStr(singletonArea[parent])} :
+                    </span>
+                    <br />
+                    <span className="text-xs">{parentData.name}</span>
+                  </div>
+                )
+              })}
+
+              <Link
+                href={`https://www.google.com/maps/search/${latLng?.lat},${latLng?.lng}`}
+                passHref
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs flex items-center gap-1 mt-3"
+                title={`Coordinate: ${latLng?.lat}, ${latLng?.lng}`}
+              >
+                <ExternalLinkIcon className="h-4 w-4" />
+                See on Google Maps
+              </Link>
+            </>
+          ) : (
+            <span className="block text-gray-500">Loading...</span>
+          )}
+        </Popup>
+      </FeatureGroup>
+    </Pane>
+  )
 }

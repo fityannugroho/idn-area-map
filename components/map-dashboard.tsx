@@ -24,6 +24,7 @@ import {
   Island,
   Areas,
   singletonArea,
+  parentArea,
 } from '@/lib/const'
 import { Switch } from './ui/switch'
 import { LatLngBounds } from 'leaflet'
@@ -48,12 +49,12 @@ const MapMarker = dynamic(() => import('@/components/map-marker'), {
 type FeatureAreas = Exclude<Areas, 'islands'>
 
 const featureConfig: {
-  readonly [A in FeatureAreas]: { color?: string }
+  readonly [A in FeatureAreas]: { color?: string; order: number }
 } = {
-  provinces: { color: '#2563eb' },
-  regencies: { color: '#16a34a' },
-  districts: { color: '#facc15' },
-  villages: { color: '#ef4444' },
+  provinces: { color: '#2563eb', order: 0 },
+  regencies: { color: '#16a34a', order: 1 },
+  districts: { color: '#facc15', order: 2 },
+  villages: { color: '#ef4444', order: 3 },
 } as const
 
 type Selected = {
@@ -79,9 +80,15 @@ function MapFlyToBounds({ bounds }: { bounds: LatLngBounds }) {
   return null
 }
 
-export default function MapDashboard() {
+type Props = {
+  defaultSelected?: Selected
+}
+
+export default function MapDashboard({ defaultSelected }: Props) {
   const [islands, setIslands] = useState<Island[]>([])
-  const [selected, setSelected] = useState<Selected>()
+  const [selected, setSelected] = useState<Selected | undefined>(
+    defaultSelected,
+  )
   const [query, setQuery] =
     useState<{ [A in Exclude<Areas, 'provinces'>]?: Query<A> }>()
   const [isLoading, setLoading] = useState<{
@@ -94,6 +101,31 @@ export default function MapDashboard() {
   const [panelDirection, setPanelDirection] = useState<
     'horizontal' | 'vertical'
   >('horizontal')
+
+  useEffect(() => {
+    if (defaultSelected) {
+      setQuery({
+        regencies: {
+          parentCode: defaultSelected.province?.code,
+          limit: MAX_PAGE_SIZE,
+        },
+        districts: {
+          parentCode: defaultSelected.regency?.code,
+          limit: MAX_PAGE_SIZE,
+        },
+        villages: {
+          parentCode: defaultSelected.district?.code,
+          limit: MAX_PAGE_SIZE,
+        },
+        ...(defaultSelected.regency && {
+          islands: {
+            parentCode: defaultSelected.regency.code,
+            limit: MAX_PAGE_SIZE,
+          },
+        }),
+      })
+    }
+  }, [defaultSelected])
 
   // Island data
   useEffect(() => {
@@ -351,6 +383,7 @@ export default function MapDashboard() {
                 onLoaded={() => {
                   setLoading((current) => ({ ...current, [area]: false }))
                 }}
+                order={config.order}
               />
             )
           })}
