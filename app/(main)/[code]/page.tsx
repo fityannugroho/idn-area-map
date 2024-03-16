@@ -51,7 +51,7 @@ export async function generateMetadata(
 
   const title = `${areaNames} | ${config.appName}`
   const description = `See the information about ${areaNames}, Indonesia.`
-  const ogImage = `${config.appUrl}/api/og-image/area/${areaData.code}`
+  const ogImage = `/api/og-image/area/${areaData.code}`
 
   return {
     title,
