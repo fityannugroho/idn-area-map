@@ -41,6 +41,7 @@ export async function generateMetadata(
   const description = `${areaData.name}, ${Object.entries(areaData.parent)
     .map(([, data]) => data?.name)
     .join(', ')}, Indonesia`
+  const ogImage = `${config.appUrl}/api/og-image/area/${areaData.code}`
 
   return {
     title,
@@ -48,13 +49,13 @@ export async function generateMetadata(
     openGraph: {
       title,
       description,
-      images: [...previousImages],
+      images: [ogImage, ...previousImages],
       url,
     },
     twitter: {
       title,
       description,
-      images: [...previousImages],
+      images: [ogImage, ...previousImages],
       site: url,
     },
   }
