@@ -2,7 +2,7 @@ import MapDashboard from '@/components/map-dashboard'
 import { config } from '@/lib/config'
 import { Areas, singletonArea } from '@/lib/const'
 import { getSpecificData } from '@/lib/data'
-import { areaCodeSchema, determineAreaByCode } from '@/lib/utils'
+import { areaCodeSchema, determineAreaByCode, ucWords } from '@/lib/utils'
 import { Metadata, ResolvingMetadata } from 'next'
 import { ZodError } from 'zod'
 import { fromZodError } from 'zod-validation-error'
@@ -30,17 +30,27 @@ export async function generateMetadata(
   { params: { code } }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const areaData = await getAreaData(determineAreaByCode(code), code)
+  const area = determineAreaByCode(code)
+  const areaData = await getAreaData(area, code)
 
   // optionally access and extend (rather than replace) parent metadata
   const parentMetadata = await parent
   const previousImages = parentMetadata.openGraph?.images || []
 
   const url = `${config.appUrl}/${areaData.code}`
-  const title = `${areaData.name} | ${config.appName}`
-  const description = `${areaData.name}, ${Object.entries(areaData.parent)
-    .map(([, data]) => data?.name)
-    .join(', ')}, Indonesia`
+  const parentNames = Object.keys(areaData.parent ?? {}).map((parent) =>
+    parent === 'regency'
+      ? ucWords(areaData.parent?.[parent]?.name ?? '')
+      : areaData.parent?.[parent]?.name ?? '',
+  )
+
+  const areaNames = [
+    area === 'regencies' ? ucWords(areaData.name) : areaData.name,
+    ...parentNames,
+  ].join(', ')
+
+  const title = `${areaNames} | ${config.appName}`
+  const description = `See the information about ${areaNames}, Indonesia.`
 
   return {
     title,

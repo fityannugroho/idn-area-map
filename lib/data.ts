@@ -74,7 +74,7 @@ export type GetSpecificDataReturn<Area extends Areas> = {
   statusCode: number
   message: string
   data: GetArea<Area> & {
-    parent: {
+    parent?: {
       [P in Areas as (typeof singletonArea)[P]]?: GetArea<P>
     }
   }
