@@ -33,10 +33,6 @@ export async function generateMetadata(
   const area = determineAreaByCode(code)
   const areaData = await getAreaData(area, code)
 
-  // optionally access and extend (rather than replace) parent metadata
-  const parentMetadata = await parent
-  const previousImages = parentMetadata.openGraph?.images || []
-
   const url = `${config.appUrl}/${areaData.code}`
   const parentNames = Object.keys(areaData.parent ?? {}).map((parent) =>
     parent === 'regency'
@@ -59,13 +55,13 @@ export async function generateMetadata(
     openGraph: {
       title,
       description,
-      images: [ogImage, ...previousImages],
+      images: ogImage,
       url,
     },
     twitter: {
       title,
       description,
-      images: [ogImage, ...previousImages],
+      images: ogImage,
       site: url,
     },
   }
