@@ -158,7 +158,7 @@ export default function GeoJsonArea<A extends Areas>({
               <span className="text-sm">{addDotSeparator(areaData.code)}</span>
 
               {parents.map((parent) => {
-                const parentData = areaData.parent[singletonArea[parent]]
+                const parentData = areaData.parent?.[singletonArea[parent]]
 
                 if (!parentData) return null
 

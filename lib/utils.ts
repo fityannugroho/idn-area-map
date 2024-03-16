@@ -54,6 +54,19 @@ export function ucFirstStr(str: string): string {
 }
 
 /**
+ * Set the first letter of each word in string into upper-case.
+ */
+export function ucWords(str: string): string {
+  const splitStr = str.toLowerCase().split(' ')
+
+  for (let i = 0; i < splitStr.length; i += 1) {
+    splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1)
+  }
+
+  return splitStr.join(' ')
+}
+
+/**
  * Get all parents of an area.
  */
 export function getAllParents<Area extends Areas>(area: Area): Areas[] {
