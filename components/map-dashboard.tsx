@@ -1,6 +1,6 @@
 'use client'
 
-import { config } from '@/lib/config'
+import { FeatureAreas, config, featureConfig } from '@/lib/config'
 import { Query, getData } from '@/lib/data'
 import { Cross2Icon, ExternalLinkIcon, ReloadIcon } from '@radix-ui/react-icons'
 import dynamic from 'next/dynamic'
@@ -46,17 +46,6 @@ const MapMarker = dynamic(() => import('@/components/map-marker'), {
   ssr: false,
 })
 
-type FeatureAreas = Exclude<Areas, 'islands'>
-
-const featureConfig: {
-  readonly [A in FeatureAreas]: { color?: string; order: number }
-} = {
-  provinces: { color: '#2563eb', order: 0 },
-  regencies: { color: '#16a34a', order: 1 },
-  districts: { color: '#facc15', order: 2 },
-  villages: { color: '#ef4444', order: 3 },
-} as const
-
 type Selected = {
   province?: Province
   regency?: Regency
@@ -64,7 +53,7 @@ type Selected = {
   village?: Village
 }
 
-const MAX_PAGE_SIZE = config.dataSource.pagination.maxPageSize
+const MAX_PAGE_SIZE = config.dataSource.area.pagination.maxPageSize
 
 const provinceQuery: Query<'provinces'> = {
   limit: MAX_PAGE_SIZE,

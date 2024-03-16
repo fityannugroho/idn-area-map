@@ -13,7 +13,7 @@ export type Query<Area extends Areas> = {
   sortBy?: keyof GetArea<Area>
 }
 
-const { url: baseUrl } = config.dataSource
+const { url: baseUrl } = config.dataSource.area
 
 type GetDataReturn<Area extends Areas> = {
   statusCode: number
@@ -91,11 +91,8 @@ export async function getSpecificData<Area extends Areas>(
   return await res.json()
 }
 
-const ghRawBaseUrl =
-  'https://raw.githubusercontent.com/fityannugroho/idn-area-boundary/main/data'
-
 export async function getBoundaryData(area: Areas, code: string) {
-  const url = `${ghRawBaseUrl}/${area}/${addDotSeparator(code.replaceAll('.', ''))}.geojson`
+  const url = `${config.dataSource.boundary.url}/${area}/${addDotSeparator(code.replaceAll('.', ''))}.geojson`
 
   return new Promise<Response>((resolve, reject) => {
     // Create encoding to convert token (string) to Uint8Array

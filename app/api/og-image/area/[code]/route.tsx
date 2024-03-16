@@ -1,27 +1,14 @@
-import { getBoundaryData, getSpecificData } from '@/lib/data'
+import { getBoundaryData } from '@/lib/data'
 import { determineAreaByCode } from '@/lib/utils'
-import StaticMaps, { AddLineOptions, AddPolygonOptions } from 'staticmaps'
+import StaticMaps, { AddPolygonOptions } from 'staticmaps'
 import { NextResponse } from 'next/server'
 // @ts-ignore
 import simplify from 'simplify-geojson'
-import { Areas } from '@/lib/const'
+import { FeatureAreas, featureConfig } from '@/lib/config'
 
 function countPositionInCoords(coord: GeoJSON.Position[][]) {
   return coord.reduce((acc, curr) => acc + curr.length, 0)
 }
-
-const simplificationTolerance: Record<Exclude<Areas, 'islands'>, number> = {
-  provinces: 0.012,
-  regencies: 0.005,
-  districts: 0.001,
-  villages: 0.0001,
-} as const
-
-const lineOptions: Omit<AddPolygonOptions, 'coords'> = {
-  color: '#0000FFBB',
-  width: 2,
-  fill: '#0000FF33',
-} as const
 
 /**
  * The maximum number of polygons that can be added to the map.
@@ -33,6 +20,7 @@ export async function GET(
   { params: { code } }: { params: { code: string } },
 ) {
   const area = determineAreaByCode(code)
+  const config = featureConfig[area as FeatureAreas]
   const [resBoundary] = await Promise.all([getBoundaryData(area, code)])
 
   if (!resBoundary.ok) {
@@ -51,10 +39,7 @@ export async function GET(
 
   // Simplify the boundary to reduce the number of coordinates
   const boundary: GeoJSON.Feature<GeoJSON.MultiPolygon | GeoJSON.Polygon> =
-    simplify(
-      await resBoundary.json(),
-      simplificationTolerance[area as Exclude<Areas, 'islands'>],
-    )
+    simplify(await resBoundary.json(), config.simplification.tolerance)
 
   const map = new StaticMaps({
     width: 800,
@@ -62,6 +47,12 @@ export async function GET(
     tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     tileSubdomains: ['a', 'b', 'c'],
   })
+
+  const lineOptions: Omit<AddPolygonOptions, 'coords'> = {
+    width: 2,
+    color: config.color,
+    fill: config.fillColor,
+  } as const
 
   switch (boundary.geometry.type) {
     case 'MultiPolygon':
