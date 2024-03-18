@@ -3,7 +3,7 @@
 import { Areas as BaseAreas, singletonArea } from '@/lib/const'
 import { GetSpecificDataReturn, getSpecificData } from '@/lib/data'
 import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
-import { ExternalLinkIcon } from '@radix-ui/react-icons'
+import { Link2Icon, ExternalLinkIcon } from '@radix-ui/react-icons'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -173,12 +173,33 @@ export default function GeoJsonArea<A extends Areas>({
                 )
               })}
 
+              <button
+                onClick={() => {
+                  try {
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/${addDotSeparator(code)}`,
+                    )
+                    toast.success('Link copied to clipboard', {
+                      duration: 3_000, // 3 seconds
+                    })
+                  } catch (error) {
+                    toast.error('Failed to copy link to clipboard', {
+                      closeButton: true,
+                    })
+                  }
+                }}
+                className="text-xs flex items-center gap-1 mt-3"
+              >
+                <Link2Icon className="h-4 w-4" />
+                Copy Link
+              </button>
+
               <Link
                 href={`https://www.google.com/maps/search/${latLng?.lat},${latLng?.lng}`}
                 passHref
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs flex items-center gap-1 mt-3"
+                className="text-xs flex items-center gap-1 mt-2"
                 title={`Coordinate: ${latLng?.lat}, ${latLng?.lng}`}
               >
                 <ExternalLinkIcon className="h-4 w-4" />
