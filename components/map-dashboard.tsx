@@ -168,173 +168,176 @@ export default function MapDashboard({ defaultSelected }: Props) {
     >
       <ResizablePanel
         defaultSize={25}
-        minSize={10}
-        className="h-full p-4 flex flex-col items-center gap-4"
+        minSize={16}
+        collapsible
+        className="h-full"
         style={{
           overflowY: 'auto',
         }}
       >
-        <ComboboxArea
-          area="provinces"
-          selected={selected?.province}
-          query={provinceQuery}
-          onSelect={(province) => {
-            setSelected((current) => ({ ...current, province }))
-            if (province.code === query?.regencies?.parentCode) return
-            setQuery((current) => ({
-              ...current,
-              regencies: { parentCode: province.code, limit: MAX_PAGE_SIZE },
-            }))
-          }}
-        />
+        <div className="p-4 flex flex-col items-center gap-4">
+          <ComboboxArea
+            area="provinces"
+            selected={selected?.province}
+            query={provinceQuery}
+            onSelect={(province) => {
+              setSelected((current) => ({ ...current, province }))
+              if (province.code === query?.regencies?.parentCode) return
+              setQuery((current) => ({
+                ...current,
+                regencies: { parentCode: province.code, limit: MAX_PAGE_SIZE },
+              }))
+            }}
+          />
 
-        <ComboboxArea
-          area="regencies"
-          selected={selected?.regency}
-          query={query?.regencies}
-          onSelect={(regency) => {
-            setSelected((current) => ({ ...current, regency }))
-            if (regency.code === query?.districts?.parentCode) return
-            setQuery((current) => ({
-              ...current,
-              islands: { parentCode: regency.code, limit: MAX_PAGE_SIZE },
-              districts: { parentCode: regency.code, limit: MAX_PAGE_SIZE },
-            }))
-          }}
-          inputProps={{
-            onValueChange: debounce((name) => {
-              if (!selected?.province) {
-                setQuery((current) => ({
-                  ...current,
-                  regencies: { ...current?.regencies, name },
-                }))
-              }
-            }, 500),
-          }}
-          disabled={isLoading?.provinces}
-        />
-
-        <ComboboxArea
-          area="districts"
-          selected={selected?.district}
-          query={query?.districts}
-          onSelect={(district) => {
-            setSelected((current) => ({ ...current, district }))
-            if (district.code === query?.villages?.parentCode) return
-            setQuery((current) => ({
-              ...current,
-              villages: { parentCode: district.code, limit: MAX_PAGE_SIZE },
-            }))
-          }}
-          inputProps={{
-            onValueChange: debounce((name) => {
-              if (!selected?.regency) {
-                setQuery((current) => ({
-                  ...current,
-                  districts: { ...current?.districts, name },
-                }))
-              }
-            }, 500),
-          }}
-          disabled={isLoading?.regencies}
-        />
-
-        <ComboboxArea
-          area="villages"
-          selected={selected?.village}
-          query={query?.villages}
-          onSelect={(village) => {
-            setSelected((current) => ({ ...current, village }))
-          }}
-          inputProps={{
-            onValueChange: debounce((name) => {
-              if (!selected?.district) {
-                setQuery((current) => ({
-                  ...current,
-                  villages: { ...current?.villages, name },
-                }))
-              }
-            }, 500),
-          }}
-          disabled={isLoading?.districts}
-        />
-
-        {/* Islands info */}
-        <div className="w-full p-2 border rounded flex gap-2 justify-center items-center">
-          {query?.islands?.parentCode ? (
-            <>
-              {isLoading?.islands && (
-                <ReloadIcon className="h-4 w-4 animate-spin" />
-              )}
-              <span className="text-sm w-fit">
-                {islands.length} islands found
-              </span>
-            </>
-          ) : (
-            <span className="text-sm w-fit text-gray-500">
-              Select a regency to see islands
-            </span>
-          )}
-        </div>
-
-        {/* Boundary settings */}
-        <div className="w-full p-2 flex flex-col gap-2">
-          <h3 className="font-semibold">Show Boundary</h3>
-          {Object.entries(featureConfig).map(([area, config]) => (
-            <div key={area} className="flex items-center space-x-2">
-              <Switch
-                id={`${area}Boundary`}
-                disabled={
-                  !selected?.[
-                    singletonArea[area as FeatureAreas] as keyof Selected
-                  ]
-                }
-                defaultChecked
-                onCheckedChange={(checked) => {
-                  setHideBoundary((current) => ({
+          <ComboboxArea
+            area="regencies"
+            selected={selected?.regency}
+            query={query?.regencies}
+            onSelect={(regency) => {
+              setSelected((current) => ({ ...current, regency }))
+              if (regency.code === query?.districts?.parentCode) return
+              setQuery((current) => ({
+                ...current,
+                islands: { parentCode: regency.code, limit: MAX_PAGE_SIZE },
+                districts: { parentCode: regency.code, limit: MAX_PAGE_SIZE },
+              }))
+            }}
+            inputProps={{
+              onValueChange: debounce((name) => {
+                if (!selected?.province) {
+                  setQuery((current) => ({
                     ...current,
-                    [area]: !checked,
+                    regencies: { ...current?.regencies, name },
                   }))
-                }}
-              />
-              <label
-                htmlFor={`${area}Boundary`}
-                className={cn(
-                  'flex items-center gap-2',
-                  !selected?.[
-                    singletonArea[area as FeatureAreas] as keyof Selected
-                  ] && 'text-gray-400',
-                )}
-              >
-                <div
-                  className="w-4 h-4 rounded"
-                  style={{
-                    backgroundColor: config.color,
-                  }}
-                />
+                }
+              }, 500),
+            }}
+            disabled={isLoading?.provinces}
+          />
 
-                {ucFirstStr(singletonArea[area as FeatureAreas])}
+          <ComboboxArea
+            area="districts"
+            selected={selected?.district}
+            query={query?.districts}
+            onSelect={(district) => {
+              setSelected((current) => ({ ...current, district }))
+              if (district.code === query?.villages?.parentCode) return
+              setQuery((current) => ({
+                ...current,
+                villages: { parentCode: district.code, limit: MAX_PAGE_SIZE },
+              }))
+            }}
+            inputProps={{
+              onValueChange: debounce((name) => {
+                if (!selected?.regency) {
+                  setQuery((current) => ({
+                    ...current,
+                    districts: { ...current?.districts, name },
+                  }))
+                }
+              }, 500),
+            }}
+            disabled={isLoading?.regencies}
+          />
 
-                {isLoading?.[area as FeatureAreas] && (
+          <ComboboxArea
+            area="villages"
+            selected={selected?.village}
+            query={query?.villages}
+            onSelect={(village) => {
+              setSelected((current) => ({ ...current, village }))
+            }}
+            inputProps={{
+              onValueChange: debounce((name) => {
+                if (!selected?.district) {
+                  setQuery((current) => ({
+                    ...current,
+                    villages: { ...current?.villages, name },
+                  }))
+                }
+              }, 500),
+            }}
+            disabled={isLoading?.districts}
+          />
+
+          {/* Islands info */}
+          <div className="w-full p-2 border rounded flex gap-2 justify-center items-center">
+            {query?.islands?.parentCode ? (
+              <>
+                {isLoading?.islands && (
                   <ReloadIcon className="h-4 w-4 animate-spin" />
                 )}
-              </label>
-            </div>
-          ))}
-        </div>
+                <span className="text-sm w-fit">
+                  {islands.length} islands found
+                </span>
+              </>
+            ) : (
+              <span className="text-sm w-fit text-gray-500">
+                Select a regency to see islands
+              </span>
+            )}
+          </div>
 
-        <Button
-          variant="outline"
-          className="mt-auto items-center gap-1"
-          onClick={() => {
-            setQuery(undefined)
-            setSelected(undefined)
-            setIslands([])
-          }}
-        >
-          <Cross2Icon className="h-4 w-4" />
-          Clear All Data
-        </Button>
+          {/* Boundary settings */}
+          <div className="w-full p-2 flex flex-col gap-2">
+            <h3 className="font-semibold">Show Boundary</h3>
+            {Object.entries(featureConfig).map(([area, config]) => (
+              <div key={area} className="flex items-center space-x-2 truncate">
+                <Switch
+                  id={`${area}Boundary`}
+                  disabled={
+                    !selected?.[
+                      singletonArea[area as FeatureAreas] as keyof Selected
+                    ]
+                  }
+                  defaultChecked
+                  onCheckedChange={(checked) => {
+                    setHideBoundary((current) => ({
+                      ...current,
+                      [area]: !checked,
+                    }))
+                  }}
+                />
+                <label
+                  htmlFor={`${area}Boundary`}
+                  className={cn(
+                    'flex items-center gap-2',
+                    !selected?.[
+                      singletonArea[area as FeatureAreas] as keyof Selected
+                    ] && 'text-gray-400',
+                  )}
+                >
+                  <div
+                    className="w-4 h-4 rounded"
+                    style={{
+                      backgroundColor: config.color,
+                    }}
+                  />
+
+                  {ucFirstStr(singletonArea[area as FeatureAreas])}
+
+                  {isLoading?.[area as FeatureAreas] && (
+                    <ReloadIcon className="h-4 w-4 animate-spin" />
+                  )}
+                </label>
+              </div>
+            ))}
+          </div>
+
+          <Button
+            variant="outline"
+            className="mt-auto items-center gap-1"
+            onClick={() => {
+              setQuery(undefined)
+              setSelected(undefined)
+              setIslands([])
+            }}
+          >
+            <Cross2Icon className="h-4 w-4" />
+            Clear All Data
+          </Button>
+        </div>
       </ResizablePanel>
 
       <ResizableHandle withHandle />
