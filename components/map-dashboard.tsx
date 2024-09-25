@@ -29,6 +29,7 @@ import {
 import { Switch } from './ui/switch'
 import { LatLngBounds, Map as LeafletMap } from 'leaflet'
 import { useMap } from 'react-leaflet'
+import { ImperativePanelHandle } from 'react-resizable-panels'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -103,7 +104,8 @@ export default function MapDashboard({ defaultSelected }: Props) {
   const [panelDirection, setPanelDirection] = useState<
     'horizontal' | 'vertical'
   >('horizontal')
-  const mapRef = useRef<LeafletMap | null>(null)
+  const mapRef = useRef<LeafletMap>(null)
+  const sidebarRef = useRef<ImperativePanelHandle>(null)
 
   useEffect(() => {
     if (defaultSelected) {
@@ -181,6 +183,15 @@ export default function MapDashboard({ defaultSelected }: Props) {
     }
   }
 
+  const handleSidebarToggle = () => {
+    const sidebar = sidebarRef.current
+    if (sidebar?.isCollapsed()) {
+      sidebar?.expand()
+    } else {
+      sidebar?.collapse()
+    }
+  }
+
   return (
     <ResizablePanelGroup
       direction={panelDirection}
@@ -191,6 +202,7 @@ export default function MapDashboard({ defaultSelected }: Props) {
         minSize={16}
         collapsible
         className="h-full"
+        ref={sidebarRef}
         style={{
           overflowY: 'auto',
         }}
@@ -360,7 +372,7 @@ export default function MapDashboard({ defaultSelected }: Props) {
         </div>
       </ResizablePanel>
 
-      <ResizableHandle withHandle />
+      <ResizableHandle withHandle onDoubleClick={handleSidebarToggle} />
 
       <ResizablePanel
         defaultSize={75}
