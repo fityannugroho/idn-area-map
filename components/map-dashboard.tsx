@@ -30,6 +30,7 @@ import { Switch } from './ui/switch'
 import { LatLngBounds, Map as LeafletMap } from 'leaflet'
 import { useMap } from 'react-leaflet'
 import { ImperativePanelHandle } from 'react-resizable-panels'
+import useDoubleTap from '@/hooks/useDoubleTap'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -372,7 +373,11 @@ export default function MapDashboard({ defaultSelected }: Props) {
         </div>
       </ResizablePanel>
 
-      <ResizableHandle withHandle onDoubleClick={handleSidebarToggle} />
+      <ResizableHandle
+        withHandle
+        onDoubleClick={handleSidebarToggle}
+        onTouchStart={useDoubleTap(handleSidebarToggle)}
+      />
 
       <ResizablePanel
         defaultSize={75}
