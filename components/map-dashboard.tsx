@@ -80,6 +80,7 @@ const MapRefSetter = forwardRef<LeafletMap | null>((props, ref) => {
 
   return null
 })
+MapRefSetter.displayName = 'MapRefSetter'
 
 type Props = {
   defaultSelected?: Selected
