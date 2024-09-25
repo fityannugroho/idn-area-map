@@ -5,7 +5,7 @@ import { Query, getData } from '@/lib/data'
 import { Cross2Icon, ExternalLinkIcon, ReloadIcon } from '@radix-ui/react-icons'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Button } from './ui/button'
 import {
   ResizableHandle,
@@ -27,7 +27,7 @@ import {
   parentArea,
 } from '@/lib/const'
 import { Switch } from './ui/switch'
-import { LatLngBounds } from 'leaflet'
+import { LatLngBounds, Map as LeafletMap } from 'leaflet'
 import { useMap } from 'react-leaflet'
 
 const Map = dynamic(() => import('@/components/map'), {
@@ -69,6 +69,19 @@ function MapFlyToBounds({ bounds }: { bounds: LatLngBounds }) {
   return null
 }
 
+const MapRefSetter = forwardRef<LeafletMap | null>((props, ref) => {
+  const map = useMap()
+
+  useEffect(() => {
+    if (map && ref && 'current' in ref) {
+      ref.current = map // Set the ref to the map instance
+    }
+  }, [map, ref])
+
+  return null
+})
+MapRefSetter.displayName = 'MapRefSetter'
+
 type Props = {
   defaultSelected?: Selected
 }
@@ -90,6 +103,7 @@ export default function MapDashboard({ defaultSelected }: Props) {
   const [panelDirection, setPanelDirection] = useState<
     'horizontal' | 'vertical'
   >('horizontal')
+  const mapRef = useRef<LeafletMap | null>(null)
 
   useEffect(() => {
     if (defaultSelected) {
@@ -160,6 +174,12 @@ export default function MapDashboard({ defaultSelected }: Props) {
 
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  const handleResizeMap = () => {
+    if (mapRef.current) {
+      mapRef.current.invalidateSize({ animate: true })
+    }
+  }
 
   return (
     <ResizablePanelGroup
@@ -342,9 +362,14 @@ export default function MapDashboard({ defaultSelected }: Props) {
 
       <ResizableHandle withHandle />
 
-      <ResizablePanel defaultSize={75}>
+      <ResizablePanel
+        defaultSize={75}
+        onResize={debounce(handleResizeMap, 100)}
+      >
         <Map className="h-full z-0">
           {areaBounds && <MapFlyToBounds bounds={areaBounds} />}
+
+          <MapRefSetter ref={mapRef} />
 
           {Object.entries(featureConfig).map(([area, config]) => {
             const selectedArea =
