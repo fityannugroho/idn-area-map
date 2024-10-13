@@ -51,6 +51,7 @@ export default function RootLayout({
             inter.variable,
           )}
         >
+          {/* @ts-ignore error type return on build. Revert this when https://github.com/pacocoursey/next-themes/issues/279 issue has been fixed */}
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
