@@ -37,7 +37,7 @@ export async function generateMetadata(
   const parentNames = Object.keys(areaData.parent ?? {}).map((parent) =>
     parent === 'regency'
       ? ucWords(areaData.parent?.[parent]?.name ?? '')
-      : areaData.parent?.[parent]?.name ?? '',
+      : (areaData.parent?.[parent]?.name ?? ''),
   )
 
   const areaNames = [
