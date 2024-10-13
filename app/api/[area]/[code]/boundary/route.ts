@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { Params, paramSchema } from './schema'
 import { getBoundaryData } from '@/lib/data'
@@ -11,12 +11,12 @@ export async function GET(
   try {
     validatedParams = paramSchema.parse(params)
   } catch (error) {
-    return new Response(
-      JSON.stringify({
+    return NextResponse.json(
+      {
         statusCode: 400,
         message: 'Bad Request',
         ...(error instanceof z.ZodError && { error: error.errors }),
-      }),
+      },
       { status: 400 },
     )
   }
