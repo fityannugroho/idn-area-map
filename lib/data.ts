@@ -4,6 +4,7 @@ import { get } from 'https'
 import { config } from './config'
 import { Areas, GetArea, parentArea, singletonArea } from './const'
 import { addDotSeparator } from './utils'
+import { NextResponse } from 'next/server'
 
 export type Query<Area extends Areas> = {
   limit?: number
@@ -94,7 +95,7 @@ export async function getSpecificData<Area extends Areas>(
 export async function getBoundaryData(area: Areas, code: string) {
   const url = `${config.dataSource.boundary.url}/${area}/${addDotSeparator(code.replaceAll('.', ''))}.geojson`
 
-  return new Promise<Response>((resolve, reject) => {
+  return new Promise<NextResponse>((resolve, reject) => {
     // Create encoding to convert token (string) to Uint8Array
     const encoder = new TextEncoder()
 
@@ -105,11 +106,11 @@ export async function getBoundaryData(area: Areas, code: string) {
     get(url, (res) => {
       if (res.statusCode !== 200) {
         resolve(
-          new Response(
-            JSON.stringify({
+          NextResponse.json(
+            {
               statusCode: res.statusCode,
               message: res.statusMessage,
-            }),
+            },
             { status: res.statusCode },
           ),
         )
@@ -121,7 +122,7 @@ export async function getBoundaryData(area: Areas, code: string) {
 
       res.on('end', () => {
         writer.close()
-        resolve(new Response(stream.readable, { status: res.statusCode }))
+        resolve(new NextResponse(stream.readable, { status: res.statusCode }))
       })
 
       res.on('error', (error) => {
