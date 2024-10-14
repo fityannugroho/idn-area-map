@@ -1,11 +1,10 @@
 import MapDashboard from '@/components/map-dashboard'
 import { config } from '@/lib/config'
 import { Areas, singletonArea } from '@/lib/const'
-import { getSpecificData } from '@/lib/data'
-import { areaCodeSchema, determineAreaByCode, ucWords } from '@/lib/utils'
+import { getSpecificData, GetSpecificDataReturn } from '@/lib/data'
+import { determineAreaByCode, ucWords } from '@/lib/utils'
 import { Metadata, ResolvingMetadata } from 'next'
-import { ZodError } from 'zod'
-import { fromZodError } from 'zod-validation-error'
+import { notFound } from 'next/navigation'
 
 type Props = {
   params: {
@@ -13,7 +12,10 @@ type Props = {
   }
 }
 
-async function getAreaData(area: Areas, areaCode: string) {
+async function getAreaData(
+  area: Areas,
+  areaCode: string,
+): Promise<GetSpecificDataReturn<Areas>['data']> {
   const res = await getSpecificData(area, areaCode.replaceAll('.', ''))
 
   if (!('data' in res)) {
@@ -30,8 +32,17 @@ export async function generateMetadata(
   { params: { code } }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const area = determineAreaByCode(code)
-  const areaData = await getAreaData(area, code)
+  let area, areaData: Awaited<ReturnType<typeof getAreaData>>
+  try {
+    area = determineAreaByCode(code)
+    areaData = await getAreaData(area, code)
+  } catch (error) {
+    return {
+      title: 'Area Not Found',
+      description:
+        'The area you are looking for does not exist. Ensure the link is correct or search the data manually in the Main Page.',
+    }
+  }
 
   const url = `${config.appUrl}/${areaData.code}`
   const parentNames = Object.keys(areaData.parent ?? {}).map((parent) =>
@@ -45,7 +56,7 @@ export async function generateMetadata(
     ...parentNames,
   ].join(', ')
 
-  const title = `${areaNames} | ${config.appName}`
+  const title = areaNames
   const description = `See the information about ${areaNames}, Indonesia.`
   const ogImage = `/api/og-image/area/${areaData.code}`
 
@@ -68,25 +79,21 @@ export async function generateMetadata(
 }
 
 export default async function DetailAreaPage({ params }: Props) {
-  let areaCode
-
+  let area, areaData
   try {
-    areaCode = areaCodeSchema.parse(params.code)
+    area = determineAreaByCode(params.code)
+    areaData = await getAreaData(area, params.code)
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw fromZodError(error)
-    }
-    throw error
+    return notFound()
   }
 
-  const area = determineAreaByCode(areaCode)
-  const { parent: parentAreas, ...areaData } = await getAreaData(area, areaCode)
+  const { parent, ...data } = areaData
 
   return (
     <MapDashboard
       defaultSelected={{
-        [singletonArea[area]]: areaData,
-        ...parentAreas,
+        [singletonArea[area]]: data,
+        ...parent,
       }}
     />
   )

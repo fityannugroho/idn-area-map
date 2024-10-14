@@ -19,7 +19,13 @@ export async function GET(
   request: Request,
   { params: { code } }: { params: { code: string } },
 ) {
-  const area = determineAreaByCode(code)
+  let area
+  try {
+    area = determineAreaByCode(code)
+  } catch (error) {
+    return NextResponse.json({ message: 'Invalid area code' }, { status: 400 })
+  }
+
   const config = featureConfig[area as FeatureAreas]
   const [resBoundary] = await Promise.all([getBoundaryData(area, code)])
 
