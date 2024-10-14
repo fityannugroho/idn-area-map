@@ -1,4 +1,3 @@
-import { ThemeProvider } from '@/components/theme-provider'
 import { config } from '@/lib/config'
 import { cn } from '@/lib/utils'
 import { Inter } from 'next/font/google'
@@ -6,6 +5,7 @@ import { StrictMode } from 'react'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
 import { Metadata } from 'next'
+import { ThemeProvider } from 'next-themes'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -54,6 +54,7 @@ export default function RootLayout({
             inter.variable,
           )}
         >
+          {/* @ts-ignore error type return on build. Revert this when https://github.com/pacocoursey/next-themes/issues/279 issue has been fixed */}
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
