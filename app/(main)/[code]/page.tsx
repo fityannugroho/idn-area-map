@@ -2,10 +2,9 @@ import MapDashboard from '@/components/map-dashboard'
 import { config } from '@/lib/config'
 import { Areas, singletonArea } from '@/lib/const'
 import { getSpecificData } from '@/lib/data'
-import { areaCodeSchema, determineAreaByCode, ucWords } from '@/lib/utils'
+import { determineAreaByCode, ucWords } from '@/lib/utils'
 import { Metadata, ResolvingMetadata } from 'next'
-import { ZodError } from 'zod'
-import { fromZodError } from 'zod-validation-error'
+import { notFound } from 'next/navigation'
 
 type Props = {
   params: {
@@ -30,9 +29,18 @@ export async function generateMetadata(
   { params: { code } }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const area = determineAreaByCode(code)
-  const areaData = await getAreaData(area, code)
+  let area
+  try {
+    area = determineAreaByCode(code)
+  } catch (error) {
+    return {
+      title: '404 - Area Not Found | ' + config.appName,
+      description:
+        'The area you are looking for does not exist. Ensure the link is correct or search the data manually in the Main Page.',
+    }
+  }
 
+  const areaData = await getAreaData(area, code)
   const url = `${config.appUrl}/${areaData.code}`
   const parentNames = Object.keys(areaData.parent ?? {}).map((parent) =>
     parent === 'regency'
@@ -68,25 +76,20 @@ export async function generateMetadata(
 }
 
 export default async function DetailAreaPage({ params }: Props) {
-  let areaCode
-
+  let area
   try {
-    areaCode = areaCodeSchema.parse(params.code)
+    area = determineAreaByCode(params.code)
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw fromZodError(error)
-    }
-    throw error
+    return notFound()
   }
 
-  const area = determineAreaByCode(areaCode)
-  const { parent: parentAreas, ...areaData } = await getAreaData(area, areaCode)
+  const { parent, ...areaData } = await getAreaData(area, params.code)
 
   return (
     <MapDashboard
       defaultSelected={{
         [singletonArea[area]]: areaData,
-        ...parentAreas,
+        ...parent,
       }}
     />
   )

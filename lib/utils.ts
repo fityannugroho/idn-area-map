@@ -1,7 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { Areas, parentArea } from './const'
-import { z } from 'zod'
 
 /**
  * Add dot separator for the area code.
@@ -76,19 +75,6 @@ export function getAllParents<Area extends Areas>(area: Area): Areas[] {
 
   return [parent, ...getAllParents(parent)]
 }
-
-/**
- * Schema for area code, either province, regency, district, or village.
- * The code can be separated by dot (.) or not.
- */
-export const areaCodeSchema = z.string().refine(
-  (code) => {
-    return /^\d{2}(?:\.?\d{2})?(?:\.?\d{2})?(?:\.?\d{4})?$/.test(code)
-  },
-  {
-    message: 'Invalid area code',
-  },
-)
 
 /**
  * Determine the area of the given code.
