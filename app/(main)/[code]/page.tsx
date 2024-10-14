@@ -29,9 +29,10 @@ export async function generateMetadata(
   { params: { code } }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  let area
+  let area, areaData
   try {
     area = determineAreaByCode(code)
+    areaData = await getAreaData(area, code)
   } catch (error) {
     return {
       title: 'Area Not Found',
@@ -40,7 +41,6 @@ export async function generateMetadata(
     }
   }
 
-  const areaData = await getAreaData(area, code)
   const url = `${config.appUrl}/${areaData.code}`
   const parentNames = Object.keys(areaData.parent ?? {}).map((parent) =>
     parent === 'regency'
@@ -76,19 +76,20 @@ export async function generateMetadata(
 }
 
 export default async function DetailAreaPage({ params }: Props) {
-  let area
+  let area, areaData
   try {
     area = determineAreaByCode(params.code)
+    areaData = await getAreaData(area, params.code)
   } catch (error) {
     return notFound()
   }
 
-  const { parent, ...areaData } = await getAreaData(area, params.code)
+  const { parent, ...data } = areaData
 
   return (
     <MapDashboard
       defaultSelected={{
-        [singletonArea[area]]: areaData,
+        [singletonArea[area]]: data,
         ...parent,
       }}
     />
