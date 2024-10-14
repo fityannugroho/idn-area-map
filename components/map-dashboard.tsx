@@ -439,9 +439,7 @@ export default function MapDashboard({ defaultSelected }: Props) {
                   title={island.name}
                 >
                   <div className="flex flex-col gap-2">
-                    <b className="font-bold block text-primary">
-                      {island.name}
-                    </b>
+                    <b className="font-bold block">{island.name}</b>
 
                     <span className="text-xs text-gray-500 block">
                       {island.coordinate}
@@ -461,12 +459,12 @@ export default function MapDashboard({ defaultSelected }: Props) {
                     {(island.isPopulated || island.isOutermostSmall) && (
                       <div className="flex gap-1 mt-1">
                         {island.isPopulated && (
-                          <span className="bg-green-500 text-white font-medium rounded-full px-2 py-1">
+                          <span className="bg-green-500 text-popover font-semibold rounded-full px-2 py-1">
                             Populated
                           </span>
                         )}
                         {island.isOutermostSmall && (
-                          <span className="bg-red-500 text-white font-medium rounded-full px-2 py-1">
+                          <span className="bg-red-500 text-popover font-semibold rounded-full px-2 py-1">
                             Outermost Small Island
                           </span>
                         )}
