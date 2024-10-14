@@ -57,3 +57,43 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Override default leaflet styles */
+.leaflet-container {
+  /* Popup */
+  .leaflet-popup {
+    .leaflet-popup-content-wrapper {
+      @apply bg-popover text-popover-foreground;
+    }
+
+    .leaflet-popup-close-button {
+      @apply text-muted-foreground;
+    }
+
+    .leaflet-popup-close-button:hover {
+      @apply text-popover-foreground font-bold;
+    }
+
+    .leaflet-popup-tip {
+      @apply bg-popover;
+    }
+  }
+
+  /* Marker */
+  .leaflet-marker-icon {
+    span {
+      @apply text-black font-semibold;
+    }
+  }
+
+  /* Control */
+  .leaflet-control-container {
+    .leaflet-bar a {
+      @apply bg-card text-card-foreground;
+    }
+
+    .leaflet-control-attribution {
+      @apply bg-card text-card-foreground;
+    }
+  }
+}
