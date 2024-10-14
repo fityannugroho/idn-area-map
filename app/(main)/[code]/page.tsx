@@ -34,7 +34,7 @@ export async function generateMetadata(
     area = determineAreaByCode(code)
   } catch (error) {
     return {
-      title: '404 - Area Not Found | ' + config.appName,
+      title: 'Area Not Found',
       description:
         'The area you are looking for does not exist. Ensure the link is correct or search the data manually in the Main Page.',
     }
@@ -53,7 +53,7 @@ export async function generateMetadata(
     ...parentNames,
   ].join(', ')
 
-  const title = `${areaNames} | ${config.appName}`
+  const title = areaNames
   const description = `See the information about ${areaNames}, Indonesia.`
   const ogImage = `/api/og-image/area/${areaData.code}`
 

@@ -16,7 +16,10 @@ const title = config.appName
 const description = config.appDescription
 
 export const metadata: Metadata = {
-  title,
+  title: {
+    template: `%s | ${config.appName}`,
+    default: config.appName,
+  },
   description,
   robots: {
     index: true,

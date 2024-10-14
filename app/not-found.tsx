@@ -1,7 +1,14 @@
 import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
+import { Metadata } from 'next'
 import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: 'Not Found',
+  description:
+    "Sorry, we couldn't find the page or resource you were looking for. It might have been removed, renamed, or did not exist in the first place.",
+}
 
 export default function NotFound() {
   return (
