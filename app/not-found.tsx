@@ -21,8 +21,9 @@ export default function NotFound() {
         <ExclamationTriangleIcon className="h-10 w-10 text-yellow-500" />
         <h1 className="text-2xl font-bold">404 - Not Found</h1>
         <p className="max-w-prose">
-          Sorry, we couldn't find the page or resource you were looking for. It
-          might have been removed, renamed, or did not exist in the first place.
+          Sorry, we couldn&apos;t find the page or resource you were looking
+          for. It might have been removed, renamed, or did not exist in the
+          first place.
         </p>
         <Button asChild>
           <Link href="/">Go to Main Page</Link>
