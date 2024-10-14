@@ -1,7 +1,7 @@
 import MapDashboard from '@/components/map-dashboard'
 import { config } from '@/lib/config'
 import { Areas, singletonArea } from '@/lib/const'
-import { getSpecificData } from '@/lib/data'
+import { getSpecificData, GetSpecificDataReturn } from '@/lib/data'
 import { determineAreaByCode, ucWords } from '@/lib/utils'
 import { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -12,7 +12,10 @@ type Props = {
   }
 }
 
-async function getAreaData(area: Areas, areaCode: string) {
+async function getAreaData(
+  area: Areas,
+  areaCode: string,
+): Promise<GetSpecificDataReturn<Areas>['data']> {
   const res = await getSpecificData(area, areaCode.replaceAll('.', ''))
 
   if (!('data' in res)) {
@@ -29,7 +32,7 @@ export async function generateMetadata(
   { params: { code } }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  let area, areaData
+  let area, areaData: Awaited<ReturnType<typeof getAreaData>>
   try {
     area = determineAreaByCode(code)
     areaData = await getAreaData(area, code)
