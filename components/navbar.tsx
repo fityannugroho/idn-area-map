@@ -2,7 +2,7 @@
 
 import { config } from '@/lib/config'
 import { cn } from '@/lib/utils'
-import { GitHubLogoIcon } from '@radix-ui/react-icons'
+import { GitHubLogoIcon, HeartFilledIcon } from '@radix-ui/react-icons'
 import Link from 'next/link'
 import * as React from 'react'
 import { ThemeToggle } from './theme-toggle'
@@ -23,10 +23,24 @@ export function Navbar({ className }: NavbarProps) {
       )}
     >
       {/* Left */}
-      <div className="flex items-center gap-4">
-        <Link href="/">
-          <span className="text-lg font-semibold">{appName}</span>
+      <div className="flex items-center gap-6 lg:gap-8">
+        <Link href="/" className="text-lg font-semibold">
+          {appName}
         </Link>
+        <ul className="flex gap-4 lg:gap-6 text-sm *:text-foreground/60 hover:*:text-foreground">
+          <li>
+            <Link href="https://idn-area.up.railway.app/docs">API</Link>
+          </li>
+          <li>
+            <Link
+              href="https://trakteer.id/fityannugroho/tip"
+              className="flex items-center gap-1"
+            >
+              Donate
+              <HeartFilledIcon className="h-[1rem] w-[1rem] mt-[0.125rem]" />
+            </Link>
+          </li>
+        </ul>
       </div>
 
       {/* Right */}
