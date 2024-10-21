@@ -29,11 +29,13 @@ export function Navbar({ className }: NavbarProps) {
         </Link>
         <ul className="flex gap-4 lg:gap-6 text-sm *:text-foreground/60 hover:*:text-foreground">
           <li>
-            <Link target='_blank' href="https://idn-area.up.railway.app/docs">API</Link>
+            <Link target="_blank" href="https://idn-area.up.railway.app/docs">
+              API
+            </Link>
           </li>
           <li>
             <Link
-              target='_blank'
+              target="_blank"
               href="https://trakteer.id/fityannugroho/tip"
               className="flex items-center gap-1"
             >
@@ -49,7 +51,10 @@ export function Navbar({ className }: NavbarProps) {
         {/* Icon group */}
         <div className="flex gap-1">
           <Button variant="ghost" size="icon" asChild>
-            <Link target='_blank' href="https://github.com/fityannugroho/idn-area-map">
+            <Link
+              target="_blank"
+              href="https://github.com/fityannugroho/idn-area-map"
+            >
               <GitHubLogoIcon className="h-[1.2rem] w-[1.2rem]" />
             </Link>
           </Button>
