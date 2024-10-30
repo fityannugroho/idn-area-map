@@ -1,13 +1,13 @@
 'use client'
 
+import { useArea } from '@/hooks/useArea'
 import {
   type Areas as BaseAreas,
   type GetArea,
   singletonArea,
 } from '@/lib/const'
-import { type Query, getData } from '@/lib/data'
+import type { Query } from '@/lib/data'
 import { ucFirstStr } from '@/lib/utils'
-import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Combobox, type ComboboxOption, type ComboboxProps } from './combobox'
 
@@ -38,23 +38,18 @@ export default function ComboboxArea<A extends Areas>({
   selected,
   ...comboboxProps
 }: ComboboxAreaProps<A>) {
-  const [areas, setAreas] = useState<GetArea<A>[]>([])
+  const {
+    data: areas = [],
+    error,
+    isLoading,
+  } = useArea(area, { ...query, sortBy: 'name' })
 
-  useEffect(() => {
-    getData(area, { ...query, sortBy: 'name' })
-      .then((res) => {
-        if ('data' in res) return setAreas(res.data)
-        throw new Error(
-          Array.isArray(res.message) ? res.message[0] : res.message,
-        )
-      })
-      .catch((err) => {
-        toast.error(`Failed to fetch ${singletonArea[area]} data`, {
-          description: err.message,
-          closeButton: true,
-        })
-      })
-  }, [area, query])
+  if (!isLoading && error) {
+    toast.error(`Failed to fetch ${singletonArea[area]} data`, {
+      description: error?.message,
+      closeButton: true,
+    })
+  }
 
   return (
     <Combobox
