@@ -1,11 +1,27 @@
 'use client'
 
-import { FeatureAreas, config, featureConfig } from '@/lib/config'
-import { Query, getData } from '@/lib/data'
+import useDoubleTap from '@/hooks/useDoubleTap'
+import { type FeatureAreas, config, featureConfig } from '@/lib/config'
+import {
+  type Areas,
+  type District,
+  type Island,
+  type Province,
+  type Regency,
+  type Village,
+  singletonArea,
+} from '@/lib/const'
+import { type Query, getData } from '@/lib/data'
+import { cn, debounce, ucFirstStr } from '@/lib/utils'
 import { Cross2Icon, ExternalLinkIcon, ReloadIcon } from '@radix-ui/react-icons'
+import type { LatLngBounds, Map as LeafletMap } from 'leaflet'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useMap } from 'react-leaflet'
+import type { ImperativePanelHandle } from 'react-resizable-panels'
+import ComboboxArea from './combobox-area'
+import GeoJsonArea from './geojson-area'
 import { Button } from './ui/button'
 import {
   ResizableHandle,
@@ -13,24 +29,7 @@ import {
   ResizablePanelGroup,
 } from './ui/resizable'
 import { Skeleton } from './ui/skeleton'
-import { cn, debounce, ucFirstStr } from '@/lib/utils'
-import ComboboxArea from './combobox-area'
-import GeoJsonArea from './geojson-area'
-import {
-  Province,
-  Regency,
-  District,
-  Village,
-  Island,
-  Areas,
-  singletonArea,
-  parentArea,
-} from '@/lib/const'
 import { Switch } from './ui/switch'
-import { LatLngBounds, Map as LeafletMap } from 'leaflet'
-import { useMap } from 'react-leaflet'
-import { ImperativePanelHandle } from 'react-resizable-panels'
-import useDoubleTap from '@/hooks/useDoubleTap'
 
 const Map = dynamic(() => import('@/components/map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
@@ -95,12 +94,9 @@ export default function MapDashboard({ defaultSelected }: Props) {
   )
   const [query, setQuery] =
     useState<{ [A in Exclude<Areas, 'provinces'>]?: Query<A> }>()
-  const [isLoading, setLoading] = useState<{
-    [A in Areas]?: boolean
-  }>()
-  const [hideBoundary, setHideBoundary] = useState<{
-    [A in FeatureAreas]?: boolean
-  }>()
+  const [isLoading, setLoading] = useState<{ [A in Areas]?: boolean }>()
+  const [hideBoundary, setHideBoundary] =
+    useState<{ [A in FeatureAreas]?: boolean }>()
   const [areaBounds, setAreaBounds] = useState<LatLngBounds>()
   const [panelDirection, setPanelDirection] = useState<
     'horizontal' | 'vertical'

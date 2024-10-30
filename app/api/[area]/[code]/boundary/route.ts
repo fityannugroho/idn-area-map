@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { Params, paramSchema } from './schema'
 import { getBoundaryData } from '@/lib/data'
+import { type NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { type Params, paramSchema } from './schema'
 
 export async function GET(
   request: NextRequest,

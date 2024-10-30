@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 
 /**
  * Hook that triggers a callback function on a double-tap event.

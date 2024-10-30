@@ -1,4 +1,4 @@
-import { Areas } from './const'
+import type { Areas } from './const'
 
 export type Config = Readonly<{
   appName: string
@@ -27,10 +27,10 @@ export const config: Config = {
     area: {
       url: process.env.DATA_SOURCE_URL ?? 'https://idn-area.up.railway.app',
       pagination: {
-        defaultPageSize: parseInt(
+        defaultPageSize: Number.parseInt(
           process.env.DATA_SOURCE_PAGINATION_DEFAULT_PAGE_SIZE ?? '10',
         ),
-        maxPageSize: parseInt(
+        maxPageSize: Number.parseInt(
           process.env.DATA_SOURCE_PAGINATION_MAX_PAGE_SIZE ?? '100',
         ),
       },

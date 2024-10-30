@@ -1,13 +1,13 @@
 'use client'
 
-import { Areas as BaseAreas, singletonArea } from '@/lib/const'
-import { GetSpecificDataReturn, getSpecificData } from '@/lib/data'
+import { type Areas as BaseAreas, singletonArea } from '@/lib/const'
+import { type GetSpecificDataReturn, getSpecificData } from '@/lib/data'
 import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
-import { Link2Icon, ExternalLinkIcon } from '@radix-ui/react-icons'
+import { ExternalLinkIcon, Link2Icon } from '@radix-ui/react-icons'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { GeoJSONProps } from 'react-leaflet'
+import type { GeoJSONProps } from 'react-leaflet'
 import { toast } from 'sonner'
 
 const GeoJSON = dynamic(
@@ -83,6 +83,8 @@ export default function GeoJsonArea<A extends Areas>({
   const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()
   const parents = getAllParents(area)
 
+  // TODO: optimize this
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Ignore `onLoading` and `onLoaded` dependencies
   useEffect(() => {
     onLoading?.()
 
@@ -121,7 +123,6 @@ export default function GeoJsonArea<A extends Areas>({
           closeButton: true,
         })
       })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [area, code])
 
   return (
@@ -174,6 +175,7 @@ export default function GeoJsonArea<A extends Areas>({
               })}
 
               <button
+                type="button"
                 onClick={() => {
                   try {
                     navigator.clipboard.writeText(

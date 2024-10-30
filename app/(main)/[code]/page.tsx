@@ -1,9 +1,9 @@
 import MapDashboard from '@/components/map-dashboard'
 import { config } from '@/lib/config'
-import { Areas, singletonArea } from '@/lib/const'
-import { getSpecificData, GetSpecificDataReturn } from '@/lib/data'
+import { type Areas, singletonArea } from '@/lib/const'
+import { type GetSpecificDataReturn, getSpecificData } from '@/lib/data'
 import { determineAreaByCode, ucWords } from '@/lib/utils'
-import { Metadata, ResolvingMetadata } from 'next'
+import type { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
 
 type Props = {
@@ -32,7 +32,9 @@ export async function generateMetadata(
   { params: { code } }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  let area, areaData: Awaited<ReturnType<typeof getAreaData>>
+  let area: Areas
+  let areaData: Awaited<ReturnType<typeof getAreaData>>
+
   try {
     area = determineAreaByCode(code)
     areaData = await getAreaData(area, code)
@@ -79,7 +81,9 @@ export async function generateMetadata(
 }
 
 export default async function DetailAreaPage({ params }: Props) {
-  let area, areaData
+  let area: Areas
+  let areaData: Awaited<ReturnType<typeof getAreaData>>
+
   try {
     area = determineAreaByCode(params.code)
     areaData = await getAreaData(area, params.code)
