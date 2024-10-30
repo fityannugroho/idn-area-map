@@ -83,6 +83,8 @@ export default function GeoJsonArea<A extends Areas>({
   const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()
   const parents = getAllParents(area)
 
+  // TODO: optimize this
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Ignore `onLoading` and `onLoaded` dependencies
   useEffect(() => {
     onLoading?.()
 
@@ -121,7 +123,7 @@ export default function GeoJsonArea<A extends Areas>({
           closeButton: true,
         })
       })
-  }, [area, code, onLoaded, onLoading])
+  }, [area, code])
 
   return (
     <Pane
