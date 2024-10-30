@@ -1,10 +1,10 @@
 'use server'
 
-import { get } from 'https'
-import { config } from './config'
-import { Areas, GetArea, parentArea, singletonArea } from './const'
-import { addDotSeparator } from './utils'
+import { get } from 'node:https'
 import { NextResponse } from 'next/server'
+import { config } from './config'
+import { type Areas, type GetArea, parentArea, singletonArea } from './const'
+import { addDotSeparator } from './utils'
 
 export type Query<Area extends Areas> = {
   limit?: number

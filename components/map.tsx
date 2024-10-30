@@ -1,8 +1,8 @@
 'use client'
 
 import 'leaflet/dist/leaflet.css'
-import { PropsWithChildren } from 'react'
-import { MapContainer, MapContainerProps, TileLayer } from 'react-leaflet'
+import type { PropsWithChildren } from 'react'
+import { MapContainer, type MapContainerProps, TileLayer } from 'react-leaflet'
 
 export type MapProps = MapContainerProps & PropsWithChildren
 

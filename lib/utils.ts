@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { Areas, parentArea } from './const'
+import { type Areas, parentArea } from './const'
 
 /**
  * Add dot separator for the area code.
@@ -27,13 +27,13 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Debounce a function call by a given delay.
  */
-export function debounce<T extends any[]>(
+export function debounce<T extends unknown[]>(
   callback: (...args: T) => void,
   delay: number,
 ) {
   let timeoutId: NodeJS.Timeout | null = null
 
-  return function (...args: T) {
+  return (...args: T) => {
     if (timeoutId) {
       clearTimeout(timeoutId)
     }

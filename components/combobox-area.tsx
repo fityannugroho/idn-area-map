@@ -1,11 +1,15 @@
 'use client'
 
-import { Query, getData } from '@/lib/data'
+import {
+  type Areas as BaseAreas,
+  type GetArea,
+  singletonArea,
+} from '@/lib/const'
+import { type Query, getData } from '@/lib/data'
+import { ucFirstStr } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Combobox, ComboboxOption, ComboboxProps } from './combobox'
-import { ucFirstStr } from '@/lib/utils'
-import { Areas as BaseAreas, GetArea, singletonArea } from '@/lib/const'
+import { Combobox, type ComboboxOption, type ComboboxProps } from './combobox'
 
 type Areas = Exclude<BaseAreas, 'islands'>
 

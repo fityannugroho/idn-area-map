@@ -1,10 +1,11 @@
+import { type FeatureAreas, featureConfig } from '@/lib/config'
+import type { Areas } from '@/lib/const'
 import { getBoundaryData } from '@/lib/data'
 import { determineAreaByCode } from '@/lib/utils'
-import StaticMaps, { AddPolygonOptions } from 'staticmaps'
 import { NextResponse } from 'next/server'
 // @ts-ignore
 import simplify from 'simplify-geojson'
-import { FeatureAreas, featureConfig } from '@/lib/config'
+import StaticMaps, { type AddPolygonOptions } from 'staticmaps'
 
 function countPositionInCoords(coord: GeoJSON.Position[][]) {
   return coord.reduce((acc, curr) => acc + curr.length, 0)
@@ -19,7 +20,7 @@ export async function GET(
   request: Request,
   { params: { code } }: { params: { code: string } },
 ) {
-  let area
+  let area: Areas
   try {
     area = determineAreaByCode(code)
   } catch (error) {
@@ -61,7 +62,7 @@ export async function GET(
   } as const
 
   switch (boundary.geometry.type) {
-    case 'MultiPolygon':
+    case 'MultiPolygon': {
       // Sort the coordinates by the number of positions (the largest first)
       const sortedCoordsFromLargest = [...boundary.geometry.coordinates].sort(
         (a, b) => countPositionInCoords(b) - countPositionInCoords(a),
@@ -80,6 +81,7 @@ export async function GET(
         })
       }
       break
+    }
     case 'Polygon':
       map.addMultiPolygon({
         // @ts-expect-error
