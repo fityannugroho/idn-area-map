@@ -65,8 +65,6 @@
     "@types/react-dom": "^18.3.1",
     "@types/staticmaps": "^1.12.5",
     "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.15",
-    "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.3.3"
+    "eslint-config-next": "^14.2.15"
   }
 }
