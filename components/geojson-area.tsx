@@ -1,12 +1,13 @@
 'use client'
 
+import { useArea } from '@/hooks/useArea'
 import { type Areas as BaseAreas, singletonArea } from '@/lib/const'
-import { type GetSpecificDataReturn, getData } from '@/lib/data'
 import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
 import { ExternalLinkIcon, Link2Icon } from '@radix-ui/react-icons'
+import { useQuery } from '@tanstack/react-query'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { GeoJSONProps } from 'react-leaflet'
 import { toast } from 'sonner'
 
@@ -77,53 +78,34 @@ export default function GeoJsonArea<A extends Areas>({
   pathOptions,
   ...props
 }: GeoJsonAreaProps<A>) {
-  const [geoJson, setGeoJson] =
-    useState<GeoJSON.Feature<GeoJSON.MultiPolygon>>()
-  const [areaData, setAreaData] = useState<GetSpecificDataReturn<A>['data']>()
+  const fetchBoundary = async () => {
+    const res = await fetch(`/api/${area}/${code}/boundary`)
+
+    if (!res.ok) {
+      throw new Error(
+        res.status === 404
+          ? `Data not found for ${singletonArea[area]} ${code}`
+          : `Unexpected status code: ${res.status}`,
+      )
+    }
+
+    return (await res.json()) as GeoJSON.Feature<GeoJSON.MultiPolygon>
+  }
+
+  const { data: geoJson, status: geoStatus } = useQuery({
+    queryKey: ['geoJson', area, code],
+    queryFn: fetchBoundary,
+  })
+  const { data: areaData, status: areaStatus } = useArea(area, code)
   const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()
   const parents = getAllParents(area)
 
-  // TODO: optimize this
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Ignore `onLoading` and `onLoaded` dependencies
-  useEffect(() => {
-    onLoading?.()
-
-    fetch(`/api/${area}/${code}/boundary`)
-      .then((res) => {
-        if (!res.ok) {
-          if (res.status === 404) {
-            throw new Error(`Data not found for ${singletonArea[area]} ${code}`)
-          }
-          throw new Error(`Unexpected status code: ${res.status}`)
-        }
-        return res.json()
-      })
-      .then((res) => {
-        setGeoJson(res)
-        onLoaded?.(true)
-      })
-      .catch((err) => {
-        toast.error(`Failed to fetch ${singletonArea[area]} boundary data`, {
-          description: err.message,
-          closeButton: true,
-        })
-        onLoaded?.(false)
-      })
-
-    getData(area, code)
-      .then((res) => {
-        if ('data' in res) return setAreaData(res.data)
-        throw new Error(
-          Array.isArray(res.message) ? res.message[0] : res.message,
-        )
-      })
-      .catch((err) => {
-        toast.error(`Failed to fetch ${singletonArea[area]} data`, {
-          description: err.message,
-          closeButton: true,
-        })
-      })
-  }, [area, code])
+  if (areaStatus === 'error' || geoStatus === 'error') {
+    return toast.error(`Failed to fetch ${singletonArea[area]} data`, {
+      description: 'An error occurred while fetching the data',
+      closeButton: true,
+    })
+  }
 
   return (
     <Pane
@@ -153,7 +135,9 @@ export default function GeoJsonArea<A extends Areas>({
         {/* Render Popup inside the default `popupPane`.
             See https://leafletjs.com/reference.html#map-pane */}
         <Popup pane="popupPane">
-          {areaData ? (
+          {areaStatus === 'pending' ? (
+            <span className="block text-gray-500">Loading...</span>
+          ) : (
             <>
               <span className="block font-bold text-sm">{areaData.name}</span>
               <span className="text-sm">{addDotSeparator(areaData.code)}</span>
@@ -208,8 +192,6 @@ export default function GeoJsonArea<A extends Areas>({
                 See on Google Maps
               </Link>
             </>
-          ) : (
-            <span className="block text-gray-500">Loading...</span>
           )}
         </Popup>
       </FeatureGroup>

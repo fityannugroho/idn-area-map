@@ -38,13 +38,12 @@ export default function ComboboxArea<A extends Areas>({
   selected,
   ...comboboxProps
 }: ComboboxAreaProps<A>) {
-  const {
-    data: areas = [],
-    error,
-    isLoading,
-  } = useArea(area, { ...query, sortBy: 'name' })
+  const { data: areas = [], error } = useArea(area, {
+    ...query,
+    sortBy: 'name',
+  })
 
-  if (!isLoading && error) {
+  if (error) {
     toast.error(`Failed to fetch ${singletonArea[area]} data`, {
       description: error?.message,
       closeButton: true,
