@@ -101,10 +101,11 @@ export default function GeoJsonArea<A extends Areas>({
   const parents = getAllParents(area)
 
   if (areaStatus === 'error' || geoStatus === 'error') {
-    return toast.error(`Failed to fetch ${singletonArea[area]} data`, {
+    toast.error(`Failed to fetch ${singletonArea[area]} data`, {
       description: 'An error occurred while fetching the data',
       closeButton: true,
     })
+    return null
   }
 
   return (
