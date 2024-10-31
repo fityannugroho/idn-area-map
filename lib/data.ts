@@ -1,7 +1,5 @@
 'use server'
 
-import { get } from 'node:https'
-import { NextResponse } from 'next/server'
 import { config } from './config'
 import { type Area, type GetArea, endpoints, parentArea } from './const'
 import { addDotSeparator } from './utils'
@@ -102,43 +100,22 @@ export async function getData<A extends Area, P extends string | Query<A>>(
   return await res.json()
 }
 
-export async function getBoundaryData(area: Area, code: string) {
+type BoundaryResponse = {
+  statusCode: number
+  message: string
+  data?: GeoJSON.Feature<GeoJSON.MultiPolygon>
+}
+
+export async function getBoundaryData(
+  area: Area,
+  code: string,
+): Promise<BoundaryResponse> {
   const url = `${config.dataSource.boundary.url}/${endpoints[area]}/${addDotSeparator(code.replaceAll('.', ''))}.geojson`
+  const res = await fetch(url)
 
-  return new Promise<NextResponse>((resolve, reject) => {
-    // Create encoding to convert token (string) to Uint8Array
-    const encoder = new TextEncoder()
-
-    // Create a TransformStream for writing the response as the tokens as generated
-    const stream = new TransformStream()
-    const writer = stream.writable.getWriter()
-
-    get(url, (res) => {
-      if (res.statusCode !== 200) {
-        resolve(
-          NextResponse.json(
-            {
-              statusCode: res.statusCode,
-              message: res.statusMessage,
-            },
-            { status: res.statusCode },
-          ),
-        )
-      }
-
-      res.on('data', (chunk) => {
-        writer.write(encoder.encode(chunk))
-      })
-
-      res.on('end', () => {
-        writer.close()
-        resolve(new NextResponse(stream.readable, { status: res.statusCode }))
-      })
-
-      res.on('error', (error) => {
-        writer.close()
-        reject('Error occurred while fetching data')
-      })
-    })
-  })
+  return {
+    statusCode: res.status,
+    message: res.statusText,
+    ...(res.ok && { data: await res.json() }),
+  }
 }

@@ -2,6 +2,7 @@
 
 import { useArea } from '@/hooks/useArea'
 import type { FeatureArea } from '@/lib/config'
+import { getBoundaryData } from '@/lib/data'
 import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
 import { ExternalLinkIcon, Link2Icon } from '@radix-ui/react-icons'
 import { useQuery } from '@tanstack/react-query'
@@ -77,20 +78,24 @@ export default function GeoJsonArea<A extends FeatureArea>({
   ...props
 }: GeoJsonAreaProps<A>) {
   const fetchBoundary = async () => {
-    const res = await fetch(`/api/${area}/${code}/boundary`)
+    const res = await getBoundaryData(area, code)
 
-    if (!res.ok) {
+    if (!res.data) {
       throw new Error(
-        res.status === 404
+        res.statusCode === 404
           ? `Data not found for ${area} ${code}`
-          : `Unexpected status code: ${res.status}`,
+          : `Unexpected status code: ${res.statusCode}`,
       )
     }
 
-    return (await res.json()) as GeoJSON.Feature<GeoJSON.MultiPolygon>
+    return res.data
   }
 
-  const { data: geoJson, status: geoStatus } = useQuery({
+  const {
+    data: geoJson,
+    status: geoStatus,
+    error,
+  } = useQuery({
     queryKey: ['geoJson', area, code],
     queryFn: fetchBoundary,
   })
@@ -100,7 +105,7 @@ export default function GeoJsonArea<A extends FeatureArea>({
 
   if (areaStatus === 'error' || geoStatus === 'error') {
     toast.error(`Failed to fetch ${area} data`, {
-      description: 'An error occurred while fetching the data',
+      description: error?.message || 'An error occurred while fetching thedata',
       closeButton: true,
     })
     return null

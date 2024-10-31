@@ -28,25 +28,19 @@ export async function GET(
   }
 
   const config = featureConfig[area as FeatureArea]
-  const [resBoundary] = await Promise.all([getBoundaryData(area, code)])
+  const resBoundary = await getBoundaryData(area, code)
 
-  if (!resBoundary.ok) {
-    return new NextResponse(
-      JSON.stringify({
-        statusCode: resBoundary.status,
-        message: resBoundary.statusText,
-      }),
-      {
-        status: resBoundary.status,
-        statusText: resBoundary.statusText,
-        headers: { 'content-type': 'application/json' },
-      },
-    )
+  if (!resBoundary.data) {
+    return new NextResponse(JSON.stringify(resBoundary), {
+      status: resBoundary.statusCode,
+      statusText: resBoundary.message,
+      headers: { 'content-type': 'application/json' },
+    })
   }
 
   // Simplify the boundary to reduce the number of coordinates
   const boundary: GeoJSON.Feature<GeoJSON.MultiPolygon | GeoJSON.Polygon> =
-    simplify(await resBoundary.json(), config.simplification.tolerance)
+    simplify(resBoundary.data, config.simplification.tolerance)
 
   const map = new StaticMaps({
     width: 800,
