@@ -1,15 +1,14 @@
 'use client'
 
 import useDoubleTap from '@/hooks/useDoubleTap'
-import { type FeatureAreas, config, featureConfig } from '@/lib/config'
+import { type FeatureArea, config, featureConfig } from '@/lib/config'
 import {
-  type Areas,
+  Area,
   type District,
   type Island,
   type Province,
   type Regency,
   type Village,
-  singletonArea,
 } from '@/lib/const'
 import { type Query, getData } from '@/lib/data'
 import { cn, debounce, ucFirstStr } from '@/lib/utils'
@@ -56,7 +55,7 @@ type Selected = {
 
 const MAX_PAGE_SIZE = config.dataSource.area.pagination.maxPageSize
 
-const provinceQuery: Query<'provinces'> = {
+const provinceQuery: Query<Area.PROVINCE> = {
   limit: MAX_PAGE_SIZE,
 }
 
@@ -93,10 +92,10 @@ export default function MapDashboard({ defaultSelected }: Props) {
     defaultSelected,
   )
   const [query, setQuery] =
-    useState<{ [A in Exclude<Areas, 'provinces'>]?: Query<A> }>()
-  const [isLoading, setLoading] = useState<{ [A in Areas]?: boolean }>()
+    useState<{ [A in Exclude<Area, 'province'>]?: Query<A> }>()
+  const [isLoading, setLoading] = useState<{ [A in Area]?: boolean }>()
   const [hideBoundary, setHideBoundary] =
-    useState<{ [A in FeatureAreas]?: boolean }>()
+    useState<{ [A in FeatureArea]?: boolean }>()
   const [areaBounds, setAreaBounds] = useState<LatLngBounds>()
   const [panelDirection, setPanelDirection] = useState<
     'horizontal' | 'vertical'
@@ -107,20 +106,20 @@ export default function MapDashboard({ defaultSelected }: Props) {
   useEffect(() => {
     if (defaultSelected) {
       setQuery({
-        regencies: {
+        [Area.REGENCY]: {
           parentCode: defaultSelected.province?.code,
           limit: MAX_PAGE_SIZE,
         },
-        districts: {
+        [Area.DISTRICT]: {
           parentCode: defaultSelected.regency?.code,
           limit: MAX_PAGE_SIZE,
         },
-        villages: {
+        [Area.VILLAGE]: {
           parentCode: defaultSelected.district?.code,
           limit: MAX_PAGE_SIZE,
         },
         ...(defaultSelected.regency && {
-          islands: {
+          [Area.ISLAND]: {
             parentCode: defaultSelected.regency.code,
             limit: MAX_PAGE_SIZE,
           },
@@ -134,8 +133,8 @@ export default function MapDashboard({ defaultSelected }: Props) {
     async function fetchIslandsRecursively(page = 1, limit = MAX_PAGE_SIZE) {
       setLoading((current) => ({ ...current, islands: true }))
 
-      const res = await getData('islands', {
-        ...query?.islands,
+      const res = await getData(Area.ISLAND, {
+        ...query?.island,
         page,
         limit,
       })
@@ -154,10 +153,10 @@ export default function MapDashboard({ defaultSelected }: Props) {
 
     setIslands([])
 
-    if (query?.islands?.parentCode) {
+    if (query?.island?.parentCode) {
       fetchIslandsRecursively()
     }
-  }, [query?.islands])
+  }, [query?.island])
 
   useLayoutEffect(() => {
     const handleResize = () => {
@@ -206,30 +205,30 @@ export default function MapDashboard({ defaultSelected }: Props) {
       >
         <div className="p-4 flex flex-col items-center gap-4">
           <ComboboxArea
-            area="provinces"
+            area={Area.PROVINCE}
             selected={selected?.province}
             query={provinceQuery}
             onSelect={(province) => {
               setSelected((current) => ({ ...current, province }))
-              if (province.code === query?.regencies?.parentCode) return
+              if (province.code === query?.regency?.parentCode) return
               setQuery((current) => ({
                 ...current,
-                regencies: { parentCode: province.code, limit: MAX_PAGE_SIZE },
+                regency: { parentCode: province.code, limit: MAX_PAGE_SIZE },
               }))
             }}
           />
 
           <ComboboxArea
-            area="regencies"
+            area={Area.REGENCY}
             selected={selected?.regency}
-            query={query?.regencies}
+            query={query?.regency}
             onSelect={(regency) => {
               setSelected((current) => ({ ...current, regency }))
-              if (regency.code === query?.districts?.parentCode) return
+              if (regency.code === query?.district?.parentCode) return
               setQuery((current) => ({
                 ...current,
-                islands: { parentCode: regency.code, limit: MAX_PAGE_SIZE },
-                districts: { parentCode: regency.code, limit: MAX_PAGE_SIZE },
+                island: { parentCode: regency.code, limit: MAX_PAGE_SIZE },
+                district: { parentCode: regency.code, limit: MAX_PAGE_SIZE },
               }))
             }}
             inputProps={{
@@ -237,24 +236,24 @@ export default function MapDashboard({ defaultSelected }: Props) {
                 if (!selected?.province) {
                   setQuery((current) => ({
                     ...current,
-                    regencies: { ...current?.regencies, name },
+                    regency: { ...current?.regency, name },
                   }))
                 }
               }, 500),
             }}
-            disabled={isLoading?.provinces}
+            disabled={isLoading?.province}
           />
 
           <ComboboxArea
-            area="districts"
+            area={Area.DISTRICT}
             selected={selected?.district}
-            query={query?.districts}
+            query={query?.district}
             onSelect={(district) => {
               setSelected((current) => ({ ...current, district }))
-              if (district.code === query?.villages?.parentCode) return
+              if (district.code === query?.village?.parentCode) return
               setQuery((current) => ({
                 ...current,
-                villages: { parentCode: district.code, limit: MAX_PAGE_SIZE },
+                village: { parentCode: district.code, limit: MAX_PAGE_SIZE },
               }))
             }}
             inputProps={{
@@ -262,18 +261,18 @@ export default function MapDashboard({ defaultSelected }: Props) {
                 if (!selected?.regency) {
                   setQuery((current) => ({
                     ...current,
-                    districts: { ...current?.districts, name },
+                    district: { ...current?.district, name },
                   }))
                 }
               }, 500),
             }}
-            disabled={isLoading?.regencies}
+            disabled={isLoading?.regency}
           />
 
           <ComboboxArea
-            area="villages"
+            area={Area.VILLAGE}
             selected={selected?.village}
-            query={query?.villages}
+            query={query?.village}
             onSelect={(village) => {
               setSelected((current) => ({ ...current, village }))
             }}
@@ -282,19 +281,19 @@ export default function MapDashboard({ defaultSelected }: Props) {
                 if (!selected?.district) {
                   setQuery((current) => ({
                     ...current,
-                    villages: { ...current?.villages, name },
+                    village: { ...current?.village, name },
                   }))
                 }
               }, 500),
             }}
-            disabled={isLoading?.districts}
+            disabled={isLoading?.district}
           />
 
           {/* Islands info */}
           <div className="w-full p-2 border rounded flex gap-2 justify-center items-center">
-            {query?.islands?.parentCode ? (
+            {query?.island?.parentCode ? (
               <>
-                {isLoading?.islands && (
+                {isLoading?.island && (
                   <ReloadIcon className="h-4 w-4 animate-spin" />
                 )}
                 <span className="text-sm w-fit">
@@ -315,11 +314,7 @@ export default function MapDashboard({ defaultSelected }: Props) {
               <div key={area} className="flex items-center space-x-2 truncate">
                 <Switch
                   id={`${area}Boundary`}
-                  disabled={
-                    !selected?.[
-                      singletonArea[area as FeatureAreas] as keyof Selected
-                    ]
-                  }
+                  disabled={!selected?.[area as keyof Selected]}
                   defaultChecked
                   onCheckedChange={(checked) => {
                     setHideBoundary((current) => ({
@@ -332,9 +327,7 @@ export default function MapDashboard({ defaultSelected }: Props) {
                   htmlFor={`${area}Boundary`}
                   className={cn(
                     'flex items-center gap-2',
-                    !selected?.[
-                      singletonArea[area as FeatureAreas] as keyof Selected
-                    ] && 'text-gray-400',
+                    !selected?.[area as keyof Selected] && 'text-gray-400',
                   )}
                 >
                   <div
@@ -344,9 +337,9 @@ export default function MapDashboard({ defaultSelected }: Props) {
                     }}
                   />
 
-                  {ucFirstStr(singletonArea[area as FeatureAreas])}
+                  {ucFirstStr(area)}
 
-                  {isLoading?.[area as FeatureAreas] && (
+                  {isLoading?.[area as FeatureArea] && (
                     <ReloadIcon className="h-4 w-4 animate-spin" />
                   )}
                 </label>
@@ -385,8 +378,7 @@ export default function MapDashboard({ defaultSelected }: Props) {
           <MapRefSetter ref={mapRef} />
 
           {Object.entries(featureConfig).map(([area, config]) => {
-            const selectedArea =
-              selected?.[singletonArea[area as FeatureAreas] as keyof Selected]
+            const selectedArea = selected?.[area as keyof Selected]
 
             if (!selectedArea) {
               return null
@@ -395,13 +387,13 @@ export default function MapDashboard({ defaultSelected }: Props) {
             return (
               <GeoJsonArea
                 key={selectedArea.code}
-                area={area as FeatureAreas}
+                area={area as FeatureArea}
                 code={selectedArea.code}
                 pathOptions={{
                   color: config.color,
                   fillOpacity: 0.08,
                 }}
-                hide={hideBoundary?.[area as FeatureAreas]}
+                hide={hideBoundary?.[area as FeatureArea]}
                 eventHandlers={{
                   add: (e) => {
                     setAreaBounds(e.target.getBounds())

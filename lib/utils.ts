@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { type Areas, parentArea } from './const'
+import { Area, parentArea } from './const'
 
 /**
  * Add dot separator for the area code.
@@ -68,7 +68,7 @@ export function ucWords(str: string): string {
 /**
  * Get all parents of an area.
  */
-export function getAllParents<Area extends Areas>(area: Area): Areas[] {
+export function getAllParents<A extends Area>(area: A): Area[] {
   const parent = parentArea[area]
 
   if (!parent) return []
@@ -82,25 +82,25 @@ export function getAllParents<Area extends Areas>(area: Area): Areas[] {
  *
  * @throws If code is invalid.
  */
-export function determineAreaByCode(code: string): Areas {
+export function determineAreaByCode(code: string): Area {
   if (/^\d{2}$/.test(code)) {
-    return 'provinces'
+    return Area.PROVINCE
   }
 
   if (/^\d{2}\.?\d{2}$/.test(code)) {
-    return 'regencies'
+    return Area.REGENCY
   }
 
   if (/^\d{2}\.?\d{2}\.?\d{2}$/.test(code)) {
-    return 'districts'
+    return Area.DISTRICT
   }
 
   if (/^\d{2}\.?\d{2}\.?\d{5}$/.test(code)) {
-    return 'islands'
+    return Area.ISLAND
   }
 
   if (/^\d{2}\.?\d{2}\.?\d{2}\.?\d{4}$/.test(code)) {
-    return 'villages'
+    return Area.VILLAGE
   }
 
   throw new Error('Invalid area code')

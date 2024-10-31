@@ -1,5 +1,5 @@
-import { type FeatureAreas, featureConfig } from '@/lib/config'
-import type { Areas } from '@/lib/const'
+import { type FeatureArea, featureConfig } from '@/lib/config'
+import type { Area } from '@/lib/const'
 import { getBoundaryData } from '@/lib/data'
 import { determineAreaByCode } from '@/lib/utils'
 import { NextResponse } from 'next/server'
@@ -20,14 +20,14 @@ export async function GET(
   request: Request,
   { params: { code } }: { params: { code: string } },
 ) {
-  let area: Areas
+  let area: Area
   try {
     area = determineAreaByCode(code)
   } catch (error) {
     return NextResponse.json({ message: 'Invalid area code' }, { status: 400 })
   }
 
-  const config = featureConfig[area as FeatureAreas]
+  const config = featureConfig[area as FeatureArea]
   const [resBoundary] = await Promise.all([getBoundaryData(area, code)])
 
   if (!resBoundary.ok) {

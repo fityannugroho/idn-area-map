@@ -3,23 +3,23 @@
 import { get } from 'node:https'
 import { NextResponse } from 'next/server'
 import { config } from './config'
-import { type Areas, type GetArea, parentArea, singletonArea } from './const'
+import { type Area, type GetArea, endpoints, parentArea } from './const'
 import { addDotSeparator } from './utils'
 
-export type Query<Area extends Areas> = {
+export type Query<A extends Area> = {
   limit?: number
   name?: string
   page?: number
-  parentCode?: Area extends 'provinces' ? never : string
-  sortBy?: keyof GetArea<Area>
+  parentCode?: A extends Area.PROVINCE ? never : string
+  sortBy?: keyof GetArea<A>
 }
 
 const { url: baseUrl } = config.dataSource.area
 
-export type GetDataReturn<Area extends Areas> = {
+export type GetDataReturn<A extends Area> = {
   statusCode: number
   message: string
-  data: GetArea<Area>[]
+  data: GetArea<A>[]
   meta: {
     total: number
     pagination: {
@@ -35,12 +35,12 @@ export type GetDataReturn<Area extends Areas> = {
   }
 }
 
-export type GetSpecificDataReturn<Area extends Areas> = {
+export type GetSpecificDataReturn<A extends Area> = {
   statusCode: number
   message: string
-  data: GetArea<Area> & {
+  data: GetArea<A> & {
     parent?: {
-      [P in Areas as (typeof singletonArea)[P]]?: GetArea<P>
+      [P in Area]?: GetArea<P>
     }
   }
 }
@@ -55,18 +55,15 @@ export type GetDataReturnError = {
  * Get data from the API.
  * Provide the `code` to get specific data or provide the `query` to get multiple data.
  */
-export async function getData<
-  Area extends Areas,
-  P extends string | Query<Area>,
->(
-  area: Area,
+export async function getData<A extends Area, P extends string | Query<A>>(
+  area: A,
   codeOrQuery?: P,
 ): Promise<
-  | (P extends string ? GetSpecificDataReturn<Area> : GetDataReturn<Area>)
+  | (P extends string ? GetSpecificDataReturn<A> : GetDataReturn<A>)
   | GetDataReturnError
 > {
   let code: string | undefined
-  let query: Query<Area> | undefined
+  let query: Query<A> | undefined
 
   if (typeof codeOrQuery === 'string') {
     code = codeOrQuery
@@ -74,13 +71,14 @@ export async function getData<
     query = codeOrQuery
   }
 
+  const endpoint = endpoints[area]
   const url = new URL(
-    code ? `${baseUrl}/${area}/${code}` : `${baseUrl}/${area}`,
+    code ? `${baseUrl}/${endpoint}/${code}` : `${baseUrl}/${endpoint}`,
   )
   const parent = parentArea[area]
 
   if (query?.parentCode && parent) {
-    url.searchParams.append(`${singletonArea[parent]}Code`, query.parentCode)
+    url.searchParams.append(`${parent}Code`, query.parentCode)
   }
 
   if (query?.name) {
@@ -104,8 +102,8 @@ export async function getData<
   return await res.json()
 }
 
-export async function getBoundaryData(area: Areas, code: string) {
-  const url = `${config.dataSource.boundary.url}/${area}/${addDotSeparator(code.replaceAll('.', ''))}.geojson`
+export async function getBoundaryData(area: Area, code: string) {
+  const url = `${config.dataSource.boundary.url}/${endpoints[area]}/${addDotSeparator(code.replaceAll('.', ''))}.geojson`
 
   return new Promise<NextResponse>((resolve, reject) => {
     // Create encoding to convert token (string) to Uint8Array

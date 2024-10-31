@@ -1,19 +1,14 @@
 'use client'
 
 import { useArea } from '@/hooks/useArea'
-import {
-  type Areas as BaseAreas,
-  type GetArea,
-  singletonArea,
-} from '@/lib/const'
+import type { FeatureArea } from '@/lib/config'
+import type { GetArea } from '@/lib/const'
 import type { Query } from '@/lib/data'
 import { ucFirstStr } from '@/lib/utils'
 import { toast } from 'sonner'
 import { Combobox, type ComboboxOption, type ComboboxProps } from './combobox'
 
-type Areas = Exclude<BaseAreas, 'islands'>
-
-function areaToOption<A extends Areas>(data: GetArea<A>): ComboboxOption {
+function areaToOption<A extends FeatureArea>(data: GetArea<A>): ComboboxOption {
   return {
     key: data.code,
     label: data.name,
@@ -21,7 +16,7 @@ function areaToOption<A extends Areas>(data: GetArea<A>): ComboboxOption {
   }
 }
 
-export type ComboboxAreaProps<A extends Areas> = Omit<
+export type ComboboxAreaProps<A extends FeatureArea> = Omit<
   ComboboxProps,
   'autoClose' | 'fullWidth' | 'options' | 'onSelect' | 'selected'
 > & {
@@ -31,7 +26,7 @@ export type ComboboxAreaProps<A extends Areas> = Omit<
   selected?: GetArea<A> | null
 }
 
-export default function ComboboxArea<A extends Areas>({
+export default function ComboboxArea<A extends FeatureArea>({
   area,
   query,
   onSelect,
@@ -44,7 +39,7 @@ export default function ComboboxArea<A extends Areas>({
   })
 
   if (error) {
-    toast.error(`Failed to fetch ${singletonArea[area]} data`, {
+    toast.error(`Failed to fetch ${area} data`, {
       description: error?.message,
       closeButton: true,
     })
@@ -54,10 +49,8 @@ export default function ComboboxArea<A extends Areas>({
     <Combobox
       {...comboboxProps}
       options={areas.map((a) => areaToOption<A>(a))}
-      label={comboboxProps.label || ucFirstStr(singletonArea[area])}
-      placeholder={
-        comboboxProps.placeholder || `Search ${ucFirstStr(singletonArea[area])}`
-      }
+      label={comboboxProps.label || ucFirstStr(area)}
+      placeholder={comboboxProps.placeholder || `Search ${ucFirstStr(area)}`}
       onSelect={(opt) => {
         const selectedArea = areas.find((a) => a.code === opt.key)
         if (selectedArea) {

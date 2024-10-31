@@ -1,18 +1,12 @@
+import { Area } from '@/lib/const'
 import { z } from 'zod'
-
-export const areas = [
-  'provinces',
-  'regencies',
-  'districts',
-  'villages',
-] as const
 
 export const paramSchema = z
   .object({
     /**
      * Area type
      */
-    area: z.enum(areas),
+    area: z.nativeEnum(Area),
     /**
      * Area code (numeric string)
      */
@@ -21,10 +15,10 @@ export const paramSchema = z
   .refine(
     (data) => {
       // Validate code length based on area type
-      if (data.area === 'provinces') return data.code.length === 2
-      if (data.area === 'regencies') return data.code.length === 4
-      if (data.area === 'districts') return data.code.length === 6
-      if (data.area === 'villages') return data.code.length === 10
+      if (data.area === Area.PROVINCE) return data.code.length === 2
+      if (data.area === Area.REGENCY) return data.code.length === 4
+      if (data.area === Area.DISTRICT) return data.code.length === 6
+      if (data.area === Area.VILLAGE) return data.code.length === 10
       return false
     },
     {

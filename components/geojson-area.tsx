@@ -1,7 +1,7 @@
 'use client'
 
 import { useArea } from '@/hooks/useArea'
-import { type Areas as BaseAreas, singletonArea } from '@/lib/const'
+import type { FeatureArea } from '@/lib/config'
 import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
 import { ExternalLinkIcon, Link2Icon } from '@radix-ui/react-icons'
 import { useQuery } from '@tanstack/react-query'
@@ -33,9 +33,7 @@ const FeatureGroup = dynamic(
   },
 )
 
-type Areas = Exclude<BaseAreas, 'islands'>
-
-export type GeoJsonAreaProps<A extends Areas> = Omit<
+export type GeoJsonAreaProps<A extends FeatureArea> = Omit<
   GeoJSONProps,
   'key' | 'data' | 'children' | 'pane'
 > & {
@@ -67,7 +65,7 @@ export type GeoJsonAreaProps<A extends Areas> = Omit<
  */
 const defaultOverlayPaneZIndex = 400
 
-export default function GeoJsonArea<A extends Areas>({
+export default function GeoJsonArea<A extends FeatureArea>({
   area,
   code,
   hide,
@@ -84,7 +82,7 @@ export default function GeoJsonArea<A extends Areas>({
     if (!res.ok) {
       throw new Error(
         res.status === 404
-          ? `Data not found for ${singletonArea[area]} ${code}`
+          ? `Data not found for ${area} ${code}`
           : `Unexpected status code: ${res.status}`,
       )
     }
@@ -101,7 +99,7 @@ export default function GeoJsonArea<A extends Areas>({
   const parents = getAllParents(area)
 
   if (areaStatus === 'error' || geoStatus === 'error') {
-    toast.error(`Failed to fetch ${singletonArea[area]} data`, {
+    toast.error(`Failed to fetch ${area} data`, {
       description: 'An error occurred while fetching the data',
       closeButton: true,
     })
@@ -144,14 +142,14 @@ export default function GeoJsonArea<A extends Areas>({
               <span className="text-sm">{addDotSeparator(areaData.code)}</span>
 
               {parents.map((parent) => {
-                const parentData = areaData.parent?.[singletonArea[parent]]
+                const parentData = areaData.parent?.[parent]
 
                 if (!parentData) return null
 
                 return (
                   <div key={parent} className="mt-1">
                     <span className="text-xs text-gray-500">
-                      {ucFirstStr(singletonArea[parent])} :
+                      {ucFirstStr(parent)} :
                     </span>
                     <br />
                     <span className="text-xs">{parentData.name}</span>
