@@ -16,7 +16,7 @@ export type Query<Area extends Areas> = {
 
 const { url: baseUrl } = config.dataSource.area
 
-type GetDataReturn<Area extends Areas> = {
+export type GetDataReturn<Area extends Areas> = {
   statusCode: number
   message: string
   data: GetArea<Area>[]
@@ -35,17 +35,48 @@ type GetDataReturn<Area extends Areas> = {
   }
 }
 
-type GetDataReturnError = {
+export type GetSpecificDataReturn<Area extends Areas> = {
+  statusCode: number
+  message: string
+  data: GetArea<Area> & {
+    parent?: {
+      [P in Areas as (typeof singletonArea)[P]]?: GetArea<P>
+    }
+  }
+}
+
+export type GetDataReturnError = {
   statusCode: number
   message: string | string[]
   error: string
 }
 
-export async function getData<Area extends Areas>(
+/**
+ * Get data from the API.
+ * Provide the `code` to get specific data or provide the `query` to get multiple data.
+ */
+export async function getData<
+  Area extends Areas,
+  P extends string | Query<Area>,
+>(
   area: Area,
-  query?: Query<Area>,
-): Promise<GetDataReturn<Area> | GetDataReturnError> {
-  const url = new URL(`${baseUrl}/${area}`)
+  codeOrQuery?: P,
+): Promise<
+  | (P extends string ? GetSpecificDataReturn<Area> : GetDataReturn<Area>)
+  | GetDataReturnError
+> {
+  let code: string | undefined
+  let query: Query<Area> | undefined
+
+  if (typeof codeOrQuery === 'string') {
+    code = codeOrQuery
+  } else {
+    query = codeOrQuery
+  }
+
+  const url = new URL(
+    code ? `${baseUrl}/${area}/${code}` : `${baseUrl}/${area}`,
+  )
   const parent = parentArea[area]
 
   if (query?.parentCode && parent) {
@@ -69,25 +100,6 @@ export async function getData<Area extends Areas>(
   }
 
   const res = await fetch(url)
-
-  return await res.json()
-}
-
-export type GetSpecificDataReturn<Area extends Areas> = {
-  statusCode: number
-  message: string
-  data: GetArea<Area> & {
-    parent?: {
-      [P in Areas as (typeof singletonArea)[P]]?: GetArea<P>
-    }
-  }
-}
-
-export async function getSpecificData<Area extends Areas>(
-  area: Area,
-  code: string,
-): Promise<GetSpecificDataReturn<Area> | GetDataReturnError> {
-  const res = await fetch(`${baseUrl}/${area}/${code}`)
 
   return await res.json()
 }

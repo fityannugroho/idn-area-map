@@ -1,7 +1,7 @@
 import MapDashboard from '@/components/map-dashboard'
 import { config } from '@/lib/config'
 import { type Areas, singletonArea } from '@/lib/const'
-import { type GetSpecificDataReturn, getSpecificData } from '@/lib/data'
+import { type GetSpecificDataReturn, getData } from '@/lib/data'
 import { determineAreaByCode, ucWords } from '@/lib/utils'
 import type { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -16,7 +16,7 @@ async function getAreaData(
   area: Areas,
   areaCode: string,
 ): Promise<GetSpecificDataReturn<Areas>['data']> {
-  const res = await getSpecificData(area, areaCode.replaceAll('.', ''))
+  const res = await getData(area, areaCode.replaceAll('.', ''))
 
   if (!('data' in res)) {
     if (res.statusCode === 404) {

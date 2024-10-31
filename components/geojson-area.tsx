@@ -1,7 +1,7 @@
 'use client'
 
 import { type Areas as BaseAreas, singletonArea } from '@/lib/const'
-import { type GetSpecificDataReturn, getSpecificData } from '@/lib/data'
+import { type GetSpecificDataReturn, getData } from '@/lib/data'
 import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
 import { ExternalLinkIcon, Link2Icon } from '@radix-ui/react-icons'
 import dynamic from 'next/dynamic'
@@ -110,7 +110,7 @@ export default function GeoJsonArea<A extends Areas>({
         onLoaded?.(false)
       })
 
-    getSpecificData(area, code)
+    getData(area, code)
       .then((res) => {
         if ('data' in res) return setAreaData(res.data)
         throw new Error(
