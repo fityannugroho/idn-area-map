@@ -1,3 +1,5 @@
+'use client'
+
 import { ReloadIcon } from '@radix-ui/react-icons'
 import { useMapDashboard } from './hooks/useDashboard'
 import { useIslands } from './hooks/useIslands'

@@ -1,3 +1,5 @@
+'use client'
+
 import type { FeatureArea } from '@/lib/config'
 import {
   Area,

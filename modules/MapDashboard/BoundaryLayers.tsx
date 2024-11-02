@@ -1,3 +1,5 @@
+'use client'
+
 import { featureConfig } from '@/lib/config'
 import { getObjectKeys } from '@/lib/utils'
 import AreaBoundary from './AreaBoundary'

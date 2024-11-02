@@ -1,3 +1,5 @@
+'use client'
+
 import { Skeleton } from '@/components/ui/skeleton'
 import type { LatLngBounds, Map as LeafletMap } from 'leaflet'
 import dynamic from 'next/dynamic'

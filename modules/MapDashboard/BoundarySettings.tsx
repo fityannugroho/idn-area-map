@@ -1,3 +1,5 @@
+'use client'
+
 import { Switch } from '@/components/ui/switch'
 import { featureConfig } from '@/lib/config'
 import { cn, objectToEntries, ucFirstStr } from '@/lib/utils'

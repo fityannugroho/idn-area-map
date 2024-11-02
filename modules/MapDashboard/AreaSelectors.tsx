@@ -1,3 +1,5 @@
+'use client'
+
 import { config, featureConfig } from '@/lib/config'
 import { debounce, getAreaRelations, getObjectKeys } from '@/lib/utils'
 import { useMemo } from 'react'
