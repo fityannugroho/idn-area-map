@@ -8,6 +8,7 @@ import {
 import { useArea } from '@/hooks/useArea'
 import type { FeatureArea } from '@/lib/config'
 import type { GetArea } from '@/lib/const'
+import type { Query } from '@/lib/data'
 import { ucFirstStr } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useMapDashboard } from './hooks/useDashboard'
@@ -25,17 +26,19 @@ export type ComboboxAreaProps<A extends FeatureArea> = Omit<
   'autoClose' | 'fullWidth' | 'options' | 'onSelect' | 'selected'
 > & {
   area: A
+  query: Query<A>
   onSelect?: (option: GetArea<A>) => void
 }
 
 export default function ComboboxArea<A extends FeatureArea>({
   area,
+  query,
   onSelect,
   ...comboboxProps
 }: ComboboxAreaProps<A>) {
-  const { selectedArea, query } = useMapDashboard()
+  const { selectedArea } = useMapDashboard()
   const { data: areas = [], error } = useArea(area, {
-    ...query[area],
+    ...query,
     sortBy: 'name',
   })
 

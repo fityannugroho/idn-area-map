@@ -8,7 +8,6 @@ import {
   type Regency,
   type Village,
 } from '@/lib/const'
-import type { Query } from '@/lib/data'
 import type { LatLngBounds } from 'leaflet'
 import { createContext, useCallback, useContext, useState } from 'react'
 
@@ -26,10 +25,6 @@ type Props = {
     area: A,
     selected?: SelectedArea[A],
   ) => void
-
-  // Query Management
-  query: { [A in Area]?: Query<A> }
-  updateQuery: <A extends Area>(area: A, newQuery: Query<A>) => void
 
   // Loading States
   isLoading: { [A in Area]?: boolean }
@@ -49,7 +44,7 @@ type Props = {
   setAreaBounds: React.Dispatch<React.SetStateAction<LatLngBounds | undefined>>
 
   /**
-   * Clear all states (`query` and `selectedArea`)
+   * Clear selected areas.
    */
   clear: () => void
 }
@@ -77,11 +72,6 @@ export function MapDashboardProvider({
   const [selectedArea, setSelected] = useState<SelectedArea>(
     defaultSelected ?? {},
   )
-  const [query, setQuery] = useState<Props['query']>({
-    regency: { parentCode: defaultSelected?.[Area.PROVINCE]?.code },
-    district: { parentCode: defaultSelected?.[Area.REGENCY]?.code },
-    village: { parentCode: defaultSelected?.[Area.DISTRICT]?.code },
-  })
 
   const loading = useCallback<Props['loading']>((area, isLoading) => {
     setLoading((current) => ({
@@ -110,23 +100,13 @@ export function MapDashboardProvider({
     [],
   )
 
-  const updateQuery = useCallback<Props['updateQuery']>((area, newQuery) => {
-    setQuery((current) => ({
-      ...current,
-      [area]: newQuery,
-    }))
-  }, [])
-
   const clear = useCallback(() => {
     setSelected({})
-    setQuery({})
   }, [])
 
   const value: Props = {
     selectedArea,
     changeSelectedArea,
-    query,
-    updateQuery,
     isLoading,
     loading,
     boundaryVisibility,
