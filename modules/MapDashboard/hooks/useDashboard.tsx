@@ -22,9 +22,9 @@ export type SelectedArea = {
 type Props = {
   // Area Selection
   selectedArea: SelectedArea
-  changeSelectedArea: (
-    area: FeatureArea,
-    selected: SelectedArea | undefined,
+  changeSelectedArea: <A extends FeatureArea>(
+    area: A,
+    selected?: SelectedArea[A],
   ) => void
 
   // Query Management

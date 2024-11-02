@@ -28,7 +28,7 @@ export default function AreaSelectors() {
           area={area}
           disabled={parent ? isLoading[parent] : false}
           onSelect={(selected) => {
-            changeSelectedArea(area, selected as SelectedArea)
+            changeSelectedArea(area, selected)
 
             if (child) {
               updateQuery(child, {
