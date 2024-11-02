@@ -71,4 +71,4 @@ export const childArea: { readonly [A in Area]?: Area } = {
   [Area.PROVINCE]: Area.REGENCY,
   [Area.REGENCY]: Area.DISTRICT,
   [Area.DISTRICT]: Area.VILLAGE,
-}
+} as const
