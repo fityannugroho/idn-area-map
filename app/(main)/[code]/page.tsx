@@ -1,8 +1,8 @@
-import MapDashboard from '@/components/map-dashboard'
 import { config } from '@/lib/config'
-import { type Areas, singletonArea } from '@/lib/const'
-import { type GetSpecificDataReturn, getSpecificData } from '@/lib/data'
+import type { Area } from '@/lib/const'
+import { type GetSpecificDataReturn, getData } from '@/lib/data'
 import { determineAreaByCode, ucWords } from '@/lib/utils'
+import MapDashboard from '@/modules/MapDashboard/Dashboard'
 import type { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
 
@@ -13,10 +13,10 @@ type Props = {
 }
 
 async function getAreaData(
-  area: Areas,
+  area: Area,
   areaCode: string,
-): Promise<GetSpecificDataReturn<Areas>['data']> {
-  const res = await getSpecificData(area, areaCode.replaceAll('.', ''))
+): Promise<GetSpecificDataReturn<Area>['data']> {
+  const res = await getData(area, areaCode.replaceAll('.', ''))
 
   if (!('data' in res)) {
     if (res.statusCode === 404) {
@@ -32,7 +32,7 @@ export async function generateMetadata(
   { params: { code } }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  let area: Areas
+  let area: Area
   let areaData: Awaited<ReturnType<typeof getAreaData>>
 
   try {
@@ -50,11 +50,11 @@ export async function generateMetadata(
   const parentNames = Object.keys(areaData.parent ?? {}).map((parent) =>
     parent === 'regency'
       ? ucWords(areaData.parent?.[parent]?.name ?? '')
-      : (areaData.parent?.[parent]?.name ?? ''),
+      : (areaData.parent?.[parent as Area]?.name ?? ''),
   )
 
   const areaNames = [
-    area === 'regencies' ? ucWords(areaData.name) : areaData.name,
+    area === 'regency' ? ucWords(areaData.name) : areaData.name,
     ...parentNames,
   ].join(', ')
 
@@ -81,7 +81,7 @@ export async function generateMetadata(
 }
 
 export default async function DetailAreaPage({ params }: Props) {
-  let area: Areas
+  let area: Area
   let areaData: Awaited<ReturnType<typeof getAreaData>>
 
   try {
@@ -96,7 +96,7 @@ export default async function DetailAreaPage({ params }: Props) {
   return (
     <MapDashboard
       defaultSelected={{
-        [singletonArea[area]]: data,
+        [area]: data,
         ...parent,
       }}
     />

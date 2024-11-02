@@ -1,14 +1,17 @@
 'use client'
 
-import { type Areas as BaseAreas, singletonArea } from '@/lib/const'
-import { type GetSpecificDataReturn, getSpecificData } from '@/lib/data'
+import { useArea } from '@/hooks/useArea'
+import { type FeatureArea, featureConfig } from '@/lib/config'
+import { getBoundaryData } from '@/lib/data'
 import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
 import { ExternalLinkIcon, Link2Icon } from '@radix-ui/react-icons'
+import { useQuery } from '@tanstack/react-query'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { GeoJSONProps } from 'react-leaflet'
 import { toast } from 'sonner'
+import { useMapDashboard } from './hooks/useDashboard'
 
 const GeoJSON = dynamic(
   () => import('react-leaflet').then((mod) => mod.GeoJSON),
@@ -32,33 +35,6 @@ const FeatureGroup = dynamic(
   },
 )
 
-type Areas = Exclude<BaseAreas, 'islands'>
-
-export type GeoJsonAreaProps<A extends Areas> = Omit<
-  GeoJSONProps,
-  'key' | 'data' | 'children' | 'pane'
-> & {
-  area: A
-  code: string
-  /**
-   * Hide the area
-   */
-  hide?: boolean
-  /**
-   * Called when the data is being fetched.
-   */
-  onLoading?: () => void
-  /**
-   * Called when the data is loaded successfully or not.
-   * @param success Whether the data is loaded successfully or not.
-   */
-  onLoaded?: (success: boolean) => void
-  /**
-   * The pane order.
-   */
-  order?: number
-}
-
 /**
  * The default overlay pane for the GeoJsonArea component.
  *
@@ -66,64 +42,63 @@ export type GeoJsonAreaProps<A extends Areas> = Omit<
  */
 const defaultOverlayPaneZIndex = 400
 
-export default function GeoJsonArea<A extends Areas>({
+export type AreaBoundaryProps = Omit<
+  GeoJSONProps,
+  'key' | 'data' | 'children' | 'pane'
+> & {
+  area: FeatureArea
+}
+
+export default function AreaBoundary({
   area,
-  code,
-  hide,
-  eventHandlers,
-  onLoading,
-  onLoaded,
-  order,
   pathOptions,
   ...props
-}: GeoJsonAreaProps<A>) {
-  const [geoJson, setGeoJson] =
-    useState<GeoJSON.Feature<GeoJSON.MultiPolygon>>()
-  const [areaData, setAreaData] = useState<GetSpecificDataReturn<A>['data']>()
+}: AreaBoundaryProps) {
+  const { selectedArea, boundaryVisibility, loading, setAreaBounds } =
+    useMapDashboard()
+  const { order, color } = featureConfig[area]
+  const code = selectedArea[area]?.code
+
+  if (!code) {
+    return null
+  }
+
+  const fetchBoundary = async () => {
+    const res = await getBoundaryData(area, code)
+
+    if (!res.data) {
+      throw new Error(
+        res.statusCode === 404
+          ? `Data not found for ${area} ${code}`
+          : `Unexpected status code: ${res.statusCode}`,
+      )
+    }
+
+    return res.data
+  }
+
+  const {
+    data: geoJson,
+    status: geoStatus,
+    error,
+  } = useQuery({
+    queryKey: ['geoJson', area, code],
+    queryFn: fetchBoundary,
+  })
+  const { data: areaData, status: areaStatus } = useArea(area, code)
   const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()
-  const parents = getAllParents(area)
 
-  // TODO: optimize this
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Ignore `onLoading` and `onLoaded` dependencies
+  if (areaStatus === 'error' || geoStatus === 'error') {
+    toast.error(`Failed to fetch ${area} data`, {
+      description: error?.message || 'An error occurred while fetching thedata',
+      closeButton: true,
+    })
+    return null
+  }
+
   useEffect(() => {
-    onLoading?.()
-
-    fetch(`/api/${area}/${code}/boundary`)
-      .then((res) => {
-        if (!res.ok) {
-          if (res.status === 404) {
-            throw new Error(`Data not found for ${singletonArea[area]} ${code}`)
-          }
-          throw new Error(`Unexpected status code: ${res.status}`)
-        }
-        return res.json()
-      })
-      .then((res) => {
-        setGeoJson(res)
-        onLoaded?.(true)
-      })
-      .catch((err) => {
-        toast.error(`Failed to fetch ${singletonArea[area]} boundary data`, {
-          description: err.message,
-          closeButton: true,
-        })
-        onLoaded?.(false)
-      })
-
-    getSpecificData(area, code)
-      .then((res) => {
-        if ('data' in res) return setAreaData(res.data)
-        throw new Error(
-          Array.isArray(res.message) ? res.message[0] : res.message,
-        )
-      })
-      .catch((err) => {
-        toast.error(`Failed to fetch ${singletonArea[area]} data`, {
-          description: err.message,
-          closeButton: true,
-        })
-      })
-  }, [area, code])
+    loading(area, geoStatus === 'pending')
+  }, [geoStatus, area, loading])
 
   return (
     <Pane
@@ -133,40 +108,50 @@ export default function GeoJsonArea<A extends Areas>({
       <FeatureGroup>
         {geoJson && (
           <GeoJSON
+            {...props}
             key={code}
             data={geoJson}
-            eventHandlers={{
-              ...eventHandlers,
-              click: (e) => {
-                setLatLng(e.latlng)
-                eventHandlers?.click?.(e)
-              },
-            }}
             pathOptions={{
               ...pathOptions,
-              ...(hide ? { fillOpacity: 0, color: 'transparent' } : {}),
+              color,
+              fillOpacity: 0.08,
+              ...(!boundaryVisibility[area] && {
+                color: 'transparent',
+                fillOpacity: 0,
+              }),
             }}
-            {...props}
+            eventHandlers={{
+              click: (e) => {
+                setLatLng(e.latlng)
+                props.eventHandlers?.click?.(e)
+              },
+              add: (e) => {
+                setAreaBounds(e.target.getBounds())
+              },
+              ...props.eventHandlers,
+            }}
           />
         )}
 
         {/* Render Popup inside the default `popupPane`.
             See https://leafletjs.com/reference.html#map-pane */}
         <Popup pane="popupPane">
-          {areaData ? (
+          {areaStatus === 'pending' ? (
+            <span className="block text-gray-500">Loading...</span>
+          ) : (
             <>
               <span className="block font-bold text-sm">{areaData.name}</span>
               <span className="text-sm">{addDotSeparator(areaData.code)}</span>
 
-              {parents.map((parent) => {
-                const parentData = areaData.parent?.[singletonArea[parent]]
+              {getAllParents(area).map((parent) => {
+                const parentData = areaData.parent?.[parent]
 
                 if (!parentData) return null
 
                 return (
                   <div key={parent} className="mt-1">
                     <span className="text-xs text-gray-500">
-                      {ucFirstStr(singletonArea[parent])} :
+                      {ucFirstStr(parent)} :
                     </span>
                     <br />
                     <span className="text-xs">{parentData.name}</span>
@@ -208,8 +193,6 @@ export default function GeoJsonArea<A extends Areas>({
                 See on Google Maps
               </Link>
             </>
-          ) : (
-            <span className="block text-gray-500">Loading...</span>
           )}
         </Popup>
       </FeatureGroup>

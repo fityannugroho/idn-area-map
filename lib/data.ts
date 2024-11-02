@@ -1,25 +1,23 @@
 'use server'
 
-import { get } from 'node:https'
-import { NextResponse } from 'next/server'
 import { config } from './config'
-import { type Areas, type GetArea, parentArea, singletonArea } from './const'
+import { type Area, type GetArea, endpoints, parentArea } from './const'
 import { addDotSeparator } from './utils'
 
-export type Query<Area extends Areas> = {
+export type Query<A extends Area> = {
   limit?: number
   name?: string
   page?: number
-  parentCode?: Area extends 'provinces' ? never : string
-  sortBy?: keyof GetArea<Area>
+  parentCode?: A extends Area.PROVINCE ? never : string
+  sortBy?: keyof GetArea<A>
 }
 
 const { url: baseUrl } = config.dataSource.area
 
-type GetDataReturn<Area extends Areas> = {
+export type GetDataReturn<A extends Area> = {
   statusCode: number
   message: string
-  data: GetArea<Area>[]
+  data: GetArea<A>[]
   meta: {
     total: number
     pagination: {
@@ -35,21 +33,50 @@ type GetDataReturn<Area extends Areas> = {
   }
 }
 
-type GetDataReturnError = {
+export type GetSpecificDataReturn<A extends Area> = {
+  statusCode: number
+  message: string
+  data: GetArea<A> & {
+    parent?: {
+      [P in Area]?: GetArea<P>
+    }
+  }
+}
+
+export type GetDataReturnError = {
   statusCode: number
   message: string | string[]
   error: string
 }
 
-export async function getData<Area extends Areas>(
-  area: Area,
-  query?: Query<Area>,
-): Promise<GetDataReturn<Area> | GetDataReturnError> {
-  const url = new URL(`${baseUrl}/${area}`)
+/**
+ * Get data from the API.
+ * Provide the `code` to get specific data or provide the `query` to get multiple data.
+ */
+export async function getData<A extends Area, P extends string | Query<A>>(
+  area: A,
+  codeOrQuery?: P,
+): Promise<
+  | (P extends string ? GetSpecificDataReturn<A> : GetDataReturn<A>)
+  | GetDataReturnError
+> {
+  let code: string | undefined
+  let query: Query<A> | undefined
+
+  if (typeof codeOrQuery === 'string') {
+    code = codeOrQuery
+  } else {
+    query = codeOrQuery
+  }
+
+  const endpoint = endpoints[area]
+  const url = new URL(
+    code ? `${baseUrl}/${endpoint}/${code}` : `${baseUrl}/${endpoint}`,
+  )
   const parent = parentArea[area]
 
   if (query?.parentCode && parent) {
-    url.searchParams.append(`${singletonArea[parent]}Code`, query.parentCode)
+    url.searchParams.append(`${parent}Code`, query.parentCode)
   }
 
   if (query?.name) {
@@ -73,62 +100,22 @@ export async function getData<Area extends Areas>(
   return await res.json()
 }
 
-export type GetSpecificDataReturn<Area extends Areas> = {
+type BoundaryResponse = {
   statusCode: number
   message: string
-  data: GetArea<Area> & {
-    parent?: {
-      [P in Areas as (typeof singletonArea)[P]]?: GetArea<P>
-    }
-  }
+  data?: GeoJSON.Feature<GeoJSON.MultiPolygon>
 }
 
-export async function getSpecificData<Area extends Areas>(
+export async function getBoundaryData(
   area: Area,
   code: string,
-): Promise<GetSpecificDataReturn<Area> | GetDataReturnError> {
-  const res = await fetch(`${baseUrl}/${area}/${code}`)
+): Promise<BoundaryResponse> {
+  const url = `${config.dataSource.boundary.url}/${endpoints[area]}/${addDotSeparator(code.replaceAll('.', ''))}.geojson`
+  const res = await fetch(url)
 
-  return await res.json()
-}
-
-export async function getBoundaryData(area: Areas, code: string) {
-  const url = `${config.dataSource.boundary.url}/${area}/${addDotSeparator(code.replaceAll('.', ''))}.geojson`
-
-  return new Promise<NextResponse>((resolve, reject) => {
-    // Create encoding to convert token (string) to Uint8Array
-    const encoder = new TextEncoder()
-
-    // Create a TransformStream for writing the response as the tokens as generated
-    const stream = new TransformStream()
-    const writer = stream.writable.getWriter()
-
-    get(url, (res) => {
-      if (res.statusCode !== 200) {
-        resolve(
-          NextResponse.json(
-            {
-              statusCode: res.statusCode,
-              message: res.statusMessage,
-            },
-            { status: res.statusCode },
-          ),
-        )
-      }
-
-      res.on('data', (chunk) => {
-        writer.write(encoder.encode(chunk))
-      })
-
-      res.on('end', () => {
-        writer.close()
-        resolve(new NextResponse(stream.readable, { status: res.statusCode }))
-      })
-
-      res.on('error', (error) => {
-        writer.close()
-        reject('Error occurred while fetching data')
-      })
-    })
-  })
+  return {
+    statusCode: res.status,
+    message: res.statusText,
+    ...(res.ok && { data: await res.json() }),
+  }
 }

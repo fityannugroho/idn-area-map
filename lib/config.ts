@@ -1,4 +1,4 @@
-import type { Areas } from './const'
+import { Area } from './const'
 
 export type Config = Readonly<{
   appName: string
@@ -43,11 +43,11 @@ export const config: Config = {
   },
 } as const
 
-export type FeatureAreas = Exclude<Areas, 'islands'>
+export type FeatureArea = Exclude<Area, 'island'>
 
 export type FeatureConfig = Readonly<
   Record<
-    FeatureAreas,
+    FeatureArea,
     {
       color: string
       fillColor: string
@@ -60,7 +60,7 @@ export type FeatureConfig = Readonly<
 >
 
 export const featureConfig: FeatureConfig = {
-  provinces: {
+  [Area.PROVINCE]: {
     color: '#2563eb',
     fillColor: '#2563eb33',
     order: 0,
@@ -68,7 +68,7 @@ export const featureConfig: FeatureConfig = {
       tolerance: 0.012,
     },
   },
-  regencies: {
+  [Area.REGENCY]: {
     color: '#16a34a',
     fillColor: '#16a34a33',
     order: 1,
@@ -76,7 +76,7 @@ export const featureConfig: FeatureConfig = {
       tolerance: 0.005,
     },
   },
-  districts: {
+  [Area.DISTRICT]: {
     color: '#facc15',
     fillColor: '#facc1533',
     order: 2,
@@ -84,7 +84,7 @@ export const featureConfig: FeatureConfig = {
       tolerance: 0.001,
     },
   },
-  villages: {
+  [Area.VILLAGE]: {
     color: '#ef4444',
     fillColor: '#ef444433',
     order: 3,

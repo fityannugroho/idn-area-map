@@ -32,36 +32,43 @@ export type Island = {
   regencyCode: string | null
 }
 
-export type Areas =
-  | 'provinces'
-  | 'regencies'
-  | 'districts'
-  | 'villages'
-  | 'islands'
+export enum Area {
+  PROVINCE = 'province',
+  REGENCY = 'regency',
+  DISTRICT = 'district',
+  VILLAGE = 'village',
+  ISLAND = 'island',
+}
 
-export type GetArea<Area> = Area extends 'provinces'
+export const endpoints = {
+  [Area.PROVINCE]: 'provinces',
+  [Area.REGENCY]: 'regencies',
+  [Area.DISTRICT]: 'districts',
+  [Area.VILLAGE]: 'villages',
+  [Area.ISLAND]: 'islands',
+}
+
+export type GetArea<Area> = Area extends Area.PROVINCE
   ? Province
-  : Area extends 'regencies'
+  : Area extends Area.REGENCY
     ? Regency
-    : Area extends 'islands'
+    : Area extends Area.ISLAND
       ? Island
-      : Area extends 'districts'
+      : Area extends Area.DISTRICT
         ? District
-        : Area extends 'villages'
+        : Area extends Area.VILLAGE
           ? Village
           : never
 
-export const singletonArea: { readonly [A in Areas]: string } = {
-  provinces: 'province',
-  regencies: 'regency',
-  islands: 'island',
-  districts: 'district',
-  villages: 'village',
+export const parentArea: { readonly [A in Area]?: Area } = {
+  [Area.REGENCY]: Area.PROVINCE,
+  [Area.ISLAND]: Area.REGENCY,
+  [Area.DISTRICT]: Area.REGENCY,
+  [Area.VILLAGE]: Area.DISTRICT,
 } as const
 
-export const parentArea: { readonly [A in Areas]?: Areas } = {
-  regencies: 'provinces',
-  islands: 'regencies',
-  districts: 'regencies',
-  villages: 'districts',
+export const childArea: { readonly [A in Area]?: Area } = {
+  [Area.PROVINCE]: Area.REGENCY,
+  [Area.REGENCY]: Area.DISTRICT,
+  [Area.DISTRICT]: Area.VILLAGE,
 } as const

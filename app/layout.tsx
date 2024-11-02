@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import { Inter } from 'next/font/google'
 import { StrictMode } from 'react'
 import './globals.css'
+import QueryProvider from '@/components/query-provider'
 import { Toaster } from '@/components/ui/sonner'
 import type { Metadata } from 'next'
 import { ThemeProvider } from 'next-themes'
@@ -61,7 +62,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <QueryProvider>{children}</QueryProvider>
             <Toaster />
           </ThemeProvider>
         </body>
