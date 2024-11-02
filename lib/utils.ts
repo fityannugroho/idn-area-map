@@ -1,6 +1,23 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { Area, parentArea } from './const'
+import { Area, childArea, parentArea } from './const'
+
+export function objectToEntries<T extends object>(
+  obj: T,
+): [keyof T, T[keyof T]][] {
+  return Object.entries(obj) as [keyof T, T[keyof T]][]
+}
+
+export function getObjectKeys<T extends object>(obj: T): (keyof T)[] {
+  return Object.keys(obj) as (keyof T)[]
+}
+
+export function getAreaRelations(area: Area) {
+  return {
+    parent: parentArea[area],
+    child: childArea[area],
+  }
+}
 
 /**
  * Add dot separator for the area code.

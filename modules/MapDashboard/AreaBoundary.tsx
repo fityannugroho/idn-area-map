@@ -1,16 +1,17 @@
 'use client'
 
 import { useArea } from '@/hooks/useArea'
-import type { FeatureArea } from '@/lib/config'
+import { type FeatureArea, featureConfig } from '@/lib/config'
 import { getBoundaryData } from '@/lib/data'
 import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
 import { ExternalLinkIcon, Link2Icon } from '@radix-ui/react-icons'
 import { useQuery } from '@tanstack/react-query'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { GeoJSONProps } from 'react-leaflet'
 import { toast } from 'sonner'
+import { useMapDashboard } from './hooks/useDashboard'
 
 const GeoJSON = dynamic(
   () => import('react-leaflet').then((mod) => mod.GeoJSON),
@@ -34,31 +35,6 @@ const FeatureGroup = dynamic(
   },
 )
 
-export type GeoJsonAreaProps<A extends FeatureArea> = Omit<
-  GeoJSONProps,
-  'key' | 'data' | 'children' | 'pane'
-> & {
-  area: A
-  code: string
-  /**
-   * Hide the area
-   */
-  hide?: boolean
-  /**
-   * Called when the data is being fetched.
-   */
-  onLoading?: () => void
-  /**
-   * Called when the data is loaded successfully or not.
-   * @param success Whether the data is loaded successfully or not.
-   */
-  onLoaded?: (success: boolean) => void
-  /**
-   * The pane order.
-   */
-  order?: number
-}
-
 /**
  * The default overlay pane for the GeoJsonArea component.
  *
@@ -66,17 +42,27 @@ export type GeoJsonAreaProps<A extends FeatureArea> = Omit<
  */
 const defaultOverlayPaneZIndex = 400
 
-export default function GeoJsonArea<A extends FeatureArea>({
+export type AreaBoundaryProps = Omit<
+  GeoJSONProps,
+  'key' | 'data' | 'children' | 'pane'
+> & {
+  area: FeatureArea
+}
+
+export default function AreaBoundary({
   area,
-  code,
-  hide,
-  eventHandlers,
-  onLoading,
-  onLoaded,
-  order,
   pathOptions,
   ...props
-}: GeoJsonAreaProps<A>) {
+}: AreaBoundaryProps) {
+  const { selectedArea, boundaryVisibility, loading, setAreaBounds } =
+    useMapDashboard()
+  const { order, color } = featureConfig[area]
+  const code = selectedArea[area]?.code
+
+  if (!code) {
+    return null
+  }
+
   const fetchBoundary = async () => {
     const res = await getBoundaryData(area, code)
 
@@ -101,7 +87,6 @@ export default function GeoJsonArea<A extends FeatureArea>({
   })
   const { data: areaData, status: areaStatus } = useArea(area, code)
   const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()
-  const parents = getAllParents(area)
 
   if (areaStatus === 'error' || geoStatus === 'error') {
     toast.error(`Failed to fetch ${area} data`, {
@@ -111,6 +96,10 @@ export default function GeoJsonArea<A extends FeatureArea>({
     return null
   }
 
+  useEffect(() => {
+    loading(area, geoStatus === 'pending')
+  }, [geoStatus, area, loading])
+
   return (
     <Pane
       name={area}
@@ -119,20 +108,28 @@ export default function GeoJsonArea<A extends FeatureArea>({
       <FeatureGroup>
         {geoJson && (
           <GeoJSON
+            {...props}
             key={code}
             data={geoJson}
-            eventHandlers={{
-              ...eventHandlers,
-              click: (e) => {
-                setLatLng(e.latlng)
-                eventHandlers?.click?.(e)
-              },
-            }}
             pathOptions={{
               ...pathOptions,
-              ...(hide ? { fillOpacity: 0, color: 'transparent' } : {}),
+              color,
+              fillOpacity: 0.08,
+              ...(!boundaryVisibility[area] && {
+                color: 'transparent',
+                fillOpacity: 0,
+              }),
             }}
-            {...props}
+            eventHandlers={{
+              click: (e) => {
+                setLatLng(e.latlng)
+                props.eventHandlers?.click?.(e)
+              },
+              add: (e) => {
+                setAreaBounds(e.target.getBounds())
+              },
+              ...props.eventHandlers,
+            }}
           />
         )}
 
@@ -146,7 +143,7 @@ export default function GeoJsonArea<A extends FeatureArea>({
               <span className="block font-bold text-sm">{areaData.name}</span>
               <span className="text-sm">{addDotSeparator(areaData.code)}</span>
 
-              {parents.map((parent) => {
+              {getAllParents(area).map((parent) => {
                 const parentData = areaData.parent?.[parent]
 
                 if (!parentData) return null

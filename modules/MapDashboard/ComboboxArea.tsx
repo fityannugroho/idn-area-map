@@ -1,12 +1,16 @@
 'use client'
 
+import {
+  Combobox,
+  type ComboboxOption,
+  type ComboboxProps,
+} from '@/components/combobox'
 import { useArea } from '@/hooks/useArea'
 import type { FeatureArea } from '@/lib/config'
 import type { GetArea } from '@/lib/const'
-import type { Query } from '@/lib/data'
 import { ucFirstStr } from '@/lib/utils'
 import { toast } from 'sonner'
-import { Combobox, type ComboboxOption, type ComboboxProps } from './combobox'
+import { useMapDashboard } from './hooks/useDashboard'
 
 function areaToOption<A extends FeatureArea>(data: GetArea<A>): ComboboxOption {
   return {
@@ -21,20 +25,17 @@ export type ComboboxAreaProps<A extends FeatureArea> = Omit<
   'autoClose' | 'fullWidth' | 'options' | 'onSelect' | 'selected'
 > & {
   area: A
-  query?: Query<A>
   onSelect?: (option: GetArea<A>) => void
-  selected?: GetArea<A> | null
 }
 
 export default function ComboboxArea<A extends FeatureArea>({
   area,
-  query,
   onSelect,
-  selected,
   ...comboboxProps
 }: ComboboxAreaProps<A>) {
+  const { selectedArea, query } = useMapDashboard()
   const { data: areas = [], error } = useArea(area, {
-    ...query,
+    ...query[area],
     sortBy: 'name',
   })
 
@@ -44,6 +45,8 @@ export default function ComboboxArea<A extends FeatureArea>({
       closeButton: true,
     })
   }
+
+  const areaData = selectedArea[area]
 
   return (
     <Combobox
@@ -57,7 +60,7 @@ export default function ComboboxArea<A extends FeatureArea>({
           onSelect?.(selectedArea)
         }
       }}
-      selected={selected ? areaToOption<A>(selected) : undefined}
+      selected={areaData ? areaToOption(areaData) : undefined}
       autoClose
       fullWidth
     />

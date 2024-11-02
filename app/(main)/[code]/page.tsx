@@ -1,8 +1,8 @@
-import MapDashboard from '@/components/map-dashboard'
 import { config } from '@/lib/config'
 import type { Area } from '@/lib/const'
 import { type GetSpecificDataReturn, getData } from '@/lib/data'
 import { determineAreaByCode, ucWords } from '@/lib/utils'
+import MapDashboard from '@/modules/MapDashboard/Dashboard'
 import type { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
 
