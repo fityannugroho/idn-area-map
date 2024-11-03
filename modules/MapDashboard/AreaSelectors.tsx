@@ -37,7 +37,7 @@ export default function AreaSelectors() {
 
         if (parent && parent !== 'island' && selectedArea[parent]) {
           query = {
-            parentCode: selectedArea[parent].code,
+            parentCode: selectedArea[parent]?.code, // Need optional chaining. Build fails without it
             limit: MAX_PAGE_SIZE,
           }
         }
