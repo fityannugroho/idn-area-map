@@ -12,6 +12,12 @@ export function getObjectKeys<T extends object>(obj: T): (keyof T)[] {
   return Object.keys(obj) as (keyof T)[]
 }
 
+export function objectFromEntries<K extends string | number | symbol, V>(
+  entries: [K, V][],
+): Record<K, V> {
+  return Object.fromEntries(entries) as Record<K, V>
+}
+
 export function getAreaRelations(area: Area) {
   return {
     parent: parentArea[area],
