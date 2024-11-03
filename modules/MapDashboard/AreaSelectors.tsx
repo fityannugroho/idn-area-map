@@ -29,19 +29,20 @@ export default function AreaSelectors() {
   const defaultQuery = objectFromEntries(
     areas.reduce<[FeatureArea, Query<FeatureArea>][]>(
       (acc, { area, parent }) => {
-        if (parent !== 'island') {
-          acc.push([
-            area,
-            {
-              ...(area === 'province' && {
-                limit: MAX_PAGE_SIZE,
-              }),
-              ...(parent && {
-                parentCode: selectedArea[parent]?.code,
-              }),
-            },
-          ])
+        let query: Query<typeof area> = {}
+
+        if (area === 'province') {
+          query = { limit: MAX_PAGE_SIZE }
         }
+
+        if (parent && parent !== 'island' && selectedArea[parent]) {
+          query = {
+            parentCode: selectedArea[parent].code,
+            limit: MAX_PAGE_SIZE,
+          }
+        }
+
+        acc.push([area, query])
         return acc
       },
       [],
