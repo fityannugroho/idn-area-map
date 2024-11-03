@@ -33,7 +33,9 @@ export default function AreaSelectors() {
           acc.push([
             area,
             {
-              limit: MAX_PAGE_SIZE,
+              ...(area === 'province' && {
+                limit: MAX_PAGE_SIZE,
+              }),
               ...(parent && {
                 parentCode: selectedArea[parent]?.code,
               }),
