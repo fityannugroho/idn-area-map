@@ -28,6 +28,7 @@
     "node": ">=18.17"
   },
   "dependencies": {
+    "@next/env": "^15.0.2",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
@@ -76,6 +77,7 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.15",
     "jsdom": "^25.0.1",
+    "msw": "^2.6.0",
     "vitest": "^2.1.4"
   }
 }
