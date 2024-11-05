@@ -54,6 +54,14 @@ export function debounce<T extends unknown[]>(
   callback: (...args: T) => void,
   delay: number,
 ) {
+  if (typeof callback !== 'function') {
+    throw new Error('Callback must be a function')
+  }
+
+  if (typeof delay !== 'number' || delay < 0) {
+    throw new Error('Delay must be a positive number')
+  }
+
   let timeoutId: NodeJS.Timeout | null = null
 
   return (...args: T) => {
