@@ -9,6 +9,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest --coverage",
+    "test:e2e": "playwright test",
     "start": "next start",
     "lint": "next lint && biome check .",
     "lint:fix": "next lint --fix && biome check --write ."
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@playwright/test": "^1.48.2",
     "@tanstack/react-query-devtools": "^5.59.16",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.0.1",
