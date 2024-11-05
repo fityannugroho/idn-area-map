@@ -1,9 +1,4 @@
-import { loadEnvConfig } from '@next/env'
 import { Area } from './const'
-
-if (process.env.NODE_ENV !== 'production') {
-  loadEnvConfig(process.cwd())
-}
 
 export type Config = Readonly<{
   appName: string

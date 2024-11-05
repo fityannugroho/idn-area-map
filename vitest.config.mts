@@ -9,5 +9,6 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./', import.meta.url)),
     },
     environment: 'jsdom',
+    setupFiles: ['./vitest.setup.ts'],
   },
 })
