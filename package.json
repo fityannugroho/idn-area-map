@@ -8,7 +8,7 @@
     "build": "next build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:cov": "vitest --coverage",
+    "test:cov": "vitest run --coverage",
     "test:e2e": "playwright test",
     "start": "next start",
     "lint": "next lint && biome check .",
