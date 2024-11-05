@@ -1,4 +1,4 @@
-name: Test
+name: Test and Build
 
 on:
   push:
@@ -32,6 +32,9 @@ jobs:
 
     - name: Check code style
       run: npm run lint
+
+    - name: Run unit tests
+      run: npm test
 
     - name: Build project
       run: npm run build
