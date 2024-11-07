@@ -1,6 +1,6 @@
 'use client'
 
-import { ReloadIcon } from '@radix-ui/react-icons'
+import { LoaderCircleIcon } from 'lucide-react'
 import { useMapDashboard } from './hooks/useDashboard'
 import { useIslands } from './hooks/useIslands'
 
@@ -16,7 +16,7 @@ export default function IslandsInfo() {
         <div className="flex flex-col w-full justify-center items-center">
           {isLoading ? (
             <div className="flex gap-2 justify-center items-center">
-              <ReloadIcon className="animate-spin h-4 w-4" />
+              <LoaderCircleIcon className="animate-spin h-4 w-4" />
               <span className="text-sm">Loading islands...</span>
             </div>
           ) : (

@@ -15,7 +15,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
-import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
 import * as React from 'react'
 
 export type ComboboxOption = {
@@ -93,7 +93,7 @@ export function Combobox({
           }}
         >
           <span className="truncate">{selected?.label ?? label}</span>
-          <CaretSortIcon className="ml-1 shrink-0 opacity-50" />
+          <ChevronsUpDownIcon className="ml-1 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent

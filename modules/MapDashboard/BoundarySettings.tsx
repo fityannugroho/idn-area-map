@@ -3,7 +3,7 @@
 import { Switch } from '@/components/ui/switch'
 import { featureConfig } from '@/lib/config'
 import { cn, objectToEntries, ucFirstStr } from '@/lib/utils'
-import { ReloadIcon } from '@radix-ui/react-icons'
+import { LoaderCircleIcon } from 'lucide-react'
 import { useMapDashboard } from './hooks/useDashboard'
 
 export default function BoundarySettings() {
@@ -35,7 +35,9 @@ export default function BoundarySettings() {
 
             {ucFirstStr(area)}
 
-            {isLoading[area] && <ReloadIcon className="animate-spin" />}
+            {isLoading[area] && (
+              <LoaderCircleIcon className="h-4 w-4 animate-spin" />
+            )}
           </label>
         </div>
       ))}
