@@ -25,7 +25,7 @@ export default function Sidebar() {
           clear()
         }}
       >
-        <Cross2Icon className="h-4 w-4" />
+        <Cross2Icon />
         Clear All Data
       </Button>
     </div>

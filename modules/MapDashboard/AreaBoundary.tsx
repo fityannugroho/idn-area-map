@@ -177,7 +177,7 @@ export default function AreaBoundary({
                 }}
                 className="text-xs flex items-center gap-1 mt-3"
               >
-                <Link2Icon className="h-4 w-4" />
+                <Link2Icon />
                 Copy Link
               </button>
 
@@ -189,7 +189,7 @@ export default function AreaBoundary({
                 className="text-xs flex items-center gap-1 mt-2"
                 title={`Coordinate: ${latLng?.lat}, ${latLng?.lng}`}
               >
-                <ExternalLinkIcon className="h-4 w-4" />
+                <ExternalLinkIcon />
                 See on Google Maps
               </Link>
             </>

@@ -35,7 +35,7 @@ export default function BoundarySettings() {
 
             {ucFirstStr(area)}
 
-            {isLoading[area] && <ReloadIcon className="h-4 w-4 animate-spin" />}
+            {isLoading[area] && <ReloadIcon className="animate-spin" />}
           </label>
         </div>
       ))}

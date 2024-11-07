@@ -93,7 +93,7 @@ export function Combobox({
           }}
         >
           <span className="truncate">{selected?.label ?? label}</span>
-          <CaretSortIcon className="ml-1 h-4 w-4 shrink-0 opacity-50" />
+          <CaretSortIcon className="ml-1 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -128,7 +128,7 @@ export function Combobox({
                   {opt.label}
                   <CheckIcon
                     className={cn(
-                      'ml-auto h-4 w-4',
+                      'ml-auto',
                       selected && selected.key === opt.key
                         ? 'opacity-100'
                         : 'opacity-0',

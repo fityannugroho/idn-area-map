@@ -48,7 +48,7 @@ export default function IslandMarkers() {
               rel="noopener noreferrer"
               className="text-xs inline-flex items-center gap-1"
             >
-              <ExternalLinkIcon className="h-4 w-4" />
+              <ExternalLinkIcon />
               See on Google Maps
             </Link>
 
