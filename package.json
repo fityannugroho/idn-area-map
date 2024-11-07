@@ -38,7 +38,7 @@
     "@radix-ui/react-popover": "^1.1.2",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.1",
-    "@tanstack/react-query": "^5.59.19",
+    "@tanstack/react-query": "^5.59.20",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -65,7 +65,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@playwright/test": "^1.48.2",
-    "@tanstack/react-query-devtools": "^5.59.19",
+    "@tanstack/react-query-devtools": "^5.59.20",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.0.1",
     "@types/leaflet": "^1.9.14",
@@ -79,7 +79,7 @@
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.16",
     "jsdom": "^25.0.1",
-    "msw": "^2.6.0",
+    "msw": "^2.6.2",
     "vitest": "^2.1.4"
   }
 }
