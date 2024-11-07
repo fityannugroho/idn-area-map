@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons'
+import { TriangleAlertIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 
@@ -33,7 +33,7 @@ export default function Error({
           <AlertDialogHeader>
             <AlertDialogTitle>
               <div className="flex gap-2 items-center">
-                <ExclamationTriangleIcon className="h-5 w-5" />
+                <TriangleAlertIcon className="h-5 w-5" />
                 Error!
               </div>
             </AlertDialogTitle>

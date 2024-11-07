@@ -2,9 +2,10 @@
 
 import { config } from '@/lib/config'
 import { cn } from '@/lib/utils'
-import { GitHubLogoIcon, HeartFilledIcon } from '@radix-ui/react-icons'
+import { HandHeartIcon } from 'lucide-react'
 import Link from 'next/link'
 import * as React from 'react'
+import GitHubIcon from './icons/GitHubIcon'
 import { ThemeToggle } from './theme-toggle'
 import { Button } from './ui/button'
 
@@ -39,8 +40,8 @@ export function Navbar({ className }: NavbarProps) {
               href="https://trakteer.id/fityannugroho/tip"
               className="flex items-center gap-1"
             >
-              Donate
-              <HeartFilledIcon className="h-[1rem] w-[1rem] mt-[0.125rem]" />
+              Support
+              <HandHeartIcon className="h-5 w-5" />
             </Link>
           </li>
         </ul>
@@ -55,7 +56,7 @@ export function Navbar({ className }: NavbarProps) {
               target="_blank"
               href="https://github.com/fityannugroho/idn-area-map"
             >
-              <GitHubLogoIcon className="h-[1.2rem] w-[1.2rem]" />
+              <GitHubIcon className="h-[1.2rem] w-[1.2rem]" />
             </Link>
           </Button>
 

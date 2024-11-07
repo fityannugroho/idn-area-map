@@ -1,7 +1,7 @@
 'use client'
 
 import { Area } from '@/lib/const'
-import { ExternalLinkIcon } from '@radix-ui/react-icons'
+import { MapIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useMapDashboard } from './hooks/useDashboard'
@@ -48,7 +48,7 @@ export default function IslandMarkers() {
               rel="noopener noreferrer"
               className="text-xs inline-flex items-center gap-1"
             >
-              <ExternalLinkIcon />
+              <MapIcon />
               See on Google Maps
             </Link>
 

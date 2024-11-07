@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Cross2Icon } from '@radix-ui/react-icons'
+import { EraserIcon } from 'lucide-react'
 import AreaSelectors from './AreaSelectors'
 import BoundarySettings from './BoundarySettings'
 import IslandsInfo from './IslandsInfo'
@@ -20,12 +20,12 @@ export default function Sidebar() {
 
       <Button
         variant="outline"
-        className="mt-auto items-center gap-1"
+        className="mt-auto items-center"
         onClick={() => {
           clear()
         }}
       >
-        <Cross2Icon />
+        <EraserIcon />
         Clear All Data
       </Button>
     </div>

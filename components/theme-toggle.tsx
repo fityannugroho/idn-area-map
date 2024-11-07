@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { DesktopIcon, MoonIcon, SunIcon } from '@radix-ui/react-icons'
+import { LaptopMinimalIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import * as React from 'react'
 
@@ -33,7 +33,7 @@ export function ThemeToggle() {
           Dark
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('system')}>
-          <DesktopIcon />
+          <LaptopMinimalIcon />
           System
         </DropdownMenuItem>
       </DropdownMenuContent>

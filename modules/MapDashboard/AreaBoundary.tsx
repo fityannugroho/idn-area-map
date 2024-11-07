@@ -4,11 +4,11 @@ import { useArea } from '@/hooks/useArea'
 import { type FeatureArea, featureConfig } from '@/lib/config'
 import { getBoundaryData } from '@/lib/data'
 import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
-import { ExternalLinkIcon, Link2Icon } from '@radix-ui/react-icons'
 import { useQuery } from '@tanstack/react-query'
+import { LinkIcon, MapIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { GeoJSONProps } from 'react-leaflet'
 import { toast } from 'sonner'
 import { useMapDashboard } from './hooks/useDashboard'
@@ -175,9 +175,9 @@ export default function AreaBoundary({
                     })
                   }
                 }}
-                className="text-xs flex items-center gap-1 mt-3"
+                className="text-xs flex items-center gap-2 mt-4 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
               >
-                <Link2Icon />
+                <LinkIcon />
                 Copy Link
               </button>
 
@@ -186,10 +186,10 @@ export default function AreaBoundary({
                 passHref
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs flex items-center gap-1 mt-2"
+                className="text-xs flex items-center gap-2 mt-2 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
                 title={`Coordinate: ${latLng?.lat}, ${latLng?.lng}`}
               >
-                <ExternalLinkIcon />
+                <MapIcon />
                 See on Google Maps
               </Link>
             </>
