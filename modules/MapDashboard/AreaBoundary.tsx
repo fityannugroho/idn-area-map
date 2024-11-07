@@ -175,9 +175,9 @@ export default function AreaBoundary({
                     })
                   }
                 }}
-                className="text-xs flex items-center gap-2 mt-4 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                className="text-xs flex items-center gap-2 mt-4"
               >
-                <LinkIcon />
+                <LinkIcon className="h-4 w-4" />
                 Copy Link
               </button>
 
@@ -186,10 +186,10 @@ export default function AreaBoundary({
                 passHref
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs flex items-center gap-2 mt-2 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                className="text-xs flex items-center gap-2 mt-2"
                 title={`Coordinate: ${latLng?.lat}, ${latLng?.lng}`}
               >
-                <MapIcon />
+                <MapIcon className="h-4 w-4" />
                 See on Google Maps
               </Link>
             </>
