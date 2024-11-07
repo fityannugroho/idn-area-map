@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoonIcon, SunIcon } from '@radix-ui/react-icons'
+import { DesktopIcon, MoonIcon, SunIcon } from '@radix-ui/react-icons'
 import { useTheme } from 'next-themes'
 import * as React from 'react'
 
@@ -25,12 +25,15 @@ export function ThemeToggle() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme('light')}>
+          <SunIcon />
           Light
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('dark')}>
+          <MoonIcon />
           Dark
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('system')}>
+          <DesktopIcon />
           System
         </DropdownMenuItem>
       </DropdownMenuContent>
