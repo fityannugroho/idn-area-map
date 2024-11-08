@@ -121,10 +121,8 @@ test.describe('area selector', () => {
     await page.getByRole('button', { name: 'Province' }).click()
     await page.getByPlaceholder('Search Province').fill('jawa')
 
-    // Ensure all options contains 'jawa' word (non case-sensitive)
-    const options = page.getByRole('option')
-
-    for (const option of await options.all()) {
+    // Ensure all options contains 'jawa' word (case-insensitive)
+    for (const option of await page.getByRole('option').all()) {
       const text = await option.textContent()
       expect(text).toMatch(/jawa/i)
     }
@@ -135,10 +133,8 @@ test.describe('area selector', () => {
     await page.getByRole('button', { name: 'Regency' }).click()
     await page.getByPlaceholder('Search Regency').fill('bandung')
 
-    // Ensure all options contains 'bandung' word (non case-sensitive)
-    const options = page.getByRole('option')
-
-    for (const option of await options.all()) {
+    // Ensure all options contains 'bandung' word (case-insensitive)
+    for (const option of await page.getByRole('option').all()) {
       const text = await option.textContent()
       expect(text).toMatch(/bandung/i)
     }
@@ -151,10 +147,8 @@ test.describe('area selector', () => {
     await page.getByRole('button', { name: 'District' }).click()
     await page.getByPlaceholder('Search District').fill('cirebon')
 
-    // Ensure all options contains 'cirebon' word (non case-sensitive)
-    const options = page.getByRole('option')
-
-    for (const option of await options.all()) {
+    // Ensure all options contains 'cirebon' word (case-insensitive)
+    for (const option of await page.getByRole('option').all()) {
       const text = await option.textContent()
       expect(text).toMatch(/cirebon/i)
     }
@@ -165,35 +159,83 @@ test.describe('area selector', () => {
     await page.getByRole('button', { name: 'Village' }).click()
     await page.getByPlaceholder('Search Village').fill('pabean')
 
-    // Ensure all options contains 'pabean' word (non case-sensitive)
-    const options = page.getByRole('option')
-
-    for (const option of await options.all()) {
+    // Ensure all options contains 'pabean' word (case-insensitive)
+    for (const option of await page.getByRole('option').all()) {
       const text = await option.textContent()
       expect(text).toMatch(/pabean/i)
     }
   })
 
-  test.fixme(
-    'select a province should load the regencies of the selected province',
-    async ({ page }) => {
-      // TODO: Add tests for selecting a province
-    },
-  )
+  test('should load all regencies of the selected province', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Province' }).click()
 
-  test.fixme(
-    'select a regency should load the districts of the selected regency',
-    async ({ page }) => {
-      // TODO: Add tests for selecting a regency
-    },
-  )
+    const provinceCode = (
+      await page
+        .getByRole('option', { name: 'Bali' })
+        .getAttribute('data-value')
+    )?.split('_')[0]
+    await page.getByRole('option', { name: 'Bali' }).click()
 
-  test.fixme(
-    'select a district should load the villages of the selected district',
-    async ({ page }) => {
-      // TODO: Add tests for selecting a district
-    },
-  )
+    await expect(
+      page.getByRole('button', { name: 'Regency' }),
+    ).not.toBeDisabled()
+    await page.getByRole('button', { name: 'Regency' }).click()
+
+    // Ensure that the value of each option starts with the selected province code
+    for (const option of await page.getByRole('option').all()) {
+      const value = await option.getAttribute('data-value')
+      expect(value).toMatch(new RegExp(`^${provinceCode}`))
+    }
+  })
+
+  test('should load all districts of the selected regency', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Regency' }).click()
+
+    const regencyCode = (
+      await page.getByRole('option').first().getAttribute('data-value')
+    )?.split('_')[0]
+    await page.getByRole('option').first().click()
+
+    await expect(
+      page.getByRole('button', { name: 'District' }),
+    ).not.toBeDisabled()
+    await page.getByRole('button', { name: 'District' }).click()
+
+    // Ensure that the value of each option starts with the selected regency code
+    for (const option of await page.getByRole('option').all()) {
+      const value = await option.getAttribute('data-value')
+      expect(value).toMatch(new RegExp(`^${regencyCode}`))
+    }
+  })
+
+  test('should load all villages of the selected district', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'District' }).click()
+
+    const districtCode = (
+      await page.getByRole('option').first().getAttribute('data-value')
+    )?.split('_')[0]
+    await page.getByRole('option').first().click()
+
+    await expect(
+      page.getByRole('button', { name: 'Village' }),
+    ).not.toBeDisabled()
+    await page.getByRole('button', { name: 'Village' }).click()
+
+    // Ensure that the value of each option starts with the selected district code
+    for (const option of await page.getByRole('option').all()) {
+      const value = await option.getAttribute('data-value')
+      expect(value).toMatch(new RegExp(`^${districtCode}`))
+    }
+  })
 })
 
 test.describe.fixme('boundary settings', () => {
