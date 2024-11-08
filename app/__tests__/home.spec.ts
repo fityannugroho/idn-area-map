@@ -67,8 +67,133 @@ test.describe('theme toggle', () => {
   })
 })
 
-test.describe.fixme('area selector', () => {
-  // TODO: Add tests for the area selector
+test.describe('area selector', () => {
+  test('province selector should load all provinces', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.getByRole('button', { name: 'Province' })).toBeVisible()
+    await page.getByRole('button', { name: 'Province' }).click()
+    await expect(page.getByPlaceholder('Search Province')).toBeVisible()
+
+    // Ensure that all provinces are displayed
+    await expect(page.getByRole('option')).toHaveCount(38)
+  })
+
+  test('regency selector should load some regencies', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.getByRole('button', { name: 'Regency' })).toBeVisible()
+    await page.getByRole('button', { name: 'Regency' }).click()
+    await expect(page.getByPlaceholder('Search Regency')).toBeVisible()
+
+    // Ensure that the number of options available matches the expected count
+    await expect(page.getByRole('option')).toHaveCount(
+      config.dataSource.area.pagination.defaultPageSize,
+    )
+  })
+
+  test('district selector should load some districts', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.getByRole('button', { name: 'District' })).toBeVisible()
+    await page.getByRole('button', { name: 'District' }).click()
+    await expect(page.getByPlaceholder('Search District')).toBeVisible()
+
+    // Ensure that the number of options available matches the expected count
+    await expect(page.getByRole('option')).toHaveCount(
+      config.dataSource.area.pagination.defaultPageSize,
+    )
+  })
+
+  test('village selector should load some villages', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.getByRole('button', { name: 'Village' })).toBeVisible()
+    await page.getByRole('button', { name: 'Village' }).click()
+    await expect(page.getByPlaceholder('Search Village')).toBeVisible()
+
+    // Ensure that the number of options available matches the expected count
+    await expect(page.getByRole('option')).toHaveCount(
+      config.dataSource.area.pagination.defaultPageSize,
+    )
+  })
+
+  test('search province should show the correct provinces', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Province' }).click()
+    await page.getByPlaceholder('Search Province').fill('jawa')
+
+    // Ensure all options contains 'jawa' word (non case-sensitive)
+    const options = page.getByRole('option')
+
+    for (const option of await options.all()) {
+      const text = await option.textContent()
+      expect(text).toMatch(/jawa/i)
+    }
+  })
+
+  test('search regency should show the correct regencies', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Regency' }).click()
+    await page.getByPlaceholder('Search Regency').fill('bandung')
+
+    // Ensure all options contains 'bandung' word (non case-sensitive)
+    const options = page.getByRole('option')
+
+    for (const option of await options.all()) {
+      const text = await option.textContent()
+      expect(text).toMatch(/bandung/i)
+    }
+  })
+
+  test('search district should show the correct districts', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'District' }).click()
+    await page.getByPlaceholder('Search District').fill('cirebon')
+
+    // Ensure all options contains 'cirebon' word (non case-sensitive)
+    const options = page.getByRole('option')
+
+    for (const option of await options.all()) {
+      const text = await option.textContent()
+      expect(text).toMatch(/cirebon/i)
+    }
+  })
+
+  test('search village should show the correct villages', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Village' }).click()
+    await page.getByPlaceholder('Search Village').fill('pabean')
+
+    // Ensure all options contains 'pabean' word (non case-sensitive)
+    const options = page.getByRole('option')
+
+    for (const option of await options.all()) {
+      const text = await option.textContent()
+      expect(text).toMatch(/pabean/i)
+    }
+  })
+
+  test.fixme(
+    'select a province should load the regencies of the selected province',
+    async ({ page }) => {
+      // TODO: Add tests for selecting a province
+    },
+  )
+
+  test.fixme(
+    'select a regency should load the districts of the selected regency',
+    async ({ page }) => {
+      // TODO: Add tests for selecting a regency
+    },
+  )
+
+  test.fixme(
+    'select a district should load the villages of the selected district',
+    async ({ page }) => {
+      // TODO: Add tests for selecting a district
+    },
+  )
 })
 
 test.describe.fixme('boundary settings', () => {
