@@ -6,6 +6,7 @@ test('province selector should load all provinces', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Province' })).toBeVisible()
   await page.getByRole('button', { name: 'Province' }).click()
   await expect(page.getByPlaceholder('Search Province')).toBeVisible()
+  await expect(page.getByRole('option')).toBeVisible()
 
   // Ensure that all provinces are displayed
   await expect(page.getByRole('option')).toHaveCount(38)
@@ -16,6 +17,7 @@ test('regency selector should load some regencies', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Regency' })).toBeVisible()
   await page.getByRole('button', { name: 'Regency' }).click()
   await expect(page.getByPlaceholder('Search Regency')).toBeVisible()
+  await expect(page.getByRole('option')).toBeVisible()
 
   // Ensure that the number of options available matches the expected count
   await expect(page.getByRole('option')).toHaveCount(
@@ -28,6 +30,7 @@ test('district selector should load some districts', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'District' })).toBeVisible()
   await page.getByRole('button', { name: 'District' }).click()
   await expect(page.getByPlaceholder('Search District')).toBeVisible()
+  await expect(page.getByRole('option')).toBeVisible()
 
   // Ensure that the number of options available matches the expected count
   await expect(page.getByRole('option')).toHaveCount(
@@ -40,6 +43,7 @@ test('village selector should load some villages', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Village' })).toBeVisible()
   await page.getByRole('button', { name: 'Village' }).click()
   await expect(page.getByPlaceholder('Search Village')).toBeVisible()
+  await expect(page.getByRole('option')).toBeVisible()
 
   // Ensure that the number of options available matches the expected count
   await expect(page.getByRole('option')).toHaveCount(
