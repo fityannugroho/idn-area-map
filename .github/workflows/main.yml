@@ -57,9 +57,9 @@ jobs:
     - name: Build project
       run: pnpm run build
     - name: Install Playwright Browsers
-      run: pnpx playwright install --with-deps
+      run: pnpm exec playwright install --with-deps
     - name: Run Playwright tests
-      run: pnpx playwright test
+      run: pnpm exec playwright test
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
