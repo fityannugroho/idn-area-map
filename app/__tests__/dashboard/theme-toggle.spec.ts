@@ -1,8 +1,11 @@
 import { expect, test } from '@playwright/test'
 
-test('dark mode', async ({ page }) => {
+test.beforeEach(async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByText('Dark')).not.toBeVisible()
+})
+
+test('dark mode', async ({ page }) => {
+  await expect(page.getByText('Dark')).toBeHidden()
 
   // Click on the theme toggle button
   await page.getByTestId('theme-toggle').click()
@@ -15,8 +18,7 @@ test('dark mode', async ({ page }) => {
 })
 
 test('light mode', async ({ page }) => {
-  await page.goto('/')
-  await expect(page.getByText('Light')).not.toBeVisible()
+  await expect(page.getByText('Light')).toBeHidden()
 
   // Click on the theme toggle button
   await page.getByTestId('theme-toggle').click()
@@ -32,13 +34,11 @@ test('system default mode', async ({ page }) => {
   // Emulate dark mode as the preferred color scheme
   await page.emulateMedia({ colorScheme: 'dark' })
 
-  await page.goto('/')
-
   // Set to Light mode first
   await page.getByTestId('theme-toggle').click()
   await page.getByText('Light').click()
   await expect(page.locator('html')).toHaveClass('light')
-  await expect(page.getByText('Light')).not.toBeVisible()
+  await expect(page.getByText('Light')).toBeHidden()
 
   // Open theme toggle again and set to System mode
   await page.getByTestId('theme-toggle').click()

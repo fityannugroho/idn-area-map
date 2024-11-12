@@ -1,9 +1,16 @@
+import { config } from '@/lib/config'
 import test, { expect } from '@playwright/test'
+
+test.beforeEach(async ({ page }) => {
+  const res = await page.request.get(config.dataSource.area.url)
+  await expect(res).toBeOK()
+
+  await page.goto('/')
+})
 
 test('should show the boundary settings, enabled by default', async ({
   page,
 }) => {
-  await page.goto('/')
   await expect(page.getByLabel('Province')).toBeChecked()
   await expect(page.getByLabel('Regency')).toBeChecked()
   await expect(page.getByLabel('District')).toBeChecked()
@@ -11,12 +18,12 @@ test('should show the boundary settings, enabled by default', async ({
 })
 
 test('should hide the province boundary when disabled', async ({ page }) => {
-  await page.goto('/')
-
   // Select a province
   await page.getByRole('button', { name: 'Province' }).click()
-  await page.getByRole('option', { name: 'BALI' }).click()
-  await expect(page.getByRole('main').locator('g path')).toBeVisible()
+  await page.getByRole('option', { name: 'jakarta' }).click()
+  await expect(page.getByRole('main').locator('g path')).toBeVisible({
+    timeout: 10_000,
+  })
 
   // Disable the province boundary
   await page.getByLabel('Province').click()
@@ -27,12 +34,12 @@ test('should hide the province boundary when disabled', async ({ page }) => {
 })
 
 test('should hide the regency boundary when disabled', async ({ page }) => {
-  await page.goto('/')
-
   // Select a regency
   await page.getByRole('button', { name: 'Regency' }).click()
   await page.getByRole('option').first().click()
-  await expect(page.getByRole('main').locator('g path')).toBeVisible()
+  await expect(page.getByRole('main').locator('g path')).toBeVisible({
+    timeout: 10_000,
+  })
 
   // Disable the regency boundary setting
   await page.getByLabel('Regency').click()
@@ -43,12 +50,12 @@ test('should hide the regency boundary when disabled', async ({ page }) => {
 })
 
 test('should hide the district boundary when disabled', async ({ page }) => {
-  await page.goto('/')
-
   // Select a district
   await page.getByRole('button', { name: 'District' }).click()
   await page.getByRole('option').first().click()
-  await expect(page.getByRole('main').locator('g path')).toBeVisible()
+  await expect(page.getByRole('main').locator('g path')).toBeVisible({
+    timeout: 10_000,
+  })
 
   // Disable the district boundary setting
   await page.getByLabel('District').click()
@@ -59,12 +66,12 @@ test('should hide the district boundary when disabled', async ({ page }) => {
 })
 
 test('should hide the village boundary when disabled', async ({ page }) => {
-  await page.goto('/')
-
   // Select a village
   await page.getByRole('button', { name: 'Village' }).click()
   await page.getByRole('option').first().click()
-  await expect(page.getByRole('main').locator('g path')).toBeVisible()
+  await expect(page.getByRole('main').locator('g path')).toBeVisible({
+    timeout: 10_000,
+  })
 
   // Disable the village boundary setting
   await page.getByLabel('Village').click()
