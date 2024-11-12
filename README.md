@@ -31,8 +31,8 @@ The map of Indonesia's administrative areas.
 ## Installation
 
 1. Clone this repository
-1. Install dependencies: `npm install`
-1. Run the app: `npm run dev`
+1. Install dependencies: `pnpm install`
+1. Run the app: `pnpm run dev`
 1. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## License
