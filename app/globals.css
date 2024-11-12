@@ -96,9 +96,4 @@
       @apply bg-card text-card-foreground;
     }
   }
-
-  /* Tile layer */
-  .leaflet-layer {
-    @apply dark:hue-rotate-180 dark:invert dark:contrast-[.90] dark:brightness-90;
-  }
 }

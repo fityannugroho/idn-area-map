@@ -2,7 +2,8 @@
 
 import 'leaflet/dist/leaflet.css'
 import type { PropsWithChildren } from 'react'
-import { MapContainer, type MapContainerProps, TileLayer } from 'react-leaflet'
+import { MapContainer, type MapContainerProps } from 'react-leaflet'
+import TileLayer from './tile-layer'
 
 export type MapProps = MapContainerProps & PropsWithChildren
 
@@ -15,15 +16,13 @@ export default function Map({
 }: MapProps) {
   return (
     <MapContainer
+      {...mapProps}
+      maxZoom={16} // Maximum zoom level provided by Protomaps
       center={center}
       zoom={zoom}
       className={className}
-      {...mapProps}
     >
-      <TileLayer
-        attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+      <TileLayer />
       {children}
     </MapContainer>
   )

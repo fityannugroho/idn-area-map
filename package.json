@@ -29,6 +29,7 @@
     "node": ">=18.17"
   },
   "dependencies": {
+    "@maplibre/maplibre-gl-leaflet": "^0.0.22",
     "@next/env": "^15.0.2",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
