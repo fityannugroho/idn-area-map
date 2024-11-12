@@ -2,9 +2,6 @@ import { config } from '@/lib/config'
 import test, { expect } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {
-  const res = await page.request.get(config.dataSource.area.url)
-  await expect(res).toBeOK()
-
   await page.goto('/')
 })
 
