@@ -25,8 +25,8 @@ The map of Indonesia's administrative areas.
 ## Built With
 
 - [Next.js](https://nextjs.org) + [TypeScript](https://www.typescriptlang.org)
-- [Tailwind CSS](https://tailwindcss.com) + [shadcn-ui](https://shadcn-ui.vercel.app)
-- [Leaflet](https://leafletjs.com) + [React Leaflet](https://react-leaflet.js.org)
+- [Tailwind CSS](https://tailwindcss.com) + [shadcn-ui](https://ui.shadcn.com)
+- [React Leaflet](https://react-leaflet.js.org) + [MapLibre GL](https://github.com/maplibre/maplibre-gl-js) (powered by [Datawan](https://datawan.id))
 
 ## Installation
 
@@ -43,4 +43,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 **Give a ⭐️** if this project helped you!
 
-Also please consider supporting this project by **becoming a sponsor**. Your donation will help us maintain and develop this project and provide you with better support.
+Also please consider supporting this project by [**becoming a sponsor**](https://github.com/sponsors/fityannugroho). Your donation will help us maintain and develop this project and provide you with better support.
