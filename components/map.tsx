@@ -17,7 +17,7 @@ export default function Map({
   return (
     <MapContainer
       {...mapProps}
-      maxZoom={16} // Maximum zoom level provided by Protomaps
+      maxZoom={24} // Maximum zoom level provided by the tile server
       center={center}
       zoom={zoom}
       className={className}
