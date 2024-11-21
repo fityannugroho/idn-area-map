@@ -30,7 +30,7 @@ export function Navbar({ className }: NavbarProps) {
         </Link>
         <ul className="flex gap-4 lg:gap-6 text-sm *:text-foreground/60 hover:*:text-foreground">
           <li>
-            <Link target="_blank" href="https://idn-area.up.railway.app/docs">
+            <Link target="_blank" href="https://idn-area.up.railway.app">
               API
             </Link>
           </li>
