@@ -44,7 +44,7 @@ export type AreaBoundaryProps<A extends FeatureArea> = Omit<
 > & {
   area: A
   code: string
-  onLoading: (isLoading: boolean) => void
+  onLoading?: (isLoading: boolean) => void
   render?: (data?: GetSpecificDataReturn<A>['data']) => React.ReactNode
 }
 
@@ -61,7 +61,7 @@ export default function AreaBoundary<A extends FeatureArea>({
   const areaDetails = useArea(area, code)
 
   useEffect(() => {
-    onLoading(boundary.status === 'pending')
+    onLoading?.(boundary.status === 'pending')
   }, [boundary.status, onLoading])
 
   if (boundary.status === 'pending') {
@@ -86,7 +86,7 @@ export default function AreaBoundary<A extends FeatureArea>({
 
   return (
     <Pane
-      name={area}
+      name={`boundary-${area}-${code}`}
       style={{ zIndex: order ? defaultOverlayPaneZIndex + order : undefined }}
     >
       <FeatureGroup>
