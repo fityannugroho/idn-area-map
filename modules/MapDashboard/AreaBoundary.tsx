@@ -46,22 +46,17 @@ export type AreaBoundaryProps = Omit<
   'key' | 'data' | 'children' | 'pane'
 > & {
   area: FeatureArea
+  code: string
 }
 
 export default function AreaBoundary({
   area,
+  code,
   pathOptions,
   ...props
 }: AreaBoundaryProps) {
-  const { selectedArea, boundaryVisibility, loading, setAreaBounds } =
-    useMapDashboard()
+  const { boundaryVisibility, loading, setAreaBounds } = useMapDashboard()
   const { order, color } = featureConfig[area]
-  const code = selectedArea[area]?.code
-
-  if (!code) {
-    return null
-  }
-
   const { data: geoJson, status: geoStatus, error } = useBoundary(area, code)
   const { data: areaData, status: areaStatus } = useArea(area, code)
   const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()

@@ -14,7 +14,13 @@ export default function BoundaryLayers() {
         const selected = selectedArea[area]
 
         if (selected) {
-          return <AreaBoundary key={selected.code} area={area} />
+          return (
+            <AreaBoundary
+              key={selected.code}
+              area={area}
+              code={selected.code}
+            />
+          )
         }
       })}
     </>
