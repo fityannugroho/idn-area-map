@@ -55,7 +55,7 @@ export default function AreaBoundary({
   pathOptions,
   ...props
 }: AreaBoundaryProps) {
-  const { boundaryVisibility, loading, setAreaBounds } = useMapDashboard()
+  const { loading, setAreaBounds } = useMapDashboard()
   const { order, color } = featureConfig[area]
   const { data: geoJson, status: geoStatus, error } = useBoundary(area, code)
   const { data: areaData, status: areaStatus } = useArea(area, code)
@@ -85,13 +85,9 @@ export default function AreaBoundary({
             key={code}
             data={geoJson}
             pathOptions={{
-              ...pathOptions,
               color,
               fillOpacity: 0.08,
-              ...(!boundaryVisibility[area] && {
-                color: 'transparent',
-                fillOpacity: 0,
-              }),
+              ...pathOptions,
             }}
             eventHandlers={{
               click: (e) => {

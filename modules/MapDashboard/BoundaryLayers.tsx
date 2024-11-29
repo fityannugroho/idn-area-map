@@ -6,7 +6,7 @@ import AreaBoundary from './AreaBoundary'
 import { useMapDashboard } from './hooks/useDashboard'
 
 export default function BoundaryLayers() {
-  const { selectedArea } = useMapDashboard()
+  const { boundaryVisibility, selectedArea } = useMapDashboard()
 
   return (
     <>
@@ -19,6 +19,12 @@ export default function BoundaryLayers() {
               key={selected.code}
               area={area}
               code={selected.code}
+              pathOptions={{
+                ...(!boundaryVisibility[area] && {
+                  color: 'transparent',
+                  fillOpacity: 0,
+                }),
+              }}
             />
           )
         }
