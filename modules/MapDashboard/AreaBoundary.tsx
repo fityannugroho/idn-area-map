@@ -10,7 +10,6 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import type { GeoJSONProps } from 'react-leaflet'
 import { toast } from 'sonner'
-import { useMapDashboard } from './hooks/useDashboard'
 
 const GeoJSON = dynamic(
   () => import('react-leaflet').then((mod) => mod.GeoJSON),
@@ -47,23 +46,24 @@ export type AreaBoundaryProps = Omit<
 > & {
   area: FeatureArea
   code: string
+  onLoading: (isLoading: boolean) => void
 }
 
 export default function AreaBoundary({
   area,
   code,
+  onLoading,
   pathOptions,
   ...props
 }: AreaBoundaryProps) {
-  const { loading } = useMapDashboard()
   const { order, color } = featureConfig[area]
   const { data: geoJson, status: geoStatus, error } = useBoundary(area, code)
   const { data: areaData, status: areaStatus } = useArea(area, code)
   const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()
 
   useEffect(() => {
-    loading(area, geoStatus === 'pending')
-  }, [geoStatus, area, loading])
+    onLoading(geoStatus === 'pending')
+  }, [geoStatus, onLoading])
 
   if (areaStatus === 'error' || geoStatus === 'error') {
     toast.error(`Failed to fetch ${area} data`, {

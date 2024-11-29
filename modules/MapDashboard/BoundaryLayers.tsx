@@ -2,16 +2,22 @@
 
 import { featureConfig } from '@/lib/config'
 import { getObjectKeys } from '@/lib/utils'
+import { useCallback } from 'react'
 import AreaBoundary from './AreaBoundary'
 import { useMapDashboard } from './hooks/useDashboard'
 
 export default function BoundaryLayers() {
-  const { boundaryVisibility, selectedArea, setAreaBounds } = useMapDashboard()
+  const { boundaryVisibility, loading, selectedArea, setAreaBounds } =
+    useMapDashboard()
 
   return (
     <>
       {getObjectKeys(featureConfig).map((area) => {
         const selected = selectedArea[area]
+        const onLoading = useCallback(
+          (isLoading: boolean) => loading(area, isLoading),
+          [area],
+        )
 
         if (selected) {
           return (
@@ -24,6 +30,7 @@ export default function BoundaryLayers() {
                   setAreaBounds(e.target.getBounds())
                 },
               }}
+              onLoading={onLoading}
               pathOptions={{
                 ...(!boundaryVisibility[area] && {
                   color: 'transparent',
