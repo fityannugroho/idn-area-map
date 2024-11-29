@@ -3,11 +3,9 @@
 import { useArea } from '@/hooks/useArea'
 import useBoundary from '@/hooks/useBoundary'
 import { type FeatureArea, featureConfig } from '@/lib/config'
-import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
-import { LinkIcon, MapIcon } from 'lucide-react'
+import type { GetSpecificDataReturn } from '@/lib/data'
 import dynamic from 'next/dynamic'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import type { GeoJSONProps } from 'react-leaflet'
 import { toast } from 'sonner'
 
@@ -40,26 +38,27 @@ const FeatureGroup = dynamic(
  */
 const defaultOverlayPaneZIndex = 400
 
-export type AreaBoundaryProps = Omit<
+export type AreaBoundaryProps<A extends FeatureArea> = Omit<
   GeoJSONProps,
   'key' | 'data' | 'children' | 'pane'
 > & {
-  area: FeatureArea
+  area: A
   code: string
   onLoading: (isLoading: boolean) => void
+  render?: (data?: GetSpecificDataReturn<A>['data']) => React.ReactNode
 }
 
-export default function AreaBoundary({
+export default function AreaBoundary<A extends FeatureArea>({
   area,
   code,
   onLoading,
   pathOptions,
+  render,
   ...props
-}: AreaBoundaryProps) {
+}: AreaBoundaryProps<A>) {
   const { order, color } = featureConfig[area]
   const boundary = useBoundary(area, code)
   const areaDetails = useArea(area, code)
-  const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()
 
   useEffect(() => {
     onLoading(boundary.status === 'pending')
@@ -100,81 +99,9 @@ export default function AreaBoundary({
             fillOpacity: 0.08,
             ...pathOptions,
           }}
-          eventHandlers={{
-            click: (e) => {
-              setLatLng(e.latlng)
-              props.eventHandlers?.click?.(e)
-            },
-            ...props.eventHandlers,
-          }}
         />
 
-        {/* Render Popup inside the default `popupPane`.
-            See https://leafletjs.com/reference.html#map-pane */}
-        <Popup pane="popupPane">
-          {areaDetails.status === 'pending' ? (
-            <span className="block text-gray-500">Loading...</span>
-          ) : (
-            <>
-              <span className="block font-bold text-sm">
-                {areaDetails.data.name}
-              </span>
-              <span className="text-sm">
-                {addDotSeparator(areaDetails.data.code)}
-              </span>
-
-              {getAllParents(area).map((parent) => {
-                const parentData = areaDetails.data.parent?.[parent]
-
-                if (!parentData) return null
-
-                return (
-                  <div key={parent} className="mt-1">
-                    <span className="text-xs text-gray-500">
-                      {ucFirstStr(parent)} :
-                    </span>
-                    <br />
-                    <span className="text-xs">{parentData.name}</span>
-                  </div>
-                )
-              })}
-
-              <button
-                type="button"
-                onClick={() => {
-                  try {
-                    navigator.clipboard.writeText(
-                      `${window.location.origin}/${addDotSeparator(code)}`,
-                    )
-                    toast.success('Link copied to clipboard', {
-                      duration: 3_000, // 3 seconds
-                    })
-                  } catch (error) {
-                    toast.error('Failed to copy link to clipboard', {
-                      closeButton: true,
-                    })
-                  }
-                }}
-                className="text-xs flex items-center gap-2 mt-4"
-              >
-                <LinkIcon className="h-4 w-4" />
-                Copy Link
-              </button>
-
-              <Link
-                href={`https://www.google.com/maps/search/${latLng?.lat},${latLng?.lng}`}
-                passHref
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs flex items-center gap-2 mt-2"
-                title={`Coordinate: ${latLng?.lat}, ${latLng?.lng}`}
-              >
-                <MapIcon className="h-4 w-4" />
-                See on Google Maps
-              </Link>
-            </>
-          )}
-        </Popup>
+        {render?.(areaDetails.data)}
       </FeatureGroup>
     </Pane>
   )
