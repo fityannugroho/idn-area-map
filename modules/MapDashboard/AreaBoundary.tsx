@@ -55,7 +55,7 @@ export default function AreaBoundary({
   pathOptions,
   ...props
 }: AreaBoundaryProps) {
-  const { loading, setAreaBounds } = useMapDashboard()
+  const { loading } = useMapDashboard()
   const { order, color } = featureConfig[area]
   const { data: geoJson, status: geoStatus, error } = useBoundary(area, code)
   const { data: areaData, status: areaStatus } = useArea(area, code)
@@ -93,9 +93,6 @@ export default function AreaBoundary({
               click: (e) => {
                 setLatLng(e.latlng)
                 props.eventHandlers?.click?.(e)
-              },
-              add: (e) => {
-                setAreaBounds(e.target.getBounds())
               },
               ...props.eventHandlers,
             }}
