@@ -57,37 +57,29 @@ export default function AreaBoundary({
   ...props
 }: AreaBoundaryProps) {
   const { order, color } = featureConfig[area]
-  const {
-    data: geoJson,
-    status: geoStatus,
-    error: geoErr,
-  } = useBoundary(area, code)
-  const {
-    data: areaData,
-    status: areaStatus,
-    error: areaErr,
-  } = useArea(area, code)
+  const boundary = useBoundary(area, code)
+  const areaDetails = useArea(area, code)
   const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()
 
   useEffect(() => {
-    onLoading(geoStatus === 'pending')
-  }, [geoStatus, onLoading])
+    onLoading(boundary.status === 'pending')
+  }, [boundary.status, onLoading])
 
-  if (geoStatus === 'pending') {
+  if (boundary.status === 'pending') {
     return null
   }
 
-  if (areaStatus === 'error') {
+  if (areaDetails.status === 'error') {
     toast.error(`Failed to fetch ${area} data`, {
-      description: areaErr.message,
+      description: areaDetails.error.message,
       closeButton: true,
     })
     return null
   }
 
-  if (geoStatus === 'error') {
+  if (boundary.status === 'error') {
     toast.error(`Failed to fetch ${area} boundary`, {
-      description: geoErr.message,
+      description: boundary.error.message,
       closeButton: true,
     })
     return null
@@ -102,7 +94,7 @@ export default function AreaBoundary({
         <GeoJSON
           {...props}
           key={code}
-          data={geoJson}
+          data={boundary.data}
           pathOptions={{
             color,
             fillOpacity: 0.08,
@@ -120,15 +112,19 @@ export default function AreaBoundary({
         {/* Render Popup inside the default `popupPane`.
             See https://leafletjs.com/reference.html#map-pane */}
         <Popup pane="popupPane">
-          {areaStatus === 'pending' ? (
+          {areaDetails.status === 'pending' ? (
             <span className="block text-gray-500">Loading...</span>
           ) : (
             <>
-              <span className="block font-bold text-sm">{areaData.name}</span>
-              <span className="text-sm">{addDotSeparator(areaData.code)}</span>
+              <span className="block font-bold text-sm">
+                {areaDetails.data.name}
+              </span>
+              <span className="text-sm">
+                {addDotSeparator(areaDetails.data.code)}
+              </span>
 
               {getAllParents(area).map((parent) => {
-                const parentData = areaData.parent?.[parent]
+                const parentData = areaDetails.data.parent?.[parent]
 
                 if (!parentData) return null
 
