@@ -61,6 +61,10 @@ export default function AreaBoundary({
   const { data: areaData, status: areaStatus } = useArea(area, code)
   const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()
 
+  useEffect(() => {
+    loading(area, geoStatus === 'pending')
+  }, [geoStatus, area, loading])
+
   if (areaStatus === 'error' || geoStatus === 'error') {
     toast.error(`Failed to fetch ${area} data`, {
       description: error?.message || 'An error occurred while fetching thedata',
@@ -68,10 +72,6 @@ export default function AreaBoundary({
     })
     return null
   }
-
-  useEffect(() => {
-    loading(area, geoStatus === 'pending')
-  }, [geoStatus, area, loading])
 
   return (
     <Pane
