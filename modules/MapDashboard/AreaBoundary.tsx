@@ -1,10 +1,9 @@
 'use client'
 
 import { useArea } from '@/hooks/useArea'
+import useBoundary from '@/hooks/useBoundary'
 import { type FeatureArea, featureConfig } from '@/lib/config'
-import { getBoundaryData } from '@/lib/data'
 import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
-import { useQuery } from '@tanstack/react-query'
 import { LinkIcon, MapIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
@@ -63,28 +62,7 @@ export default function AreaBoundary({
     return null
   }
 
-  const fetchBoundary = async () => {
-    const res = await getBoundaryData(area, code)
-
-    if (!res.data) {
-      throw new Error(
-        res.statusCode === 404
-          ? `Data not found for ${area} ${code}`
-          : `Unexpected status code: ${res.statusCode}`,
-      )
-    }
-
-    return res.data
-  }
-
-  const {
-    data: geoJson,
-    status: geoStatus,
-    error,
-  } = useQuery({
-    queryKey: ['geoJson', area, code],
-    queryFn: fetchBoundary,
-  })
+  const { data: geoJson, status: geoStatus, error } = useBoundary(area, code)
   const { data: areaData, status: areaStatus } = useArea(area, code)
   const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()
 
