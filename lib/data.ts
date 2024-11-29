@@ -116,6 +116,6 @@ export async function getBoundaryData(
   return {
     statusCode: res.status,
     message: res.statusText,
-    data: res.status === 200 ? await res.json() : undefined,
+    data: res.ok ? await res.json() : undefined,
   }
 }
