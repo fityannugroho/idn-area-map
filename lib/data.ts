@@ -103,7 +103,7 @@ export async function getData<A extends Area, P extends string | Query<A>>(
 type BoundaryResponse = {
   statusCode: number
   message: string
-  data?: GeoJSON.Feature<GeoJSON.MultiPolygon>
+  data: GeoJSON.Feature<GeoJSON.MultiPolygon> | undefined
 }
 
 export async function getBoundaryData(
@@ -116,6 +116,6 @@ export async function getBoundaryData(
   return {
     statusCode: res.status,
     message: res.statusText,
-    ...(res.ok && { data: await res.json() }),
+    data: res.ok ? await res.json() : undefined,
   }
 }
