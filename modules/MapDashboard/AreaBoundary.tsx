@@ -57,17 +57,37 @@ export default function AreaBoundary({
   ...props
 }: AreaBoundaryProps) {
   const { order, color } = featureConfig[area]
-  const { data: geoJson, status: geoStatus, error } = useBoundary(area, code)
-  const { data: areaData, status: areaStatus } = useArea(area, code)
+  const {
+    data: geoJson,
+    status: geoStatus,
+    error: geoErr,
+  } = useBoundary(area, code)
+  const {
+    data: areaData,
+    status: areaStatus,
+    error: areaErr,
+  } = useArea(area, code)
   const [latLng, setLatLng] = useState<{ lat: number; lng: number }>()
 
   useEffect(() => {
     onLoading(geoStatus === 'pending')
   }, [geoStatus, onLoading])
 
-  if (areaStatus === 'error' || geoStatus === 'error') {
+  if (geoStatus === 'pending') {
+    return null
+  }
+
+  if (areaStatus === 'error') {
     toast.error(`Failed to fetch ${area} data`, {
-      description: error?.message || 'An error occurred while fetching thedata',
+      description: areaErr.message,
+      closeButton: true,
+    })
+    return null
+  }
+
+  if (geoStatus === 'error') {
+    toast.error(`Failed to fetch ${area} boundary`, {
+      description: geoErr.message,
       closeButton: true,
     })
     return null
@@ -79,25 +99,23 @@ export default function AreaBoundary({
       style={{ zIndex: order ? defaultOverlayPaneZIndex + order : undefined }}
     >
       <FeatureGroup>
-        {geoJson && (
-          <GeoJSON
-            {...props}
-            key={code}
-            data={geoJson}
-            pathOptions={{
-              color,
-              fillOpacity: 0.08,
-              ...pathOptions,
-            }}
-            eventHandlers={{
-              click: (e) => {
-                setLatLng(e.latlng)
-                props.eventHandlers?.click?.(e)
-              },
-              ...props.eventHandlers,
-            }}
-          />
-        )}
+        <GeoJSON
+          {...props}
+          key={code}
+          data={geoJson}
+          pathOptions={{
+            color,
+            fillOpacity: 0.08,
+            ...pathOptions,
+          }}
+          eventHandlers={{
+            click: (e) => {
+              setLatLng(e.latlng)
+              props.eventHandlers?.click?.(e)
+            },
+            ...props.eventHandlers,
+          }}
+        />
 
         {/* Render Popup inside the default `popupPane`.
             See https://leafletjs.com/reference.html#map-pane */}
