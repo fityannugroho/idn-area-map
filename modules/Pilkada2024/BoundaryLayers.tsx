@@ -1,10 +1,10 @@
 'use client'
 
+import AreaBoundary from '@/components/area-boundary'
 import { useArea } from '@/hooks/useArea'
 import { config } from '@/lib/config'
 import { Area } from '@/lib/const'
 import dynamic from 'next/dynamic'
-import AreaBoundary from '../MapDashboard/AreaBoundary'
 import { useMapDashboard } from '../MapDashboard/hooks/useDashboard'
 import VotesChart from './VotesChart'
 import { useCandidates, useElectionResults } from './hooks/usePilkada'

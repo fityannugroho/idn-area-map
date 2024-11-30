@@ -1,12 +1,5 @@
-'use client'
-
 import { useQuery } from '@tanstack/react-query'
-import {
-  type PropsWithChildren,
-  createContext,
-  useContext,
-  useState,
-} from 'react'
+import { createContext, useContext } from 'react'
 
 const baseUrl =
   'https://raw.githubusercontent.com/razanfawwaz/pilkada-scrap/main'
@@ -152,22 +145,7 @@ type PropsContext = {
   >
 }
 
-const PilkadaContext = createContext<PropsContext | undefined>(undefined)
-
-export function PilkadaProvider({ children }: PropsWithChildren) {
-  const [election, setElection] = useState<ElectionType>()
-
-  return (
-    <PilkadaContext.Provider
-      value={{
-        election,
-        setElection,
-      }}
-    >
-      {children}
-    </PilkadaContext.Provider>
-  )
-}
+export const PilkadaContext = createContext<PropsContext | undefined>(undefined)
 
 export function usePilkada() {
   const context = useContext(PilkadaContext)

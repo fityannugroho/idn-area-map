@@ -16,10 +16,6 @@ const GeoJSON = dynamic(
   },
 )
 
-const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), {
-  ssr: false,
-})
-
 const Pane = dynamic(() => import('react-leaflet').then((mod) => mod.Pane), {
   ssr: false,
 })

@@ -1,6 +1,8 @@
-import { MapDashboardProvider } from '@/modules/MapDashboard/hooks/useDashboard'
-import Pilkada2024Dashboard from '@/modules/Pilkada2024/Dashboard'
-import { PilkadaProvider } from '@/modules/Pilkada2024/hooks/usePilkada'
+import DashboardLayout from '@/components/dashboard-layout'
+import MapDashboardProvider from '@/modules/MapDashboard/DashboardProvider'
+import MapView from '@/modules/Pilkada2024/MapView'
+import PilkadaProvider from '@/modules/Pilkada2024/PilkadaProvider'
+import Sidebar from '@/modules/Pilkada2024/Sidebar'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -15,7 +17,7 @@ export default function Pilkada2024() {
   return (
     <PilkadaProvider>
       <MapDashboardProvider>
-        <Pilkada2024Dashboard />
+        <DashboardLayout Sidebar={Sidebar} MapView={MapView} />
       </MapDashboardProvider>
     </PilkadaProvider>
   )

@@ -1,9 +1,9 @@
 'use client'
 
+import AreaBoundary from '@/components/area-boundary'
 import { featureConfig } from '@/lib/config'
 import { getObjectKeys } from '@/lib/utils'
 import { useCallback, useState } from 'react'
-import AreaBoundary from './AreaBoundary'
 import PopupArea from './PopupArea'
 import { useMapDashboard } from './hooks/useDashboard'
 
