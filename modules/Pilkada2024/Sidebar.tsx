@@ -17,7 +17,7 @@ import {
   usePilkada,
 } from './hooks/usePilkada'
 
-const electionOptions: { key: ElectionType; label: string }[] = [
+const electionOptions: readonly { key: ElectionType; label: string }[] = [
   { key: 'governor', label: 'Governor' },
   { key: 'regent', label: 'Regent' },
 ] as const
