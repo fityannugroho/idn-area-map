@@ -2,7 +2,7 @@
 
 import { config } from '@/lib/config'
 import { cn } from '@/lib/utils'
-import { HandHeartIcon, Menu } from 'lucide-react'
+import { ExternalLinkIcon, HandHeartIcon, MenuIcon } from 'lucide-react'
 import Link from 'next/link'
 import * as React from 'react'
 import GitHubIcon from './icons/GitHubIcon'
@@ -21,14 +21,30 @@ export type NavbarProps = {
   className?: string
 }
 
-const menuItems = [
-  { href: 'https://idn-area.up.railway.app', label: 'API', target: '_blank' },
-  { href: '/pilkada2024', label: 'Pilkada 2024', badge: 'New' },
+type MenuItem = {
+  label: string
+  href: string
+  target?: string
+  accessories?: React.ReactNode
+}
+
+const menuItems: MenuItem[] = [
+  {
+    href: '/pilkada2024',
+    label: 'Pilkada 2024',
+    accessories: <Badge variant="outline">New</Badge>,
+  },
+  {
+    href: 'https://idn-area.up.railway.app',
+    label: 'idn-area API',
+    target: '_blank',
+    accessories: <ExternalLinkIcon className="h-4 w-4" />,
+  },
   {
     href: 'https://trakteer.id/fityannugroho/tip',
     label: 'Support',
-    icon: HandHeartIcon,
     target: '_blank',
+    accessories: <HandHeartIcon className="h-5 w-5" />,
   },
 ]
 
@@ -57,8 +73,7 @@ export function Navbar({ className }: NavbarProps) {
                 className="flex items-center gap-1"
               >
                 {item.label}
-                {item.badge && <Badge variant="outline">{item.badge}</Badge>}
-                {item.icon && <item.icon className="h-5 w-5" />}
+                {item.accessories}
               </Link>
             </li>
           ))}
@@ -85,15 +100,17 @@ export function Navbar({ className }: NavbarProps) {
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
+              <MenuIcon className="h-5 w-5" />
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
+
           <SheetContent side="right">
             <SheetHeader>
-              <SheetTitle>idn-area Map</SheetTitle>
+              <SheetTitle className="font-semibold">{appName}</SheetTitle>
             </SheetHeader>
             <ul className="flex flex-col gap-4 mt-8">
+              <Link href="/">Home</Link>
               {menuItems.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -103,10 +120,7 @@ export function Navbar({ className }: NavbarProps) {
                     onClick={() => setIsOpen(false)}
                   >
                     {item.label}
-                    {item.badge && (
-                      <Badge variant="outline">{item.badge}</Badge>
-                    )}
-                    {item.icon && <item.icon className="h-5 w-5" />}
+                    {item.accessories}
                   </Link>
                 </li>
               ))}
