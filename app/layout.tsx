@@ -39,6 +39,8 @@ export const metadata: Metadata = {
     title,
     description,
   },
+  keywords:
+    'indonesia, wilayah indonesia, administrative areas, peta interaktif, interactive map, nextjs, tailwindcss, typescript, react, leaflet, maplibre',
 }
 
 export default function RootLayout({
