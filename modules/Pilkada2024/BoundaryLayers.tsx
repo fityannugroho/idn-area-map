@@ -6,6 +6,7 @@ import { Area } from '@/lib/const'
 import dynamic from 'next/dynamic'
 import type { ReactElement } from 'react'
 import AreaBoundary from '../MapDashboard/AreaBoundary'
+import { useMapDashboard } from '../MapDashboard/hooks/useDashboard'
 import VotesChart from './VotesChart'
 import { useCandidates, useElectionResults } from './hooks/usePilkada'
 
@@ -23,6 +24,7 @@ export default function BoundaryLayers({
   code: parentCode,
 }: BoundaryLayersProps) {
   const childArea = election === 'governor' ? Area.REGENCY : Area.DISTRICT
+  const { setAreaBounds } = useMapDashboard()
   const { data: childAreas = [], status: areaStatus } = useArea(childArea, {
     parentCode,
     limit: config.dataSource.area.pagination.maxPageSize,
@@ -69,6 +71,14 @@ export default function BoundaryLayers({
             code={_childArea.code}
             pathOptions={{
               color: `hsl(var(--chart-${candidates[winner].nomor_urut}))`,
+            }}
+            eventHandlers={{
+              add: (e) => {
+                // Fly to the first child area
+                if (_childArea.code === childAreas[0].code) {
+                  setAreaBounds(e.target.getBounds())
+                }
+              },
             }}
             render={() => (
               <Popup pane="popupPane">
