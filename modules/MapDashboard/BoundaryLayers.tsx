@@ -42,10 +42,9 @@ export default function BoundaryLayers() {
                   fillOpacity: 0,
                 }),
               }}
-              render={(data) => (
-                <PopupArea area={area} data={data} latLng={latLng} />
-              )}
-            />
+            >
+              <PopupArea area={area} code={selected.code} latLng={latLng} />
+            </AreaBoundary>
           )
         }
       })}
