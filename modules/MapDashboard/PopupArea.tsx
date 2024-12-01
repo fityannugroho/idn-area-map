@@ -1,12 +1,12 @@
 'use client'
 
+import { useArea } from '@/hooks/useArea'
 import type { FeatureArea } from '@/lib/config'
-import type { GetSpecificDataReturn } from '@/lib/data'
 import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
 import { LinkIcon, MapIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import type { PropsWithChildren } from 'react'
+import type { ComponentPropsWithoutRef } from 'react'
 import { toast } from 'sonner'
 
 const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), {
@@ -15,27 +15,44 @@ const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), {
 
 type PopupAreaProps<Area extends FeatureArea> = {
   area: Area
-  data?: GetSpecificDataReturn<Area>['data']
+  code: string
   latLng?: { lat: number; lng: number }
 }
 
-function BasePopupArea({ children }: PropsWithChildren) {
+function BasePopupArea({
+  children,
+  ...props
+}: Omit<ComponentPropsWithoutRef<typeof Popup>, 'pane'>) {
   // Use `pane` property to render Popup inside the default `popupPane`.
   // See https://leafletjs.com/reference.html#map-pane
-  return <Popup pane="popupPane">{children}</Popup>
+  return (
+    <Popup {...props} pane="popupPane">
+      {children}
+    </Popup>
+  )
 }
 
 export default function PopupArea<Area extends FeatureArea>({
   area,
-  data,
+  code,
   latLng,
 }: PopupAreaProps<Area>) {
-  if (!data) {
+  const { data, status, error } = useArea(area, code)
+
+  if (status === 'pending') {
     return (
-      <BasePopupArea>
+      <BasePopupArea className="flex items-center justify-center">
         <span className="block text-gray-500">Loading...</span>
       </BasePopupArea>
     )
+  }
+
+  if (status === 'error') {
+    toast.error('Failed to load area data', {
+      description: error.message,
+      closeButton: true,
+    })
+    return null
   }
 
   return (

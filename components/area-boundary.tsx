@@ -1,9 +1,7 @@
 'use client'
 
-import { useArea } from '@/hooks/useArea'
 import useBoundary from '@/hooks/useBoundary'
 import { type FeatureArea, featureConfig } from '@/lib/config'
-import type { GetSpecificDataReturn } from '@/lib/data'
 import dynamic from 'next/dynamic'
 import { useEffect } from 'react'
 import type { GeoJSONProps } from 'react-leaflet'
@@ -36,12 +34,11 @@ const defaultOverlayPaneZIndex = 400
 
 export type AreaBoundaryProps<A extends FeatureArea> = Omit<
   GeoJSONProps,
-  'key' | 'data' | 'children' | 'pane'
+  'key' | 'data' | 'pane'
 > & {
   area: A
   code: string
   onLoading?: (isLoading: boolean) => void
-  render?: (data?: GetSpecificDataReturn<A>['data']) => React.ReactNode
 }
 
 export default function AreaBoundary<A extends FeatureArea>({
@@ -49,26 +46,16 @@ export default function AreaBoundary<A extends FeatureArea>({
   code,
   onLoading,
   pathOptions,
-  render,
   ...props
 }: AreaBoundaryProps<A>) {
   const { order, color } = featureConfig[area]
   const boundary = useBoundary(area, code)
-  const areaDetails = useArea(area, code)
 
   useEffect(() => {
     onLoading?.(boundary.status === 'pending')
   }, [boundary.status, onLoading])
 
   if (boundary.status === 'pending') {
-    return null
-  }
-
-  if (areaDetails.status === 'error') {
-    toast.error(`Failed to fetch ${area} data`, {
-      description: areaDetails.error.message,
-      closeButton: true,
-    })
     return null
   }
 
@@ -96,8 +83,6 @@ export default function AreaBoundary<A extends FeatureArea>({
             ...pathOptions,
           }}
         />
-
-        {render?.(areaDetails.data)}
       </FeatureGroup>
     </Pane>
   )

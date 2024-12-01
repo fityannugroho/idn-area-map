@@ -79,18 +79,17 @@ export default function BoundaryLayers({
                 }
               },
             }}
-            render={() => (
-              <Popup pane="popupPane">
-                <h1 className="font-bold mb-2">{_childArea.name}</h1>
-                <VotesChart
-                  votes={votes}
-                  candidates={candidates}
-                  hideLegend
-                  className="w-[240px]"
-                />
-              </Popup>
-            )}
-          />
+          >
+            <Popup pane="popupPane">
+              <h1 className="font-bold mb-2">{_childArea.name}</h1>
+              <VotesChart
+                votes={votes}
+                candidates={candidates}
+                hideLegend
+                className="w-[240px]"
+              />
+            </Popup>
+          </AreaBoundary>
         )
       })}
     </>
