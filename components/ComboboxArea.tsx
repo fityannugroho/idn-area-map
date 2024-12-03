@@ -4,7 +4,7 @@ import {
   Combobox,
   type ComboboxOption,
   type ComboboxProps,
-} from '@/components/combobox'
+} from '@/components/Combobox'
 import { useArea } from '@/hooks/useArea'
 import type { FeatureArea } from '@/lib/config'
 import type { GetArea } from '@/lib/const'

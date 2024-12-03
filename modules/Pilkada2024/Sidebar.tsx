@@ -1,7 +1,7 @@
 'use client'
 
+import { Combobox } from '@/components/Combobox'
 import ComboboxArea from '@/components/ComboboxArea'
-import { Combobox } from '@/components/combobox'
 import { Button } from '@/components/ui/button'
 import { config } from '@/lib/config'
 import { Area } from '@/lib/const'
