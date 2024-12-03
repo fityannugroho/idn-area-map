@@ -12,7 +12,7 @@ const MarkerClusterGroup = dynamic(
   { ssr: false },
 )
 
-const MapMarker = dynamic(() => import('@/components/map-marker'), {
+const MapMarker = dynamic(() => import('@/components/MapMarker'), {
   ssr: false,
 })
 
