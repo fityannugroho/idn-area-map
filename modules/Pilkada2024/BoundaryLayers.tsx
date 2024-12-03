@@ -1,6 +1,6 @@
 'use client'
 
-import AreaBoundary from '@/components/area-boundary'
+import AreaBoundary from '@/components/AreaBoundary'
 import { useArea } from '@/hooks/useArea'
 import { config } from '@/lib/config'
 import { Area } from '@/lib/const'
