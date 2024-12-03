@@ -1,5 +1,6 @@
 'use client'
 
+import ComboboxArea from '@/components/ComboboxArea'
 import { Combobox } from '@/components/combobox'
 import { Button } from '@/components/ui/button'
 import { config } from '@/lib/config'
@@ -8,7 +9,6 @@ import type { Query } from '@/lib/data'
 import { EraserIcon, LoaderCircleIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import ComboboxArea from '../MapDashboard/ComboboxArea'
 import { useMapDashboard } from '../MapDashboard/hooks/useDashboard'
 import VotesChart from './VotesChart'
 import {
@@ -71,6 +71,8 @@ export default function Sidebar() {
         area={Area.PROVINCE}
         query={{ limit: config.dataSource.area.pagination.maxPageSize }}
         disabled={!election}
+        autoClose
+        fullWidth
         onSelect={(option) => {
           changeSelectedArea(Area.PROVINCE, option)
           setQuery((prevQuery) => ({
@@ -86,6 +88,8 @@ export default function Sidebar() {
           area={Area.REGENCY}
           query={regencyQuery}
           disabled={!selectedArea.province}
+          autoClose
+          fullWidth
           onSelect={(option) => {
             changeSelectedArea(Area.REGENCY, option)
           }}

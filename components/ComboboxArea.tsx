@@ -10,8 +10,8 @@ import type { FeatureArea } from '@/lib/config'
 import type { GetArea } from '@/lib/const'
 import type { Query } from '@/lib/data'
 import { ucFirstStr } from '@/lib/utils'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { useMapDashboard } from './hooks/useDashboard'
 
 function areaToOption<A extends FeatureArea>(data: GetArea<A>): ComboboxOption {
   return {
@@ -23,7 +23,7 @@ function areaToOption<A extends FeatureArea>(data: GetArea<A>): ComboboxOption {
 
 export type ComboboxAreaProps<A extends FeatureArea> = Omit<
   ComboboxProps,
-  'autoClose' | 'fullWidth' | 'options' | 'onSelect' | 'selected'
+  'options' | 'onSelect' | 'selected'
 > & {
   area: A
   query: Query<A>
@@ -36,11 +36,13 @@ export default function ComboboxArea<A extends FeatureArea>({
   onSelect,
   ...comboboxProps
 }: ComboboxAreaProps<A>) {
-  const { selectedArea } = useMapDashboard()
+  const [selectedArea, setSelectedArea] = useState<GetArea<A> | undefined>()
   const { data: areas = [], error } = useArea(area, {
     ...query,
     sortBy: 'name',
   })
+
+  const options = useMemo(() => areas.map((a) => areaToOption<A>(a)), [areas])
 
   if (error) {
     toast.error(`Failed to fetch ${area} data`, {
@@ -49,23 +51,20 @@ export default function ComboboxArea<A extends FeatureArea>({
     })
   }
 
-  const areaData = selectedArea[area]
-
   return (
     <Combobox
       {...comboboxProps}
-      options={areas.map((a) => areaToOption<A>(a))}
+      options={options}
       label={comboboxProps.label || ucFirstStr(area)}
       placeholder={comboboxProps.placeholder || `Search ${ucFirstStr(area)}`}
       onSelect={(opt) => {
         const selectedArea = areas.find((a) => a.code === opt.key)
         if (selectedArea) {
+          setSelectedArea(selectedArea)
           onSelect?.(selectedArea)
         }
       }}
-      selected={areaData ? areaToOption(areaData) : undefined}
-      autoClose
-      fullWidth
+      selected={selectedArea ? areaToOption(selectedArea) : undefined}
     />
   )
 }
