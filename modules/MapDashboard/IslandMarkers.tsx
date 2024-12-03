@@ -8,7 +8,7 @@ import { useMapDashboard } from './hooks/useDashboard'
 import { useIslands } from './hooks/useIslands'
 
 const MarkerClusterGroup = dynamic(
-  () => import('@/components/map-marker-cluster-group'),
+  () => import('@/components/MapMarkerClusterGroup'),
   { ssr: false },
 )
 
