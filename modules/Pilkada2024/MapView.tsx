@@ -9,7 +9,7 @@ import { useMapDashboard } from '../MapDashboard/hooks/useDashboard'
 import BoundaryLayers from './BoundaryLayers'
 import { usePilkada } from './hooks/usePilkada'
 
-const Map = dynamic(() => import('@/components/map'), {
+const Map = dynamic(() => import('@/components/Map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
   ssr: false,
 })

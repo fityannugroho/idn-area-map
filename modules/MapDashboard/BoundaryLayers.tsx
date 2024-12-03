@@ -1,6 +1,6 @@
 'use client'
 
-import AreaBoundary from '@/components/area-boundary'
+import AreaBoundary from '@/components/AreaBoundary'
 import { featureConfig } from '@/lib/config'
 import { getObjectKeys } from '@/lib/utils'
 import { useCallback, useState } from 'react'

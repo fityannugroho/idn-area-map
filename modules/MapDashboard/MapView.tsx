@@ -9,7 +9,7 @@ import BoundaryLayers from './BoundaryLayers'
 import IslandMarkers from './IslandMarkers'
 import { useMapDashboard } from './hooks/useDashboard'
 
-const Map = dynamic(() => import('@/components/map'), {
+const Map = dynamic(() => import('@/components/Map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,
   ssr: false,
 })
