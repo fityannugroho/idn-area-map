@@ -3,7 +3,7 @@
 import 'leaflet/dist/leaflet.css'
 import type { PropsWithChildren } from 'react'
 import { MapContainer, type MapContainerProps } from 'react-leaflet'
-import TileLayer from './tile-layer'
+import TileLayer from './TileLayer'
 
 export type MapProps = MapContainerProps & PropsWithChildren
 
