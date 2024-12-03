@@ -1,5 +1,6 @@
 'use client'
 
+import ComboboxArea from '@/components/ComboboxArea'
 import { type FeatureArea, config, featureConfig } from '@/lib/config'
 import type { Query } from '@/lib/data'
 import {
@@ -9,7 +10,6 @@ import {
   objectFromEntries,
 } from '@/lib/utils'
 import { useMemo, useState } from 'react'
-import ComboboxArea from './ComboboxArea'
 import { useMapDashboard } from './hooks/useDashboard'
 
 const MAX_PAGE_SIZE = config.dataSource.area.pagination.maxPageSize
@@ -60,6 +60,8 @@ export default function AreaSelectors() {
           area={area}
           query={query[area]}
           disabled={parent ? isLoading[parent] : false}
+          autoClose
+          fullWidth
           onSelect={(selected) => {
             changeSelectedArea(area, selected)
 
