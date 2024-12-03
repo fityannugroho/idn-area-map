@@ -1,4 +1,4 @@
-import DashboardLayout from '@/components/dashboard-layout'
+import DashboardLayout from '@/components/DashboardLayout'
 import MapDashboardProvider from './DashboardProvider'
 import MapView from './MapView'
 import Sidebar from './Sidebar'
