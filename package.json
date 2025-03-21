@@ -84,6 +84,6 @@
     "eslint-config-next": "^14.2.16",
     "jsdom": "^25.0.1",
     "msw": "^2.6.2",
-    "vitest": "^2.1.4"
+    "vitest": "^2.1.9"
   }
 }
