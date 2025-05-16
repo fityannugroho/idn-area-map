@@ -95,7 +95,25 @@ export async function getData<A extends Area, P extends string | Query<A>>(
     url.searchParams.append('page', query.page.toString())
   }
 
-  const res = await fetch(url)
+  let res: Response
+  try {
+    res = await fetch(url)
+  } catch (error) {
+    return {
+      statusCode: 500,
+      message: `Unable to connect to the server at ${url.host}. Please check your network connection or verify that the server is reachable.`,
+      error: (error as Error).message,
+    }
+  }
+
+  if (!res.ok) {
+    const errorMessage = await res.text()
+    return {
+      statusCode: res.status,
+      message: `Failed to fetch data, ${errorMessage}`,
+      error: res.statusText,
+    }
+  }
 
   return await res.json()
 }
@@ -110,8 +128,20 @@ export async function getBoundaryData(
   area: Area,
   code: string,
 ): Promise<BoundaryResponse> {
-  const url = `${config.dataSource.boundary.url}/${endpoints[area]}/${addDotSeparator(code.replaceAll('.', ''))}.geojson`
-  const res = await fetch(url)
+  const url = new URL(
+    `${config.dataSource.boundary.url}/${endpoints[area]}/${addDotSeparator(code.replaceAll('.', ''))}.geojson`,
+  )
+
+  let res: Response
+  try {
+    res = await fetch(url)
+  } catch (error) {
+    return {
+      statusCode: 500,
+      message: `Unable to connect to the server at ${url.host}. Please check your network connection or verify that the server is reachable.`,
+      data: undefined,
+    }
+  }
 
   return {
     statusCode: res.status,

@@ -15,7 +15,7 @@ export default function useBoundary(area: Area, code: string) {
       throw new Error(
         res.statusCode === 404
           ? `Data not found for ${area} ${code}`
-          : `Unexpected status code: ${res.statusCode}`,
+          : res.message || `Unexpected status code: ${res.statusCode}`,
       )
     },
   })
