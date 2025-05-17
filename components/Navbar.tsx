@@ -38,7 +38,7 @@ const menuItems: MenuItem[] = [
     href: 'https://idn-area.up.railway.app',
     label: 'idn-area API',
     target: '_blank',
-    accessories: <ExternalLinkIcon className="h-4 w-4" />,
+    accessories: <ExternalLinkIcon className="size-4" />,
   },
   {
     href: 'https://trakteer.id/fityannugroho/tip',
@@ -64,7 +64,7 @@ export function Navbar({ className }: NavbarProps) {
         <Link href="/" className="text-lg font-semibold">
           {appName}
         </Link>
-        <ul className="hidden md:flex gap-4 lg:gap-6 text-sm *:text-foreground/60 hover:*:text-foreground">
+        <ul className="hidden md:flex gap-4 lg:gap-6 text-sm *:text-foreground/60 *:hover:text-foreground">
           {menuItems.map((item) => (
             <li key={item.href}>
               <Link

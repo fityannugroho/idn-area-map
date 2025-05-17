@@ -69,7 +69,7 @@ export default function BoundaryLayers({
             key={_childArea.code}
             code={_childArea.code}
             pathOptions={{
-              color: `hsl(var(--chart-${candidates[winner].nomor_urut}))`,
+              color: `var(--chart-${candidates[winner].nomor_urut})`,
               fillOpacity: 0.3,
             }}
             eventHandlers={{
