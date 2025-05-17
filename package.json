@@ -4,7 +4,7 @@
   "description": "Map of Indonesia's administrative area",
   "main": "app/page.tsx",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "test": "vitest run",
     "test:watch": "vitest",
