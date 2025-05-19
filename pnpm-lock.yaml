@@ -87,7 +87,7 @@ importers:
         specifier: ^2.15.3
         version: 2.15.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       sharp:
-        specifier: ^0.33.2
+        specifier: ~0.33.2
         version: 0.33.2
       simplify-geojson:
         specifier: ^1.0.5
