@@ -1,10 +1,9 @@
 'use client'
 
+import MapFlyToBounds from '@/components/MapFlyToBounds'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { LatLngBounds, Map as LeafletMap } from 'leaflet'
+import type { Map as LeafletMap } from 'leaflet'
 import dynamic from 'next/dynamic'
-import { useEffect } from 'react'
-import { useMap } from 'react-leaflet'
 import { useMapDashboard } from '../MapDashboard/hooks/useDashboard'
 import BoundaryLayers from './BoundaryLayers'
 import { usePilkada } from './hooks/usePilkada'
@@ -14,38 +13,14 @@ const Map = dynamic(() => import('@/components/Map'), {
   ssr: false,
 })
 
-function MapFlyToBounds({ bounds }: { bounds: LatLngBounds }) {
-  const map = useMap()
-
-  useEffect(() => {
-    map.flyToBounds(bounds)
-  }, [map, bounds])
-
-  return null
-}
-
-function MapRefSetter({ ref }: { ref?: React.Ref<LeafletMap> }) {
-  const map = useMap()
-
-  useEffect(() => {
-    if (map && ref && 'current' in ref) {
-      ref.current = map // Set the ref to the map instance
-    }
-  }, [map, ref])
-
-  return null
-}
-
-const MapView = ({ ref }: { ref?: React.Ref<LeafletMap> }) => {
+function MapView({ ref }: { ref?: React.Ref<LeafletMap> }) {
   const { election } = usePilkada()
   const { selectedArea, areaBounds } = useMapDashboard()
   const electionArea =
     election === 'governor' ? selectedArea.province : selectedArea.regency
 
   return (
-    <Map className="h-full z-0">
-      <MapRefSetter ref={ref} />
-
+    <Map ref={ref} className="h-full z-0">
       {areaBounds && <MapFlyToBounds bounds={areaBounds} />}
 
       {election && electionArea && (
