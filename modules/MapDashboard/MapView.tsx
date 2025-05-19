@@ -3,7 +3,7 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import type { LatLngBounds, Map as LeafletMap } from 'leaflet'
 import dynamic from 'next/dynamic'
-import { forwardRef, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useMap } from 'react-leaflet'
 import BoundaryLayers from './BoundaryLayers'
 import IslandMarkers from './IslandMarkers'
@@ -24,7 +24,7 @@ function MapFlyToBounds({ bounds }: { bounds: LatLngBounds }) {
   return null
 }
 
-const MapRefSetter = forwardRef<LeafletMap | null>((props, ref) => {
+function MapRefSetter({ ref }: { ref?: React.Ref<LeafletMap> }) {
   const map = useMap()
 
   useEffect(() => {
@@ -34,10 +34,9 @@ const MapRefSetter = forwardRef<LeafletMap | null>((props, ref) => {
   }, [map, ref])
 
   return null
-})
-MapRefSetter.displayName = 'MapRefSetter'
+}
 
-const MapView = forwardRef<LeafletMap>((props, ref) => {
+function MapView({ ref }: { ref?: React.Ref<LeafletMap> }) {
   const { areaBounds } = useMapDashboard()
 
   return (
@@ -51,7 +50,6 @@ const MapView = forwardRef<LeafletMap>((props, ref) => {
       <IslandMarkers />
     </Map>
   )
-})
-MapView.displayName = 'MapView'
+}
 
 export default MapView
