@@ -7,13 +7,13 @@ export default function PilkadaProvider({ children }: PropsWithChildren) {
   const [election, setElection] = useState<ElectionType>()
 
   return (
-    <PilkadaContext.Provider
+    <PilkadaContext
       value={{
         election,
         setElection,
       }}
     >
       {children}
-    </PilkadaContext.Provider>
+    </PilkadaContext>
   )
 }
