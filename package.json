@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/fityannugroho/idn-area-map#readme",
   "engines": {
-    "node": ">=18.17"
+    "node": ">=18.18"
   },
   "dependencies": {
     "@maplibre/maplibre-gl-leaflet": "^0.1.0",
