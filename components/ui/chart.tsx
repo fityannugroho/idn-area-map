@@ -104,6 +104,9 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
+/**
+ * @see https://recharts.org/en-US/api/Tooltip#content
+ */
 function ChartTooltipContent({
   active,
   payload,
@@ -118,7 +121,7 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-  ...props
+  ref,
 }: React.ComponentPropsWithRef<'div'> &
   React.ComponentProps<typeof RechartsPrimitive.Tooltip> & {
     hideLabel?: boolean
@@ -173,11 +176,11 @@ function ChartTooltipContent({
 
   return (
     <div
+      ref={ref}
       className={cn(
         'grid min-w-32 items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl',
         className,
       )}
-      {...props}
     >
       {!nestLabel ? tooltipLabel : null}
       <div className="grid gap-1.5">
@@ -253,15 +256,18 @@ ChartTooltipContent.displayName = 'ChartTooltip'
 
 const ChartLegend = RechartsPrimitive.Legend
 
+/**
+ * @see https://recharts.org/en-US/api/Legend#content
+ */
 function ChartLegendContent({
   className,
   hideIcon = false,
   payload,
   verticalAlign = 'bottom',
   nameKey,
-  ...props
+  ref,
 }: React.ComponentPropsWithRef<'div'> &
-  Pick<RechartsPrimitive.LegendProps, 'payload' | 'verticalAlign'> & {
+  RechartsPrimitive.LegendProps & {
     hideIcon?: boolean
     nameKey?: string
   }) {
@@ -273,12 +279,12 @@ function ChartLegendContent({
 
   return (
     <div
+      ref={ref}
       className={cn(
         'flex items-center gap-2 flex-wrap',
         verticalAlign === 'top' ? 'pb-3' : 'pt-3',
         className,
       )}
-      {...props}
     >
       {payload.map((item) => {
         const key = `${nameKey || item.dataKey || 'value'}`
