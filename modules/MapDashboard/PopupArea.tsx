@@ -41,8 +41,8 @@ export default function PopupArea<Area extends FeatureArea>({
 
   if (status === 'pending') {
     return (
-      <BasePopupArea className="flex items-center justify-center">
-        <span className="block text-gray-500">Loading...</span>
+      <BasePopupArea>
+        <span className="block text-muted-foreground mx-auto">Loading...</span>
       </BasePopupArea>
     )
   }
@@ -67,7 +67,7 @@ export default function PopupArea<Area extends FeatureArea>({
 
         return (
           <div key={parent} className="mt-1">
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-muted-foreground">
               {ucFirstStr(parent)} :
             </span>
             <br />
