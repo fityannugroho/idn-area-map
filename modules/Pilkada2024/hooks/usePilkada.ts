@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { createContext, useContext } from 'react'
+import { createContext, use } from 'react'
 
 const baseUrl =
   'https://raw.githubusercontent.com/razanfawwaz/pilkada-scrap/main'
@@ -148,7 +148,7 @@ type PropsContext = {
 export const PilkadaContext = createContext<PropsContext | undefined>(undefined)
 
 export function usePilkada() {
-  const context = useContext(PilkadaContext)
+  const context = use(PilkadaContext)
 
   if (!context) {
     throw new Error('usePilkada must be used within a PilkadaProvider')
