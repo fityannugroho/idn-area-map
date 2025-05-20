@@ -1,0 +1,51 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "idn-area-map",
+  "compatibility_date": "2025-05-20",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "nodejs_compat_populate_process_env"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "logs": {
+      "enabled": true
+    }
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "idn-area-map"
+    }
+  ],
+
+  "kv_namespaces": [
+    // KV incremental cache
+    {
+      "binding": "NEXT_INC_CACHE_KV",
+      // Replace with your KV namespace ID
+      "id": "4e04069c7b7144d78f9e3d545b819f3d"
+    }
+  ],
+
+  "durable_objects": {
+    // DO Queue
+    "bindings": [
+      {
+        "name": "NEXT_CACHE_DO_QUEUE",
+        "class_name": "DOQueueHandler"
+      }
+    ]
+  },
+
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["DOQueueHandler"]
+    }
+  ]
+}
