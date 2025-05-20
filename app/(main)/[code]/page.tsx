@@ -7,9 +7,9 @@ import type { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
 
 type Props = {
-  params: {
+  params: Promise<{
     code: string
-  }
+  }>
 }
 
 async function getAreaData(
@@ -29,9 +29,13 @@ async function getAreaData(
 }
 
 export async function generateMetadata(
-  { params: { code } }: Props,
+  props: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
+  const params = await props.params
+
+  const { code } = params
+
   let area: Area
   let areaData: Awaited<ReturnType<typeof getAreaData>>
 
@@ -80,7 +84,8 @@ export async function generateMetadata(
   }
 }
 
-export default async function DetailAreaPage({ params }: Props) {
+export default async function DetailAreaPage(props: Props) {
+  const params = await props.params
   let area: Area
   let areaData: Awaited<ReturnType<typeof getAreaData>>
 

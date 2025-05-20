@@ -94,7 +94,7 @@ export default function PopupArea<Area extends FeatureArea>({
         }}
         className="text-xs flex items-center gap-2 mt-4"
       >
-        <LinkIcon className="h-4 w-4" />
+        <LinkIcon className="size-4" />
         Copy Link
       </button>
 
@@ -106,7 +106,7 @@ export default function PopupArea<Area extends FeatureArea>({
         className="text-xs flex items-center gap-2 mt-2"
         title={`Coordinate: ${latLng?.lat}, ${latLng?.lng}`}
       >
-        <MapIcon className="h-4 w-4" />
+        <MapIcon className="size-4" />
         See on Google Maps
       </Link>
     </BasePopupArea>

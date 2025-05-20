@@ -7,7 +7,7 @@ import {
   type Village,
 } from '@/lib/const'
 import type { LatLngBounds } from 'leaflet'
-import { createContext, useContext } from 'react'
+import { createContext, use } from 'react'
 
 export type SelectedArea = {
   [Area.PROVINCE]?: Province
@@ -52,7 +52,7 @@ export const MapDashboardContext = createContext<DashboardContext | undefined>(
 )
 
 export function useMapDashboard() {
-  const context = useContext(MapDashboardContext)
+  const context = use(MapDashboardContext)
   if (!context) {
     throw new Error('useMapDashboard must be used within MapDashboardProvider')
   }

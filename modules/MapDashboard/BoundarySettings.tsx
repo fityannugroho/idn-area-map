@@ -27,7 +27,7 @@ export default function BoundarySettings() {
             className={cn('flex items-center gap-2')}
           >
             <div
-              className="w-4 h-4 rounded"
+              className="size-4 rounded"
               style={{
                 backgroundColor: config.color,
               }}
@@ -36,7 +36,7 @@ export default function BoundarySettings() {
             {ucFirstStr(area)}
 
             {isLoading[area] && (
-              <LoaderCircleIcon className="h-4 w-4 animate-spin" />
+              <LoaderCircleIcon className="size-4 animate-spin" />
             )}
           </label>
         </div>

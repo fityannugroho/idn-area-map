@@ -71,9 +71,5 @@ export default function MapDashboardProvider({
     clear,
   }
 
-  return (
-    <MapDashboardContext.Provider value={value}>
-      {children}
-    </MapDashboardContext.Provider>
-  )
+  return <MapDashboardContext value={value}>{children}</MapDashboardContext>
 }

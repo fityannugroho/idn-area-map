@@ -57,7 +57,7 @@ export default function VotesChart({
         `candidate${candidates[id].nomor_urut}`,
         {
           label: candidates[id].nama,
-          color: `hsl(var(--chart-${candidates[id].nomor_urut}))`,
+          color: `var(--chart-${candidates[id].nomor_urut})`,
         },
       ]),
     ),
@@ -66,11 +66,11 @@ export default function VotesChart({
     },
     finished: {
       label: `Finished (${votes.progres.persen}%)`,
-      color: 'hsl(var(--ring))',
+      color: 'var(--ring)',
     },
     notFinished: {
       label: `Still Counting (${(100 - votes.progres.persen).toFixed(2)}%)`,
-      color: 'hsl(var(--muted))',
+      color: 'var(--muted)',
     },
   } satisfies ChartConfig
 
@@ -108,7 +108,7 @@ export default function VotesChart({
                   y={y}
                   textAnchor={x > props.cx ? 'start' : 'end'}
                   dominantBaseline="central"
-                  fill="hsla(var(--foreground))"
+                  fill="var(--foreground)"
                   className="text-xs"
                 >
                   {/* Percentage */}

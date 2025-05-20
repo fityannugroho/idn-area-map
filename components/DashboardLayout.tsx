@@ -7,14 +7,14 @@ import {
 } from '@/components/ui/resizable'
 import { useDashboardLayout } from '@/hooks/useDashboardLayout'
 import type { Map as LeafletMap } from 'leaflet'
-import type { ForwardRefExoticComponent, RefAttributes } from 'react'
+import type { RefAttributes } from 'react'
 
 export default function DashboardLayout({
   Sidebar,
   MapView,
 }: {
   Sidebar: React.FC
-  MapView: ForwardRefExoticComponent<RefAttributes<LeafletMap>>
+  MapView: React.FC<RefAttributes<LeafletMap>>
 }) {
   const {
     orientation,

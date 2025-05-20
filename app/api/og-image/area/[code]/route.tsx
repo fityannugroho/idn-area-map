@@ -18,8 +18,12 @@ const maxPolygon = 30
 
 export async function GET(
   request: Request,
-  { params: { code } }: { params: { code: string } },
+  props: { params: Promise<{ code: string }> },
 ) {
+  const params = await props.params
+
+  const { code } = params
+
   let area: Area
   try {
     area = determineAreaByCode(code)
