@@ -3,6 +3,9 @@ name: Test and Build
 env:
   NEXT_PUBLIC_VERCEL_URL: http://localhost:3000
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
