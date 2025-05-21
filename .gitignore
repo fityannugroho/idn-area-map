@@ -39,3 +39,10 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# OpenNext build output
+.open-next
+.wrangler
+
+# Cloudflare
+.dev.vars

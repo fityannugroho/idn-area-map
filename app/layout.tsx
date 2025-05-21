@@ -17,6 +17,7 @@ const title = config.appName
 const description = config.appDescription
 
 export const metadata: Metadata = {
+  metadataBase: new URL(config.appUrl),
   title: {
     template: `%s | ${config.appName}`,
     default: config.appName,

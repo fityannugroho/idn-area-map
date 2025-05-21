@@ -2,7 +2,7 @@
 
 The map of Indonesia's administrative areas.
 
-[![screenshot](app/opengraph-image.png)](https://idn-area-map.vercel.app)
+[![screenshot](app/opengraph-image.png)](https://idnarea.fityan.tech)
 
 ## Data Source
 
@@ -30,9 +30,10 @@ The map of Indonesia's administrative areas.
 
 ## Installation
 
-1. Clone this repository
-1. Install dependencies: `pnpm install`
-1. Run the app: `pnpm run dev`
+1. Clone this repository.
+1. Install dependencies: `pnpm install`.
+1. Copy `.env.example` to `.env` (or [any other environment file names](https://nextjs.org/docs/app/guides/environment-variables#environment-variable-load-order)) and modify the values as needed.
+1. Run the app: `pnpm run dev`.
 1. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## License
