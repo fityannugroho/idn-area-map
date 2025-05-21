@@ -16,23 +16,33 @@ function countPositionInCoords(coord: GeoJSON.Position[][]) {
  */
 const maxPolygon = 30
 
-export async function GET(
-  request: Request,
-  props: { params: Promise<{ code: string }> },
-) {
-  const params = await props.params
+/**
+ * The size of the image.
+ */
+export const size = {
+  width: 800,
+  height: 400,
+}
 
-  const { code } = params
+/**
+ * The content type of the image.
+ */
+export const contentType = 'image/png'
 
+export default async function Image({
+  params,
+}: {
+  params: { code: string }
+}) {
   let area: Area
   try {
-    area = determineAreaByCode(code)
+    area = determineAreaByCode(params.code)
   } catch (error) {
     return NextResponse.json({ message: 'Invalid area code' }, { status: 400 })
   }
 
   const config = featureConfig[area as FeatureArea]
-  const resBoundary = await getBoundaryData(area, code)
+  const resBoundary = await getBoundaryData(area, params.code)
 
   if (!resBoundary.data) {
     return new NextResponse(JSON.stringify(resBoundary), {
@@ -47,8 +57,7 @@ export async function GET(
     simplify(resBoundary.data, config.simplification.tolerance)
 
   const map = new StaticMaps({
-    width: 800,
-    height: 400,
+    ...size,
     tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     tileSubdomains: ['a', 'b', 'c'],
   })
@@ -90,9 +99,10 @@ export async function GET(
   }
 
   await map.render()
+  const image = await map.image.buffer(contentType)
 
-  const response = new NextResponse(await map.image.buffer('image/png'))
-  response.headers.set('content-type', 'image/png')
+  const response = new NextResponse(image)
+  response.headers.set('content-type', contentType)
 
   return response
 }
