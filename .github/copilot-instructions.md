@@ -1,5 +1,5 @@
 ## Project overview
-Single-page Next.js (App Router) application for visualizing Indonesian administrative areas and islands. Primary featur es: interactive map dashboard, area boundaries, and island markers visualization page.
+Single-page Next.js (App Router) application for visualizing Indonesian administrative areas and islands. Primary features: interactive map dashboard, area boundaries, and island markers visualization page.
 
 ## Folder structure
 ```
@@ -35,7 +35,7 @@ idn-area-map/
 - Tests: `pnpm test` (Vitest)
 - Dev: `pnpm dev` (Next.js)
 
-Always run `pnpm install` after changing `package.json`. If a command fails, prefer running it locally and report exact  error output in PR description.
+Always run `pnpm install` after changing `package.json`. If a command fails, prefer running it locally and report exact error output in PR description.
 
 ## Coding standards & conventions
 - All code, comments, and documentation must in English.
@@ -43,7 +43,7 @@ Always run `pnpm install` after changing `package.json`. If a command fails, pre
 - Use idiomatic TypeScript + React (function components, hooks, types). Keep changes minimal and well-scoped.
 - Reuse existing helpers in `lib/` and hooks in `hooks/` rather than adding duplicates.
 - For map/Leaflet components, dynamically import with `ssr: false` where DOM access is required.
-- When adding or changing boundary layers, extend `featureConfig` in `lib/config.ts` and respect `order`/`simplification `.
+- When adding or changing boundary layers, extend `featureConfig` in `lib/config.ts` and respect `order`/`simplification`.
 
 ## Preferences / Do — Don't
 Do:
@@ -57,7 +57,7 @@ Don't:
 - Introduce new global state managers if existing context/provider patterns suffice.
 
 ## If unsure
-- Prefer an incremental utility or co-located hook and add tests. Keep PR descriptions explicit about verification steps .
+- Prefer an incremental utility or co-located hook and add tests. Keep PR descriptions explicit about verification steps.
 
 ## Reference additional instructions
 
