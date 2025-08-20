@@ -2,7 +2,6 @@ import { type FeatureArea, featureConfig } from '@/lib/config'
 import type { Area } from '@/lib/const'
 import { getBoundaryData } from '@/lib/data'
 import { determineAreaByCode } from '@/lib/utils'
-import { NextResponse } from 'next/server'
 // @ts-ignore
 import simplify from 'simplify-geojson'
 import StaticMaps, { type AddPolygonOptions } from 'staticmaps'
@@ -16,26 +15,34 @@ function countPositionInCoords(coord: GeoJSON.Position[][]) {
  */
 const maxPolygon = 30
 
-export async function GET(
-  request: Request,
-  props: { params: Promise<{ code: string }> },
-) {
-  const params = await props.params
+export const size = {
+  width: 800,
+  height: 400,
+}
 
-  const { code } = params
+export const contentType = 'image/png'
+
+export default async function Image({
+  params,
+}: {
+  params: Promise<{ code: string }>
+}) {
+  const { code } = await params
 
   let area: Area
   try {
     area = determineAreaByCode(code)
   } catch (error) {
-    return NextResponse.json({ message: 'Invalid area code' }, { status: 400 })
+    // Return a simple error image
+    return new Response('Invalid area code', { status: 400 })
   }
 
   const config = featureConfig[area as FeatureArea]
   const resBoundary = await getBoundaryData(area, code)
 
   if (!resBoundary.data) {
-    return new NextResponse(JSON.stringify(resBoundary), {
+    // Return a simple error image
+    return new Response(JSON.stringify(resBoundary), {
       status: resBoundary.statusCode,
       statusText: resBoundary.message,
       headers: { 'content-type': 'application/json' },
@@ -47,8 +54,8 @@ export async function GET(
     simplify(resBoundary.data, config.simplification.tolerance)
 
   const map = new StaticMaps({
-    width: 800,
-    height: 400,
+    width: size.width,
+    height: size.height,
     tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     tileSubdomains: ['a', 'b', 'c'],
   })
@@ -91,8 +98,9 @@ export async function GET(
 
   await map.render()
 
-  const response = new NextResponse(await map.image.buffer('image/png'))
-  response.headers.set('content-type', 'image/png')
-
-  return response
+  return new Response(await map.image.buffer('image/png'), {
+    headers: {
+      'content-type': contentType,
+    },
+  })
 }
