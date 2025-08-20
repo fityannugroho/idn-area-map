@@ -6,19 +6,19 @@ const opengraphImageModule = () => import('../opengraph-image')
 
 describe('opengraph-image', () => {
   it('should export required metadata', async () => {
-    const module = await opengraphImageModule()
-    
-    expect(module.size).toBeDefined()
-    expect(module.size.width).toBe(800)
-    expect(module.size.height).toBe(400)
-    expect(module.contentType).toBe('image/png')
+    const ogModule = await opengraphImageModule()
+
+    expect(ogModule.size).toBeDefined()
+    expect(ogModule.size.width).toBe(800)
+    expect(ogModule.size.height).toBe(400)
+    expect(ogModule.contentType).toBe('image/png')
   })
 
   it('should export default Image function', async () => {
-    const module = await opengraphImageModule()
-    
-    expect(module.default).toBeDefined()
-    expect(typeof module.default).toBe('function')
+    const ogModule = await opengraphImageModule()
+
+    expect(ogModule.default).toBeDefined()
+    expect(typeof ogModule.default).toBe('function')
   })
 
   it('should handle valid area codes in function signature', () => {
