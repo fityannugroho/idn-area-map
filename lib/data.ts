@@ -1,5 +1,3 @@
-'use server'
-
 import { config } from './config'
 import { type Area, type GetArea, endpoints, parentArea } from './const'
 import { addDotSeparator } from './utils'

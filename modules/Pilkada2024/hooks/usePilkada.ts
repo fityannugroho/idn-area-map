@@ -61,7 +61,7 @@ export function useCandidates({
       if (status !== 'success') {
         throw new Error('Ensure the data is ready before calling this function')
       }
-      return data[areaCode]
+      return data[areaCode.replaceAll('.', '')]
     },
     /**
      * Get a specific candidate data.
@@ -74,7 +74,7 @@ export function useCandidates({
       if (status !== 'success') {
         throw new Error('Ensure the data is ready before calling this function')
       }
-      return data[areaCode][candidateId]
+      return data[areaCode.replaceAll('.', '')][candidateId]
     },
   }
 }
@@ -90,16 +90,18 @@ export function useElectionResults({
   areaCode: string
   enabled?: boolean
 }) {
+  const _areaCode = areaCode.replaceAll('.', '')
+
   const { data, status, ...args } = useQuery({
-    queryKey: ['votes', election, level, areaCode],
+    queryKey: ['votes', election, level, _areaCode],
     queryFn: async () => {
-      const res = await fetch(endpoints.results(election, level, areaCode))
+      const res = await fetch(endpoints.results(election, level, _areaCode))
 
       if (res.ok) {
         return (await res.json()) as ElectionData
       }
 
-      throw new Error(`Failed to fetch election data (area code: ${areaCode})`)
+      throw new Error(`Failed to fetch election data (area code: ${_areaCode})`)
     },
     enabled,
   })
@@ -129,7 +131,7 @@ export function useElectionResults({
       if (status !== 'success') {
         throw new Error('Ensure the data is ready before calling this function')
       }
-      return data.tungsura.table[childAreaCode]
+      return data.tungsura.table[childAreaCode.replaceAll('.', '')]
     },
   }
 }
