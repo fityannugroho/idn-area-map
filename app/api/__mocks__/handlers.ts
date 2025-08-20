@@ -1,5 +1,5 @@
 import { config } from '@/lib/config'
-import { endpoints } from '@/lib/const'
+import { Area, type GetArea, endpoints } from '@/lib/const'
 import { objectFromEntries, objectToEntries } from '@/lib/utils'
 import { http, HttpResponse } from 'msw'
 import { mockData } from './const'
@@ -23,15 +23,33 @@ export const handlers = [
 
     const items = mockData[areaByEndpoint[endpoint]]
 
-    if (name) {
-      return HttpResponse.json({
-        data: items.filter((item) =>
+    const filtered = name
+      ? items.filter((item) =>
           item.name.toLowerCase().includes(name.toLowerCase()),
-        ),
-      })
+        )
+      : items
+
+    // Build meta object similar to upstream API
+    const meta = {
+      total: filtered.length,
+      pagination: {
+        total: filtered.length,
+        pages: {
+          first: 1,
+          last: 1,
+          current: 1,
+          previous: null,
+          next: null,
+        },
+      },
     }
 
-    return HttpResponse.json({ data: items })
+    return HttpResponse.json({
+      statusCode: 200,
+      message: 'OK',
+      data: filtered,
+      meta,
+    })
   }),
 
   http.get(`${AREA_API_URL}/:area/:code`, ({ params }) => {
@@ -46,9 +64,102 @@ export const handlers = [
     )
 
     if (!data) {
-      return HttpResponse.json({ error: 'Not found' }, { status: 404 })
+      return HttpResponse.json(
+        { statusCode: 404, message: 'Not found', error: 'Not found' },
+        { status: 404 },
+      )
     }
 
-    return HttpResponse.json({ data })
+    // Compute parent chain based on area type and attach to data
+    const areaKey = areaByEndpoint[endpoint] as Area
+
+    // typed mock lookup based on Area -> GetArea mapping
+    const mockLookup = mockData as unknown as {
+      [K in Area]: ReadonlyArray<GetArea<K>>
+    }
+
+    const findBy = <K extends Area>(
+      aKey: K,
+      codeToFind?: string | null,
+    ): GetArea<K> | undefined => {
+      if (!codeToFind) return undefined
+      const list = mockLookup[aKey]
+      return list.find((it) => (it as { code: string }).code === codeToFind) as
+        | GetArea<K>
+        | undefined
+    }
+
+    type ParentShape = Partial<{
+      province: GetArea<Area.PROVINCE>
+      regency: GetArea<Area.REGENCY>
+      district: GetArea<Area.DISTRICT>
+    }>
+
+    let parent: ParentShape | undefined = undefined
+
+    if (areaKey === Area.REGENCY) {
+      const province = findBy(
+        Area.PROVINCE,
+        (data as { provinceCode?: string }).provinceCode ?? null,
+      )
+      parent = province ? { province } : undefined
+    } else if (areaKey === Area.DISTRICT) {
+      const regency = findBy(
+        Area.REGENCY,
+        (data as { regencyCode?: string }).regencyCode ?? null,
+      )
+      const province = regency
+        ? findBy(
+            Area.PROVINCE,
+            (regency as { provinceCode?: string }).provinceCode ?? null,
+          )
+        : undefined
+      parent = {}
+      if (regency) parent.regency = regency
+      if (province) parent.province = province
+    } else if (areaKey === Area.VILLAGE) {
+      const district = findBy(
+        Area.DISTRICT,
+        (data as { districtCode?: string }).districtCode ?? null,
+      )
+      const regency = district
+        ? findBy(
+            Area.REGENCY,
+            (district as { regencyCode?: string }).regencyCode ?? null,
+          )
+        : undefined
+      const province = regency
+        ? findBy(
+            Area.PROVINCE,
+            (regency as { provinceCode?: string }).provinceCode ?? null,
+          )
+        : undefined
+      parent = {}
+      if (district) parent.district = district
+      if (regency) parent.regency = regency
+      if (province) parent.province = province
+    } else if (areaKey === Area.ISLAND) {
+      const regency = findBy(
+        Area.REGENCY,
+        (data as { regencyCode?: string }).regencyCode ?? null,
+      )
+      const province = regency
+        ? findBy(
+            Area.PROVINCE,
+            (regency as { provinceCode?: string }).provinceCode ?? null,
+          )
+        : undefined
+      parent = {}
+      if (regency) parent.regency = regency
+      if (province) parent.province = province
+    }
+
+    const dataWithParent = parent ? { ...(data as object), parent } : data
+
+    return HttpResponse.json({
+      statusCode: 200,
+      message: 'OK',
+      data: dataWithParent,
+    })
   }),
 ]
