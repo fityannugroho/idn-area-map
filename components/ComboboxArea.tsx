@@ -1,5 +1,7 @@
 'use client'
 
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Combobox,
   type ComboboxOption,
@@ -10,8 +12,6 @@ import type { FeatureArea } from '@/lib/config'
 import type { GetArea } from '@/lib/const'
 import type { Query } from '@/lib/data'
 import { ucFirstStr } from '@/lib/utils'
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
 
 function areaToOption<A extends FeatureArea>(data: GetArea<A>): ComboboxOption {
   return {

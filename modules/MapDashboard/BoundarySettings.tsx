@@ -1,9 +1,9 @@
 'use client'
 
+import { LoaderCircleIcon } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import { featureConfig } from '@/lib/config'
 import { cn, objectToEntries, ucFirstStr } from '@/lib/utils'
-import { LoaderCircleIcon } from 'lucide-react'
 import { useMapDashboard } from './hooks/useDashboard'
 
 export default function BoundarySettings() {

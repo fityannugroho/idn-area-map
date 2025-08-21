@@ -1,11 +1,11 @@
+import { useQuery } from '@tanstack/react-query'
 import type { Area } from '@/lib/const'
 import {
   type GetDataReturn,
   type GetSpecificDataReturn,
-  type Query,
   getData,
+  type Query,
 } from '@/lib/data'
-import { useQuery } from '@tanstack/react-query'
 
 export function useArea<A extends Area, P extends string | Query<A>>(
   area: A,

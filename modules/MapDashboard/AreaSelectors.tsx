@@ -1,7 +1,8 @@
 'use client'
 
+import { useMemo, useState } from 'react'
 import ComboboxArea from '@/components/ComboboxArea'
-import { type FeatureArea, config, featureConfig } from '@/lib/config'
+import { config, type FeatureArea, featureConfig } from '@/lib/config'
 import type { Query } from '@/lib/data'
 import {
   debounce,
@@ -9,7 +10,6 @@ import {
   getObjectKeys,
   objectFromEntries,
 } from '@/lib/utils'
-import { useMemo, useState } from 'react'
 import { useMapDashboard } from './hooks/useDashboard'
 
 const MAX_PAGE_SIZE = config.dataSource.area.pagination.maxPageSize

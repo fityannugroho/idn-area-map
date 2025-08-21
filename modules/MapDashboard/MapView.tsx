@@ -1,12 +1,12 @@
 'use client'
 
-import MapFlyToBounds from '@/components/MapFlyToBounds'
-import { Skeleton } from '@/components/ui/skeleton'
 import type { Map as LeafletMap } from 'leaflet'
 import dynamic from 'next/dynamic'
+import MapFlyToBounds from '@/components/MapFlyToBounds'
+import { Skeleton } from '@/components/ui/skeleton'
 import BoundaryLayers from './BoundaryLayers'
-import IslandMarkers from './IslandMarkers'
 import { useMapDashboard } from './hooks/useDashboard'
+import IslandMarkers from './IslandMarkers'
 
 const Map = dynamic(() => import('@/components/Map'), {
   loading: () => <Skeleton className="h-full rounded-none" />,

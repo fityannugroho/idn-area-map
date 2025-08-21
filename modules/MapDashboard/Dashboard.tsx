@@ -1,8 +1,8 @@
 import DashboardLayout from '@/components/DashboardLayout'
 import MapDashboardProvider from './DashboardProvider'
+import type { SelectedArea } from './hooks/useDashboard'
 import MapView from './MapView'
 import Sidebar from './Sidebar'
-import type { SelectedArea } from './hooks/useDashboard'
 
 type Props = { defaultSelected?: SelectedArea }
 

@@ -1,8 +1,8 @@
-import { Navbar } from '@/components/Navbar'
-import { Button } from '@/components/ui/button'
 import { TriangleAlertIcon } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Navbar } from '@/components/Navbar'
+import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
   title: 'Not Found',

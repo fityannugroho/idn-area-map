@@ -1,5 +1,5 @@
-import { config } from '@/lib/config'
 import { expect, test } from '@playwright/test'
+import { config } from '@/lib/config'
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/')

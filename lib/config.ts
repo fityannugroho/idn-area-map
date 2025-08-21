@@ -31,9 +31,11 @@ export const config: Config = {
         defaultPageSize: Number.parseInt(
           process.env.NEXT_PUBLIC_DATA_SOURCE_PAGINATION_DEFAULT_PAGE_SIZE ??
             '10',
+          10,
         ),
         maxPageSize: Number.parseInt(
           process.env.NEXT_PUBLIC_DATA_SOURCE_PAGINATION_MAX_PAGE_SIZE ?? '100',
+          10,
         ),
       },
     },

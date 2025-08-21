@@ -1,13 +1,14 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import AreaBoundary from '@/components/AreaBoundary'
 import { useArea } from '@/hooks/useArea'
 import { config } from '@/lib/config'
 import { Area } from '@/lib/const'
-import dynamic from 'next/dynamic'
 import { useMapDashboard } from '../MapDashboard/hooks/useDashboard'
-import VotesChart from './VotesChart'
 import { useCandidates, useElectionResults } from './hooks/usePilkada'
+import type { ElectionType } from './types'
+import VotesChart from './VotesChart'
 
 const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), {
   ssr: false,

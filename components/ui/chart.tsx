@@ -1,8 +1,8 @@
 'use client'
 
-import { cn } from '@/lib/utils'
 import * as React from 'react'
 import * as RechartsPrimitive from 'recharts'
+import { cn } from '@/lib/utils'
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: '', dark: '.dark' } as const
@@ -79,7 +79,7 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
   return (
     <style
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: false positive
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
           .map(

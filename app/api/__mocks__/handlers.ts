@@ -1,7 +1,7 @@
+import { HttpResponse, http } from 'msw'
 import { config } from '@/lib/config'
-import { Area, type GetArea, endpoints } from '@/lib/const'
+import { Area, endpoints, type GetArea } from '@/lib/const'
 import { objectFromEntries, objectToEntries } from '@/lib/utils'
-import { http, HttpResponse } from 'msw'
 import { mockData } from './const'
 
 const AREA_API_URL = config.dataSource.area.url
@@ -95,7 +95,7 @@ export const handlers = [
       district: GetArea<Area.DISTRICT>
     }>
 
-    let parent: ParentShape | undefined = undefined
+    let parent: ParentShape | undefined
 
     if (areaKey === Area.REGENCY) {
       const province = findBy(

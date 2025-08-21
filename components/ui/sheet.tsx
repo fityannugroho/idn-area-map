@@ -1,10 +1,10 @@
 'use client'
 
-import { cn } from '@/lib/utils'
 import * as SheetPrimitive from '@radix-ui/react-dialog'
-import { type VariantProps, cva } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority'
 import { XIcon } from 'lucide-react'
 import type * as React from 'react'
+import { cn } from '@/lib/utils'
 
 const Sheet = SheetPrimitive.Root
 

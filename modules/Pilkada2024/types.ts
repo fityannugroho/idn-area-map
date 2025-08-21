@@ -1,19 +1,19 @@
-type ElectionType = 'governor' | 'regent'
+export type ElectionType = 'governor' | 'regent'
 
-type Candidate = {
+export type Candidate = {
   ts: string
   nama: string
   warna: string
   nomor_urut: number
 }
 
-type CandidateData = {
+export type CandidateData = {
   [areaCode: string]: {
     [candidateId: string]: Candidate
   }
 }
 
-type VotesData = {
+export type VotesData = {
   progres: {
     total: number
     progres: number
@@ -23,7 +23,7 @@ type VotesData = {
   [candidateId: string]: number
 }
 
-type ElectionData = {
+export type ElectionData = {
   mode: string
   psu: string
   ts: string
@@ -54,7 +54,7 @@ type ElectionData = {
   }
 }
 
-type District = {
+export type District = {
   nama: string
   id: number
   kode: string

@@ -1,9 +1,9 @@
+import type { Metadata } from 'next'
 import DashboardLayout from '@/components/DashboardLayout'
 import MapDashboardProvider from '@/modules/MapDashboard/DashboardProvider'
 import MapView from '@/modules/Pilkada2024/MapView'
 import PilkadaProvider from '@/modules/Pilkada2024/PilkadaProvider'
 import Sidebar from '@/modules/Pilkada2024/Sidebar'
-import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Pilkada 2024 Indonesia - Interactive Map and Data',

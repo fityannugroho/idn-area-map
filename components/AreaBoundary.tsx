@@ -1,11 +1,11 @@
 'use client'
 
-import useBoundary from '@/hooks/useBoundary'
-import { type FeatureArea, featureConfig } from '@/lib/config'
 import dynamic from 'next/dynamic'
 import { useEffect } from 'react'
 import type { GeoJSONProps } from 'react-leaflet'
 import { toast } from 'sonner'
+import useBoundary from '@/hooks/useBoundary'
+import { type FeatureArea, featureConfig } from '@/lib/config'
 
 const GeoJSON = dynamic(
   () => import('react-leaflet').then((mod) => mod.GeoJSON),
