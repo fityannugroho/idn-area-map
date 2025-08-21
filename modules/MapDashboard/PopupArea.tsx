@@ -2,7 +2,7 @@
 
 import { useArea } from '@/hooks/useArea'
 import type { FeatureArea } from '@/lib/config'
-import { addDotSeparator, getAllParents, ucFirstStr } from '@/lib/utils'
+import { getAllParents, ucFirstStr } from '@/lib/utils'
 import { LinkIcon, MapIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
@@ -58,7 +58,7 @@ export default function PopupArea<Area extends FeatureArea>({
   return (
     <BasePopupArea>
       <span className="block font-bold text-sm">{data.name}</span>
-      <span className="text-sm">{addDotSeparator(data.code)}</span>
+      <span className="text-sm">{data.code}</span>
 
       {getAllParents(area).map((parent) => {
         const parentData = data.parent?.[parent]
@@ -81,7 +81,7 @@ export default function PopupArea<Area extends FeatureArea>({
         onClick={() => {
           try {
             navigator.clipboard.writeText(
-              `${window.location.origin}/${addDotSeparator(data.code)}`,
+              `${window.location.origin}/${data.code}`,
             )
             toast.success('Link copied to clipboard', {
               duration: 3_000, // 3 seconds
