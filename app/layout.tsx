@@ -1,6 +1,6 @@
 import { config } from '@/lib/config'
 import { cn } from '@/lib/utils'
-import { Inter } from 'next/font/google'
+import localFont from 'next/font/local'
 import { StrictMode } from 'react'
 import './globals.css'
 import QueryProvider from '@/components/QueryProvider'
@@ -8,9 +8,13 @@ import { Toaster } from '@/components/ui/sonner'
 import type { Metadata } from 'next'
 import { ThemeProvider } from 'next-themes'
 
-const inter = Inter({
-  subsets: ['latin'],
+const inter = localFont({
+  src: [
+    { path: './fonts/Inter-VariableFont.woff2', style: 'normal' },
+    { path: './fonts/Inter-Italic-VariableFont.woff2', style: 'italic' },
+  ],
   variable: '--font-sans',
+  display: 'swap',
 })
 
 const title = config.appName
