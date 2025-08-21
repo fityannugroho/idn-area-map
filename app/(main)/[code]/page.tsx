@@ -16,7 +16,7 @@ async function getAreaData(
   area: Area,
   areaCode: string,
 ): Promise<GetSpecificDataReturn<Area>['data']> {
-  const res = await getData(area, areaCode.replaceAll('.', ''))
+  const res = await getData(area, areaCode)
 
   if (!('data' in res)) {
     if (res.statusCode === 404) {

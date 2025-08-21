@@ -24,19 +24,22 @@ export const config: Config = {
   appUrl: process.env.NEXT_PUBLIC_VERCEL_URL ?? 'http://localhost:3000',
   dataSource: {
     area: {
-      url: process.env.DATA_SOURCE_URL ?? 'https://idn-area.up.railway.app',
+      url:
+        process.env.NEXT_PUBLIC_DATA_SOURCE_URL ??
+        'https://idn-area.up.railway.app',
       pagination: {
         defaultPageSize: Number.parseInt(
-          process.env.DATA_SOURCE_PAGINATION_DEFAULT_PAGE_SIZE ?? '10',
+          process.env.NEXT_PUBLIC_DATA_SOURCE_PAGINATION_DEFAULT_PAGE_SIZE ??
+            '10',
         ),
         maxPageSize: Number.parseInt(
-          process.env.DATA_SOURCE_PAGINATION_MAX_PAGE_SIZE ?? '100',
+          process.env.NEXT_PUBLIC_DATA_SOURCE_PAGINATION_MAX_PAGE_SIZE ?? '100',
         ),
       },
     },
     boundary: {
       url:
-        process.env.DATA_SOURCE_BOUNDARY_URL ??
+        process.env.NEXT_PUBLIC_DATA_SOURCE_BOUNDARY_URL ??
         'https://raw.githubusercontent.com/fityannugroho/idn-area-boundary/main/data',
     },
   },

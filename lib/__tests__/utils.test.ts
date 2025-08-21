@@ -1,7 +1,6 @@
 import { describe, expect, test, vi } from 'vitest'
 import { Area } from '../const'
 import {
-  addDotSeparator,
   cn,
   debounce,
   determineAreaByCode,
@@ -73,21 +72,6 @@ describe('getAreaRelations', () => {
     const area = 'INVALID' as Area
     const result = getAreaRelations(area)
     expect(result).toEqual({ parent: undefined, child: undefined })
-  })
-})
-
-describe('addDotSeparator', () => {
-  test('should add dot separator to area code', () => {
-    expect(addDotSeparator('9603')).toBe('96.03')
-    expect(addDotSeparator('960301')).toBe('96.03.01')
-    expect(addDotSeparator('9603011001')).toBe('96.03.01.1001')
-    expect(addDotSeparator('123')).toBe('123')
-  })
-
-  test('should return input for invalid length', () => {
-    expect(addDotSeparator('')).toBe('')
-    expect(addDotSeparator('1')).toBe('1')
-    expect(addDotSeparator('12345')).toBe('12345')
   })
 })
 
