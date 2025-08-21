@@ -11,6 +11,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 import { cn, objectFromEntries } from '@/lib/utils'
+import type { Candidate, VotesData } from './types'
 
 type VotesPopupProps = {
   votes: VotesData
