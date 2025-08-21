@@ -1,6 +1,5 @@
 import { config } from './config'
 import { type Area, type GetArea, endpoints, parentArea } from './const'
-import { addDotSeparator } from './utils'
 
 export type Query<A extends Area> = {
   limit?: number
@@ -127,7 +126,7 @@ export async function getBoundaryData(
   code: string,
 ): Promise<BoundaryResponse> {
   const url = new URL(
-    `${config.dataSource.boundary.url}/${endpoints[area]}/${addDotSeparator(code.replaceAll('.', ''))}.geojson`,
+    `${config.dataSource.boundary.url}/${endpoints[area]}/${code}.geojson`,
   )
 
   let res: Response
