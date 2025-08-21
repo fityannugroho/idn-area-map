@@ -2,6 +2,7 @@ import { type FeatureArea, featureConfig } from '@/lib/config'
 import type { Area } from '@/lib/const'
 import { getBoundaryData } from '@/lib/data'
 import { determineAreaByCode } from '@/lib/utils'
+import { NextResponse } from 'next/server'
 // @ts-ignore
 import simplify from 'simplify-geojson'
 import StaticMaps, { type AddPolygonOptions } from 'staticmaps'
@@ -34,7 +35,7 @@ export default async function Image({
     area = determineAreaByCode(code)
   } catch (error) {
     // Return a simple error image
-    return new Response('Invalid area code', { status: 400 })
+    return NextResponse.json({ message: 'Invalid area code' }, { status: 400 })
   }
 
   const config = featureConfig[area as FeatureArea]
@@ -42,7 +43,7 @@ export default async function Image({
 
   if (!resBoundary.data) {
     // Return a simple error image
-    return new Response(JSON.stringify(resBoundary), {
+    return NextResponse.json(resBoundary, {
       status: resBoundary.statusCode,
       statusText: resBoundary.message,
       headers: { 'content-type': 'application/json' },
@@ -98,7 +99,10 @@ export default async function Image({
 
   await map.render()
 
-  return new Response(await map.image.buffer('image/png'), {
+  const imgBuffer = await map.image.buffer(contentType)
+  const body = new Uint8Array(imgBuffer)
+
+  return new NextResponse(body, {
     headers: {
       'content-type': contentType,
     },
