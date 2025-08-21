@@ -18,7 +18,14 @@
     "type": "git",
     "url": "git+https://github.com/fityannugroho/idn-area-map.git"
   },
-  "keywords": ["idn-area", "indonesia", "wilayah", "area", "data", "map"],
+  "keywords": [
+    "idn-area",
+    "indonesia",
+    "wilayah",
+    "area",
+    "data",
+    "map"
+  ],
   "author": "fityannugroho <fityannugroho@gmail.com> (https://github.com/fityannugroho)",
   "license": "MIT",
   "bugs": {
@@ -67,7 +74,7 @@
     "zod-validation-error": "^3.4.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "2.2.0",
     "@playwright/test": "^1.52.0",
     "@tanstack/react-query-devtools": "^5.76.1",
     "@testing-library/dom": "^10.4.0",

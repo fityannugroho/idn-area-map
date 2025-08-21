@@ -1,11 +1,11 @@
+import { NextResponse } from 'next/server'
+// @ts-expect-error
+import simplify from 'simplify-geojson'
+import StaticMaps, { type AddPolygonOptions } from 'staticmaps'
 import { type FeatureArea, featureConfig } from '@/lib/config'
 import type { Area } from '@/lib/const'
 import { getBoundaryData } from '@/lib/data'
 import { determineAreaByCode } from '@/lib/utils'
-import { NextResponse } from 'next/server'
-// @ts-ignore
-import simplify from 'simplify-geojson'
-import StaticMaps, { type AddPolygonOptions } from 'staticmaps'
 
 function countPositionInCoords(coord: GeoJSON.Position[][]) {
   return coord.reduce((acc, curr) => acc + curr.length, 0)
@@ -33,7 +33,7 @@ export default async function Image({
   let area: Area
   try {
     area = determineAreaByCode(code)
-  } catch (error) {
+  } catch (_error) {
     // Return a simple error image
     return NextResponse.json({ message: 'Invalid area code' }, { status: 400 })
   }

@@ -1,4 +1,3 @@
-import { config } from '@/lib/config'
 import test, { expect } from '@playwright/test'
 
 test.beforeEach(async ({ page }) => {

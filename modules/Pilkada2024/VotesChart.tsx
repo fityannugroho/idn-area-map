@@ -1,5 +1,7 @@
 'use client'
 
+import { useMemo } from 'react'
+import { Pie, PieChart, ResponsiveContainer } from 'recharts'
 import {
   type ChartConfig,
   ChartContainer,
@@ -9,8 +11,7 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 import { cn, objectFromEntries } from '@/lib/utils'
-import { useMemo } from 'react'
-import { Pie, PieChart, ResponsiveContainer } from 'recharts'
+import type { Candidate, VotesData } from './types'
 
 type VotesPopupProps = {
   votes: VotesData

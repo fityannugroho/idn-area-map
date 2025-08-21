@@ -1,12 +1,12 @@
 'use client'
 
-import { config } from '@/lib/config'
-import { cn } from '@/lib/utils'
 import { ExternalLinkIcon, HandHeartIcon, MenuIcon } from 'lucide-react'
 import Link from 'next/link'
 import * as React from 'react'
-import { ThemeToggle } from './ThemeToggle'
+import { config } from '@/lib/config'
+import { cn } from '@/lib/utils'
 import GitHubIcon from './icons/GitHubIcon'
+import { ThemeToggle } from './ThemeToggle'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import {

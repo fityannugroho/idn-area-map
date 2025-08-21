@@ -1,6 +1,6 @@
+import { useQuery } from '@tanstack/react-query'
 import type { Area } from '@/lib/const'
 import { getBoundaryData } from '@/lib/data'
-import { useQuery } from '@tanstack/react-query'
 
 export default function useBoundary(area: Area, code: string) {
   return useQuery({

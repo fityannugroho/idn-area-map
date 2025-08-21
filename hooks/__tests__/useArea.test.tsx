@@ -1,9 +1,9 @@
-import { mockData } from '@/app/api/__mocks__/const'
-import { mockServer } from '@/app/api/__mocks__/server'
-import { Area } from '@/lib/const'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest'
+import { mockData } from '@/app/api/__mocks__/const'
+import { mockServer } from '@/app/api/__mocks__/server'
+import { Area } from '@/lib/const'
 import { useArea } from '../useArea'
 
 const queryClient = new QueryClient({

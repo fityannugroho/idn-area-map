@@ -1,9 +1,9 @@
 'use client'
 
-import MapFlyToBounds from '@/components/MapFlyToBounds'
-import { Skeleton } from '@/components/ui/skeleton'
 import type { Map as LeafletMap } from 'leaflet'
 import dynamic from 'next/dynamic'
+import MapFlyToBounds from '@/components/MapFlyToBounds'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useMapDashboard } from '../MapDashboard/hooks/useDashboard'
 import BoundaryLayers from './BoundaryLayers'
 import { usePilkada } from './hooks/usePilkada'

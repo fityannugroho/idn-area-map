@@ -1,13 +1,13 @@
 'use client'
 
-import { useArea } from '@/hooks/useArea'
-import type { FeatureArea } from '@/lib/config'
-import { getAllParents, ucFirstStr } from '@/lib/utils'
 import { LinkIcon, MapIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import type { ComponentPropsWithoutRef } from 'react'
 import { toast } from 'sonner'
+import { useArea } from '@/hooks/useArea'
+import type { FeatureArea } from '@/lib/config'
+import { getAllParents, ucFirstStr } from '@/lib/utils'
 
 const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), {
   ssr: false,
@@ -86,7 +86,7 @@ export default function PopupArea<Area extends FeatureArea>({
             toast.success('Link copied to clipboard', {
               duration: 3_000, // 3 seconds
             })
-          } catch (error) {
+          } catch (_error) {
             toast.error('Failed to copy link to clipboard', {
               closeButton: true,
             })

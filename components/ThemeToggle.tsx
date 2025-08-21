@@ -1,5 +1,7 @@
 'use client'
 
+import { LaptopMinimalIcon, MoonIcon, SunIcon } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -7,9 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { LaptopMinimalIcon, MoonIcon, SunIcon } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import * as React from 'react'
 
 export function ThemeToggle() {
   const { setTheme } = useTheme()

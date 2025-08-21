@@ -1,12 +1,12 @@
-import { config } from '@/lib/config'
-import { cn } from '@/lib/utils'
 import localFont from 'next/font/local'
 import { StrictMode } from 'react'
+import { config } from '@/lib/config'
+import { cn } from '@/lib/utils'
 import './globals.css'
-import QueryProvider from '@/components/QueryProvider'
-import { Toaster } from '@/components/ui/sonner'
 import type { Metadata } from 'next'
 import { ThemeProvider } from 'next-themes'
+import QueryProvider from '@/components/QueryProvider'
+import { Toaster } from '@/components/ui/sonner'
 
 const inter = localFont({
   src: [
