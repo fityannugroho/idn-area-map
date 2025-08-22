@@ -92,5 +92,22 @@
     "jsdom": "^26.1.0",
     "msw": "^2.10.5",
     "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "sharp": "0.34.3",
+      "staticmaps>sharp": "0.34.3"
+    },
+    "supportedArchitectures": {
+      "os": [
+        "linux",
+        "win32",
+        "darwin"
+      ],
+      "cpu": [
+        "x64",
+        "arm64"
+      ]
+    }
   }
 }
