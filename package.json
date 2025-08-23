@@ -11,8 +11,8 @@
     "test:cov": "vitest run --coverage",
     "test:e2e": "playwright test",
     "start": "next start",
-    "lint": "next lint && biome check .",
-    "lint:fix": "next lint --fix && biome check --write ."
+    "lint": "biome check .",
+    "lint:fix": "biome check --write ."
   },
   "repository": {
     "type": "git",
