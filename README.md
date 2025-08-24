@@ -26,7 +26,7 @@ The map of Indonesia's administrative areas.
 
 - [Next.js](https://nextjs.org) + [TypeScript](https://www.typescriptlang.org)
 - [Tailwind CSS](https://tailwindcss.com) + [shadcn-ui](https://ui.shadcn.com)
-- [React Leaflet](https://react-leaflet.js.org) + [MapLibre GL](https://github.com/maplibre/maplibre-gl-js) (powered by [Datawan](https://datawan.id))
+- [React Leaflet](https://react-leaflet.js.org) + [MapLibre GL Leaflet](https://github.com/maplibre/maplibre-gl-leaflet)
 
 ## Installation
 
