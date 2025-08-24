@@ -1,5 +1,5 @@
-import { determineAreaByCode } from '@/lib/utils'
 import { describe, expect, it } from 'vitest'
+import { determineAreaByCode } from '@/lib/utils'
 
 // Import the opengraph-image module
 const opengraphImageModule = () => import('../opengraph-image')

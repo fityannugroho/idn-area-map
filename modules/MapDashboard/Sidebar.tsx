@@ -1,11 +1,11 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import { EraserIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import AreaSelectors from './AreaSelectors'
 import BoundarySettings from './BoundarySettings'
-import IslandsInfo from './IslandsInfo'
 import { useMapDashboard } from './hooks/useDashboard'
+import IslandsInfo from './IslandsInfo'
 
 export default function Sidebar() {
   const { clear } = useMapDashboard()

@@ -1,10 +1,10 @@
+import type { Metadata, ResolvingMetadata } from 'next'
+import { notFound } from 'next/navigation'
 import { config } from '@/lib/config'
 import type { Area } from '@/lib/const'
 import { type GetSpecificDataReturn, getData } from '@/lib/data'
 import { determineAreaByCode, ucWords } from '@/lib/utils'
 import MapDashboard from '@/modules/MapDashboard/Dashboard'
-import type { Metadata, ResolvingMetadata } from 'next'
-import { notFound } from 'next/navigation'
 
 type Props = {
   params: Promise<{
@@ -30,7 +30,7 @@ async function getAreaData(
 
 export async function generateMetadata(
   props: Props,
-  parent: ResolvingMetadata,
+  _parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const params = await props.params
 
@@ -42,7 +42,7 @@ export async function generateMetadata(
   try {
     area = determineAreaByCode(code)
     areaData = await getAreaData(area, code)
-  } catch (error) {
+  } catch (_error) {
     return {
       title: 'Area Not Found',
       description:
@@ -89,7 +89,7 @@ export default async function DetailAreaPage(props: Props) {
   try {
     area = determineAreaByCode(params.code)
     areaData = await getAreaData(area, params.code)
-  } catch (error) {
+  } catch (_error) {
     return notFound()
   }
 

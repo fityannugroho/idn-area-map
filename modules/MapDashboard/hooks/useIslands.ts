@@ -1,7 +1,7 @@
+import { useQuery } from '@tanstack/react-query'
 import { config } from '@/lib/config'
 import { Area, type Island } from '@/lib/const'
 import { getData } from '@/lib/data'
-import { useQuery } from '@tanstack/react-query'
 
 const MAX_PAGE_SIZE = config.dataSource.area.pagination.maxPageSize
 

@@ -1,5 +1,5 @@
 import { config } from './config'
-import { type Area, type GetArea, endpoints, parentArea } from './const'
+import { type Area, endpoints, type GetArea, parentArea } from './const'
 
 export type Query<A extends Area> = {
   limit?: number
@@ -95,11 +95,11 @@ export async function getData<A extends Area, P extends string | Query<A>>(
   let res: Response
   try {
     res = await fetch(url)
-  } catch (error) {
+  } catch (_error) {
     return {
       statusCode: 500,
       message: `Unable to connect to the server at ${url.host}. Please check your network connection or verify that the server is reachable.`,
-      error: (error as Error).message,
+      error: (_error as Error).message,
     }
   }
 
@@ -132,7 +132,7 @@ export async function getBoundaryData(
   let res: Response
   try {
     res = await fetch(url)
-  } catch (error) {
+  } catch (_error) {
     return {
       statusCode: 500,
       message: `Unable to connect to the server at ${url.host}. Please check your network connection or verify that the server is reachable.`,

@@ -1,21 +1,22 @@
 'use client'
 
+import { EraserIcon, LoaderCircleIcon } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Combobox } from '@/components/Combobox'
 import ComboboxArea from '@/components/ComboboxArea'
 import { Button } from '@/components/ui/button'
 import { config } from '@/lib/config'
 import { Area } from '@/lib/const'
 import type { Query } from '@/lib/data'
-import { EraserIcon, LoaderCircleIcon } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
 import { useMapDashboard } from '../MapDashboard/hooks/useDashboard'
-import VotesChart from './VotesChart'
 import {
   useCandidates,
   useElectionResults,
   usePilkada,
 } from './hooks/usePilkada'
+import type { ElectionType } from './types'
+import VotesChart from './VotesChart'
 
 const electionOptions: readonly { key: ElectionType; label: string }[] = [
   { key: 'governor', label: 'Governor' },

@@ -1,13 +1,13 @@
 'use client'
 
+import type { Map as LeafletMap } from 'leaflet'
+import type { RefAttributes } from 'react'
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from '@/components/ui/resizable'
 import { useDashboardLayout } from '@/hooks/useDashboardLayout'
-import type { Map as LeafletMap } from 'leaflet'
-import type { RefAttributes } from 'react'
 
 export default function DashboardLayout({
   Sidebar,

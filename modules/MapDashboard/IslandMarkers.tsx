@@ -1,9 +1,9 @@
 'use client'
 
-import { Area } from '@/lib/const'
 import { MapIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { Area } from '@/lib/const'
 import { useMapDashboard } from './hooks/useDashboard'
 import { useIslands } from './hooks/useIslands'
 

@@ -1,8 +1,8 @@
 'use client'
 
 import { icon } from 'leaflet'
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 import { Marker, type MarkerProps, Popup, type PopupProps } from 'react-leaflet'
 

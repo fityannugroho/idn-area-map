@@ -19,11 +19,9 @@ export default function TileLayer() {
     if (!maplibreMap) {
       glRef.current.addTo(map)
 
-      map.attributionControl
-        .addAttribution(
-          '<a href="https://datawan.id">Datawan</a> | <a href="https://github.com/protomaps/basemaps">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>',
-        )
-        .setPrefix('<a href="https://leafletjs.com">Leaflet</a>')
+      map.attributionControl.setPrefix(
+        '<a href="https://leafletjs.com">Leaflet</a>',
+      )
 
       return
     }

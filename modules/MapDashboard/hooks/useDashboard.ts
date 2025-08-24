@@ -1,3 +1,5 @@
+import type { LatLngBounds } from 'leaflet'
+import { createContext, use } from 'react'
 import type { FeatureArea } from '@/lib/config'
 import {
   Area,
@@ -6,8 +8,6 @@ import {
   type Regency,
   type Village,
 } from '@/lib/const'
-import type { LatLngBounds } from 'leaflet'
-import { createContext, use } from 'react'
 
 export type SelectedArea = {
   [Area.PROVINCE]?: Province

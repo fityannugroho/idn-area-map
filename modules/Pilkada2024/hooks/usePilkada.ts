@@ -1,5 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { createContext, use } from 'react'
+import type {
+  Candidate,
+  CandidateData,
+  ElectionData,
+  ElectionType,
+  VotesData,
+} from '../types'
 
 const baseUrl =
   'https://raw.githubusercontent.com/razanfawwaz/pilkada-scrap/main'
