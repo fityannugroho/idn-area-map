@@ -72,7 +72,8 @@ export async function getData<A extends Area, P extends string | Query<A>>(
   )
   const parent = parentArea[area]
 
-  if (query?.parentCode && parent) {
+  // Allow empty string on `parentCode` query
+  if (query?.parentCode != null && parent) {
     url.searchParams.append(`${parent}Code`, query.parentCode)
   }
 

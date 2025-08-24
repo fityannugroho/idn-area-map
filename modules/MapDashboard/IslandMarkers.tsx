@@ -17,9 +17,8 @@ const MapMarker = dynamic(() => import('@/components/MapMarker'), {
 })
 
 export default function IslandMarkers() {
-  const { selectedArea, loading } = useMapDashboard()
-  const regencyCode = selectedArea.regency?.code
-  const { data: islands = [] } = useIslands(regencyCode)
+  const { loading } = useMapDashboard()
+  const { data: islands = [] } = useIslands()
 
   return (
     <MarkerClusterGroup
