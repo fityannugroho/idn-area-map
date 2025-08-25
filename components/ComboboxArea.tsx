@@ -26,17 +26,21 @@ export type ComboboxAreaProps<A extends FeatureArea> = Omit<
   'options' | 'onSelect' | 'selected'
 > & {
   area: A
+  defaultSelected?: GetArea<A>
   query: Query<A>
   onSelect?: (option: GetArea<A>) => void
 }
 
 export default function ComboboxArea<A extends FeatureArea>({
   area,
+  defaultSelected,
   query,
   onSelect,
   ...comboboxProps
 }: ComboboxAreaProps<A>) {
-  const [selectedArea, setSelectedArea] = useState<GetArea<A> | undefined>()
+  const [selectedArea, setSelectedArea] = useState<GetArea<A> | undefined>(
+    defaultSelected,
+  )
   const { data: areas = [], error } = useArea(area, {
     ...query,
     sortBy: 'name',
