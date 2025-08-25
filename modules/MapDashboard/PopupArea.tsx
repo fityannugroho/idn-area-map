@@ -1,12 +1,24 @@
 'use client'
-
-import { LinkIcon, MapIcon } from 'lucide-react'
+import {
+  ExternalLinkIcon,
+  LinkIcon,
+  MapIcon,
+  MoreVerticalIcon,
+} from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import type { ComponentPropsWithoutRef } from 'react'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { useArea } from '@/hooks/useArea'
-import type { FeatureArea } from '@/lib/config'
+import { config, type FeatureArea } from '@/lib/config'
+import { endpoints } from '@/lib/const'
 import { getAllParents, ucFirstStr } from '@/lib/utils'
 
 const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), {
@@ -76,39 +88,63 @@ export default function PopupArea<Area extends FeatureArea>({
         )
       })}
 
-      <button
-        type="button"
-        onClick={() => {
-          try {
-            navigator.clipboard.writeText(
-              `${window.location.origin}/${data.code}`,
-            )
-            toast.success('Link copied to clipboard', {
-              duration: 3_000, // 3 seconds
-            })
-          } catch (_error) {
-            toast.error('Failed to copy link to clipboard', {
-              closeButton: true,
-            })
-          }
-        }}
-        className="text-xs flex items-center gap-2 mt-4"
-      >
-        <LinkIcon className="size-4" />
-        Copy Link
-      </button>
+      <div className="flex justify-between gap-2 mt-4">
+        <Button variant="outline" className="w-full" asChild>
+          <Link
+            href={`${config.dataSource.area.url}/${endpoints[area]}/${data.code}`}
+            target="_blank"
+          >
+            <ExternalLinkIcon />
+            View API data
+          </Link>
+        </Button>
 
-      <Link
-        href={`https://www.google.com/maps/search/${latLng?.lat},${latLng?.lng}`}
-        passHref
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-xs flex items-center gap-2 mt-2"
-        title={`Coordinate: ${latLng?.lat}, ${latLng?.lng}`}
-      >
-        <MapIcon className="size-4" />
-        See on Google Maps
-      </Link>
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon">
+              <MoreVerticalIcon />
+              <span className="sr-only">More</span>
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent
+            side="right"
+            align="start"
+            avoidCollisions
+            onCloseAutoFocus={(e) => e.preventDefault()}
+          >
+            <DropdownMenuItem
+              onClick={() => {
+                try {
+                  navigator.clipboard.writeText(
+                    `${window.location.origin}/${data.code}`,
+                  )
+                  toast.success('Link copied to clipboard', {
+                    duration: 3_000, // 3 seconds
+                  })
+                } catch (_error) {
+                  toast.error('Failed to copy link to clipboard', {
+                    closeButton: true,
+                  })
+                }
+              }}
+            >
+              <LinkIcon />
+              Copy link
+            </DropdownMenuItem>
+
+            <DropdownMenuItem asChild>
+              <Link
+                href={`https://www.google.com/maps/search/${latLng?.lat},${latLng?.lng}`}
+                target="_blank"
+              >
+                <MapIcon />
+                See on Google Maps
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </BasePopupArea>
   )
 }

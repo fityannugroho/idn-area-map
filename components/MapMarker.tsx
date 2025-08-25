@@ -18,9 +18,12 @@ export default function MapMarker({
   return (
     <Marker
       icon={icon({
-        iconUrl: markerIcon.src,
-        iconRetinaUrl: markerIcon2x.src,
-        shadowUrl: markerShadow.src,
+        // marker imports under Next can be either a string (turbopack) or an object with `src` (webpack).
+        iconUrl: typeof markerIcon === 'string' ? markerIcon : markerIcon.src,
+        iconRetinaUrl:
+          typeof markerIcon2x === 'string' ? markerIcon2x : markerIcon2x.src,
+        shadowUrl:
+          typeof markerShadow === 'string' ? markerShadow : markerShadow.src,
         iconSize: [24, 40],
         shadowSize: [0, 0],
         iconAnchor: [12, 40],

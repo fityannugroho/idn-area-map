@@ -158,6 +158,11 @@
 
 /* Override default leaflet styles */
 .leaflet-container {
+  a {
+    /* biome-ignore lint/complexity/noImportantStyles: needed */
+    color: inherit !important;
+  }
+
   /* Popup */
   .leaflet-popup {
     .leaflet-popup-content-wrapper {

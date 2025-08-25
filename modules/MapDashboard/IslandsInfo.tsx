@@ -6,13 +6,11 @@ import { useIslands } from './hooks/useIslands'
 
 export default function IslandsInfo() {
   const { selectedArea } = useMapDashboard()
-  const { isLoading, data: islands = [] } = useIslands(
-    selectedArea.regency?.code,
-  )
+  const { isLoading, data: islands = [] } = useIslands()
 
   return (
     <div className="w-full p-2 border rounded flex justify-center items-center text-center">
-      {selectedArea.regency ? (
+      {selectedArea.province || selectedArea.regency ? (
         <div className="flex flex-col w-full justify-center items-center">
           {isLoading ? (
             <div className="flex gap-2 justify-center items-center">
@@ -35,7 +33,7 @@ export default function IslandsInfo() {
         </div>
       ) : (
         <span className="text-sm text-gray-500">
-          Select a regency to see islands
+          Select a province or regency to see islands
         </span>
       )}
     </div>

@@ -58,6 +58,7 @@ export default function AreaSelectors() {
         <ComboboxArea
           key={area}
           area={area}
+          defaultSelected={selectedArea[area]}
           query={query[area]}
           disabled={parent ? isLoading[parent] : false}
           autoClose
