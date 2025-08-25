@@ -158,6 +158,10 @@
 
 /* Override default leaflet styles */
 .leaflet-container {
+  a {
+    color: inherit !important;
+  }
+
   /* Popup */
   .leaflet-popup {
     .leaflet-popup-content-wrapper {
