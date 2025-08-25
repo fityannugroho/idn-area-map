@@ -9,7 +9,6 @@ export default function Map({
   className = 'w-full h-full',
   zoom = 5,
   children,
-  ref,
   ...mapProps
 }: React.ComponentPropsWithRef<typeof MapContainer>) {
   return (
