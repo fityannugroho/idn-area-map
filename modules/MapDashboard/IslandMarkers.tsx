@@ -83,7 +83,7 @@ export default function IslandMarkers() {
                 </Link>
               </Button>
 
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="icon">
                     <MoreVerticalIcon />
@@ -91,7 +91,12 @@ export default function IslandMarkers() {
                   </Button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent side="right" align="start" avoidCollisions>
+                <DropdownMenuContent
+                  side="right"
+                  align="start"
+                  avoidCollisions
+                  onCloseAutoFocus={(e) => e.preventDefault()}
+                >
                   <DropdownMenuItem
                     onClick={() => {
                       try {

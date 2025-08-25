@@ -99,7 +99,7 @@ export default function PopupArea<Area extends FeatureArea>({
           </Link>
         </Button>
 
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">
               <MoreVerticalIcon />
@@ -107,7 +107,12 @@ export default function PopupArea<Area extends FeatureArea>({
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent side="right" align="start" avoidCollisions>
+          <DropdownMenuContent
+            side="right"
+            align="start"
+            avoidCollisions
+            onCloseAutoFocus={(e) => e.preventDefault()}
+          >
             <DropdownMenuItem
               onClick={() => {
                 try {
