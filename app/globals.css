@@ -159,6 +159,7 @@
 /* Override default leaflet styles */
 .leaflet-container {
   a {
+    /* biome-ignore lint/complexity/noImportantStyles: needed */
     color: inherit !important;
   }
 
