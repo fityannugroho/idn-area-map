@@ -1,10 +1,12 @@
 'use client'
 
 import { EraserIcon, LoaderCircleIcon } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Combobox } from '@/components/Combobox'
 import ComboboxArea from '@/components/ComboboxArea'
+import GitHubIcon from '@/components/icons/GitHubIcon'
 import { Button } from '@/components/ui/button'
 import { config } from '@/lib/config'
 import { Area } from '@/lib/const'
@@ -72,6 +74,7 @@ export default function Sidebar() {
         area={Area.PROVINCE}
         query={{ limit: config.dataSource.area.pagination.maxPageSize }}
         disabled={!election}
+        reset={!selectedArea.province}
         autoClose
         fullWidth
         onSelect={(option) => {
@@ -89,6 +92,7 @@ export default function Sidebar() {
           area={Area.REGENCY}
           query={regencyQuery}
           disabled={!selectedArea.province}
+          reset={!selectedArea.regency}
           autoClose
           fullWidth
           onSelect={(option) => {
@@ -113,16 +117,24 @@ export default function Sidebar() {
           />
         )}
 
-      <Button
-        variant="outline"
-        className="mt-auto items-center"
-        onClick={() => {
-          clear()
-        }}
-      >
-        <EraserIcon />
-        Clear All Data
-      </Button>
+      {seleted && (
+        <Button variant="outline" className="mt-2 items-center" onClick={clear}>
+          <EraserIcon />
+          Clear all results
+        </Button>
+      )}
+
+      <span className="text-xs text-foreground/60 mt-4 flex flex-wrap justify-center items-center">
+        Data from:
+        <Link
+          href="https://github.com/razanfawwaz/pilkada-scrap"
+          target="_blank"
+          className="inline-flex justify-center items-center ml-1 gap-1 underline"
+        >
+          <GitHubIcon className="w-4 h-4" />
+          razanfawwaz/pilkada-scrap
+        </Link>
+      </span>
     </div>
   )
 }

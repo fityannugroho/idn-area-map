@@ -19,6 +19,8 @@ The map of Indonesia's administrative areas.
 - [x] Button to see the area on Google Maps by coordinates
 - [x] Dark mode
 - [x] Responsive design (works on mobile)
+- [x] **NEW!** Toggle the visibility of island markers
+- [x] **NEW!** Filter islands by their attributes: `populated`, `outermostSmall`
 
 > Suggestions and contributions are welcome!
 

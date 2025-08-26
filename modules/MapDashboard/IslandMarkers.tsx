@@ -19,7 +19,7 @@ import {
 import { config } from '@/lib/config'
 import { Area } from '@/lib/const'
 import { useMapDashboard } from './hooks/useDashboard'
-import { useIslands } from './hooks/useIslands'
+import { useIslandsFilter } from './IslandsFilterProvider'
 
 const MarkerClusterGroup = dynamic(
   () => import('@/components/MapMarkerClusterGroup'),
@@ -32,7 +32,9 @@ const MapMarker = dynamic(() => import('@/components/MapMarker'), {
 
 export default function IslandMarkers() {
   const { loading } = useMapDashboard()
-  const { data: islands = [] } = useIslands()
+  const { filteredIslands: islands = [], showMarkers } = useIslandsFilter()
+
+  if (!showMarkers) return null
 
   return (
     <MarkerClusterGroup
@@ -66,7 +68,7 @@ export default function IslandMarkers() {
                 )}
                 {island.isOutermostSmall && (
                   <span className="bg-red-500 text-xs text-popover font-semibold rounded px-2 py-0.5">
-                    Outermost Small Island
+                    Outermost-small island
                   </span>
                 )}
               </div>

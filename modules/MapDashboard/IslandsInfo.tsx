@@ -1,12 +1,14 @@
 'use client'
 
-import { LoaderCircleIcon } from 'lucide-react'
+import { EyeClosedIcon, EyeIcon, LoaderCircleIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { useMapDashboard } from './hooks/useDashboard'
-import { useIslands } from './hooks/useIslands'
+import { useIslandsFilter } from './IslandsFilterProvider'
 
 export default function IslandsInfo() {
   const { selectedArea } = useMapDashboard()
-  const { isLoading, data: islands = [] } = useIslands()
+  const { filter, setFilter, counts, isLoading } = useIslandsFilter()
+  const { showMarkers, setShowMarkers } = useIslandsFilter()
 
   return (
     <div className="w-full p-2 border rounded flex justify-center items-center text-center">
@@ -19,15 +21,35 @@ export default function IslandsInfo() {
             </div>
           ) : (
             <>
-              <span className="text-sm">{islands.length} islands found</span>
-              <span className="text-sm text-gray-500">
-                {islands.filter((island) => island.isPopulated).length}{' '}
-                populated
-              </span>
-              <span className="text-sm text-gray-500">
-                {islands.filter((island) => island.isOutermostSmall).length}{' '}
-                outermost
-              </span>
+              <Button
+                variant={showMarkers ? 'outline' : 'secondary'}
+                size="sm"
+                onClick={() => setShowMarkers(!showMarkers)}
+                title={showMarkers ? 'Hide islands' : 'Show islands'}
+              >
+                {counts.total} island{counts.total === 1 ? '' : 's'} found
+                {showMarkers ? <EyeIcon /> : <EyeClosedIcon />}
+              </Button>
+
+              <div className="flex flex-wrap gap-2 w-full justify-center items-center mt-2">
+                <Button
+                  variant={filter.populated ? 'secondary' : 'outline'}
+                  size="sm"
+                  onClick={() => setFilter({ populated: !filter.populated })}
+                >
+                  Populated ({counts.populated})
+                </Button>
+
+                <Button
+                  variant={filter.outermostSmall ? 'secondary' : 'outline'}
+                  size="sm"
+                  onClick={() =>
+                    setFilter({ outermostSmall: !filter.outermostSmall })
+                  }
+                >
+                  Outermost-small ({counts.outermostSmall})
+                </Button>
+              </div>
             </>
           )}
         </div>

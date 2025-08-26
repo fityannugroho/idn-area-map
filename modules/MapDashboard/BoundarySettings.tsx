@@ -11,7 +11,7 @@ export default function BoundarySettings() {
 
   return (
     <div className="w-full p-2 flex flex-col gap-2">
-      <h3 className="font-semibold">Show Boundary</h3>
+      <h3 className="font-semibold">Show boundary</h3>
 
       {objectToEntries(featureConfig).map(([area, config]) => (
         <div key={area} className="flex items-center space-x-2 truncate">

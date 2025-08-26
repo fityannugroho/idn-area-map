@@ -26,7 +26,7 @@ export default function Sidebar() {
         }}
       >
         <EraserIcon />
-        Clear All Data
+        Clear all results
       </Button>
     </div>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Combobox,
@@ -29,6 +29,10 @@ export type ComboboxAreaProps<A extends FeatureArea> = Omit<
   defaultSelected?: GetArea<A>
   query: Query<A>
   onSelect?: (option: GetArea<A>) => void
+  /**
+   * Whether to reset the selected area when the component unmounts
+   */
+  reset?: boolean
 }
 
 export default function ComboboxArea<A extends FeatureArea>({
@@ -36,6 +40,7 @@ export default function ComboboxArea<A extends FeatureArea>({
   defaultSelected,
   query,
   onSelect,
+  reset,
   ...comboboxProps
 }: ComboboxAreaProps<A>) {
   const [selectedArea, setSelectedArea] = useState<GetArea<A> | undefined>(
@@ -55,12 +60,18 @@ export default function ComboboxArea<A extends FeatureArea>({
     })
   }
 
+  useEffect(() => {
+    if (reset) {
+      setSelectedArea(undefined)
+    }
+  }, [reset])
+
   return (
     <Combobox
       {...comboboxProps}
       options={options}
       label={comboboxProps.label || ucFirstStr(area)}
-      placeholder={comboboxProps.placeholder || `Search ${ucFirstStr(area)}`}
+      placeholder={comboboxProps.placeholder || `Search ${area}`}
       onSelect={(opt) => {
         const selectedArea = areas.find((a) => a.code === opt.key)
         if (selectedArea) {
