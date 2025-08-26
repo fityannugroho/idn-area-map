@@ -71,7 +71,7 @@ export default function ComboboxArea<A extends FeatureArea>({
       {...comboboxProps}
       options={options}
       label={comboboxProps.label || ucFirstStr(area)}
-      placeholder={comboboxProps.placeholder || `Search ${ucFirstStr(area)}`}
+      placeholder={comboboxProps.placeholder || `Search ${area}`}
       onSelect={(opt) => {
         const selectedArea = areas.find((a) => a.code === opt.key)
         if (selectedArea) {
