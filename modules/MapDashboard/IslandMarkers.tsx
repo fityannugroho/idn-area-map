@@ -66,7 +66,7 @@ export default function IslandMarkers() {
                 )}
                 {island.isOutermostSmall && (
                   <span className="bg-red-500 text-xs text-popover font-semibold rounded px-2 py-0.5">
-                    Outermost Small Island
+                    Outermost-small island
                   </span>
                 )}
               </div>
