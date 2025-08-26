@@ -72,6 +72,7 @@ export default function Sidebar() {
         area={Area.PROVINCE}
         query={{ limit: config.dataSource.area.pagination.maxPageSize }}
         disabled={!election}
+        reset={!selectedArea.province}
         autoClose
         fullWidth
         onSelect={(option) => {
@@ -89,6 +90,7 @@ export default function Sidebar() {
           area={Area.REGENCY}
           query={regencyQuery}
           disabled={!selectedArea.province}
+          reset={!selectedArea.regency}
           autoClose
           fullWidth
           onSelect={(option) => {
@@ -121,7 +123,7 @@ export default function Sidebar() {
         }}
       >
         <EraserIcon />
-        Clear All Data
+        Clear all results
       </Button>
     </div>
   )
