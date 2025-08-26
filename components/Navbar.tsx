@@ -7,7 +7,6 @@ import { config } from '@/lib/config'
 import { cn } from '@/lib/utils'
 import GitHubIcon from './icons/GitHubIcon'
 import { ThemeToggle } from './ThemeToggle'
-import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import {
   Sheet,
@@ -32,16 +31,15 @@ const menuItems: MenuItem[] = [
   {
     href: '/pilkada2024',
     label: 'Pilkada 2024',
-    accessories: <Badge variant="outline">New</Badge>,
   },
   {
-    href: 'https://idn-area.up.railway.app',
+    href: config.dataSource.area.url,
     label: 'idn-area API',
     target: '_blank',
     accessories: <ExternalLinkIcon className="size-4" />,
   },
   {
-    href: 'https://trakteer.id/fityannugroho/tip',
+    href: 'https://github.com/sponsors/fityannugroho',
     label: 'Support',
     target: '_blank',
     accessories: <HandHeartIcon className="h-5 w-5" />,
