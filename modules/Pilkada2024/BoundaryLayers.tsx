@@ -19,6 +19,9 @@ export type BoundaryLayersProps = {
   code: string
 }
 
+const MIN_OPACITY = 0.1
+const MAX_OPACITY = 0.7
+
 export default function BoundaryLayers({
   election,
   code: parentCode,
@@ -56,13 +59,30 @@ export default function BoundaryLayers({
       {childAreas.map((_childArea) => {
         const votes = getVotesByArea(_childArea.code)
 
-        // Calculate the winner
-        const winner = Object.keys(candidates).reduce((acc, id) => {
-          if (votes[id] > votes[acc]) {
-            return id
-          }
-          return acc
-        })
+        // Prepare numeric votes for sorting
+        const candidateIds = Object.keys(candidates)
+        const numericVotes = candidateIds.map((id) => ({
+          id,
+          val: votes[id],
+        }))
+
+        // Sort descending to get winner and runner-up
+        numericVotes.sort((a, b) => b.val - a.val)
+        const winnerId = numericVotes[0]?.id
+        const winnerVal = numericVotes[0].val
+        const runnerUpVal = numericVotes[1]?.val ?? 0
+
+        // Total numeric votes
+        const total = numericVotes.reduce((s, x) => s + x.val, 0)
+
+        // Compute margin = winnerShare - runnerUpShare, in [0,1]
+        const winnerShare = winnerVal / total
+        const runnerUpShare = runnerUpVal / total
+        const margin = Math.max(0, winnerShare - runnerUpShare)
+
+        // Emphasize large margins using power > 1 (exponent = 2)
+        const EXPONENT = 2
+        const transformed = Math.max(0, Math.min(1, margin)) ** EXPONENT
 
         return (
           <AreaBoundary
@@ -70,8 +90,10 @@ export default function BoundaryLayers({
             key={_childArea.code}
             code={_childArea.code}
             pathOptions={{
-              color: `var(--chart-${candidates[winner].nomor_urut})`,
-              fillOpacity: 0.3,
+              color: `var(--chart-${candidates[winnerId].nomor_urut})`,
+              fillColor: `var(--chart-${candidates[winnerId].nomor_urut})`,
+              fillOpacity:
+                MIN_OPACITY + (MAX_OPACITY - MIN_OPACITY) * transformed,
             }}
             eventHandlers={{
               add: (e) => {
