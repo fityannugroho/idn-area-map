@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ComboboxArea from '@/components/ComboboxArea'
 import { config, type FeatureArea, featureConfig } from '@/lib/config'
 import type { Query } from '@/lib/data'
@@ -29,7 +29,7 @@ export default function AreaSelectors() {
   const defaultQuery = objectFromEntries(
     areas.reduce<[FeatureArea, Query<FeatureArea>][]>(
       (acc, { area, parent }) => {
-        let query: Query<typeof area> = {}
+        let query: Query<FeatureArea> = {}
 
         if (area === 'province') {
           query = { limit: MAX_PAGE_SIZE }
@@ -37,7 +37,7 @@ export default function AreaSelectors() {
 
         if (parent && parent !== 'island' && selectedArea[parent]) {
           query = {
-            parentCode: selectedArea[parent]?.code, // Need optional chaining. Build fails without it
+            parentCode: selectedArea[parent]?.code,
             limit: MAX_PAGE_SIZE,
           }
         }
@@ -52,6 +52,19 @@ export default function AreaSelectors() {
   const [query, setQuery] =
     useState<{ [A in FeatureArea]: Query<A> }>(defaultQuery)
 
+  // Reset query to default when selectedArea is cleared
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only depends to selectedArea
+  useEffect(() => {
+    for (const { area } of areas) {
+      if (!selectedArea[area]) {
+        setQuery((prevQuery) => ({
+          ...prevQuery,
+          [area]: defaultQuery[area],
+        }))
+      }
+    }
+  }, [selectedArea])
+
   return (
     <div className="flex flex-col gap-2 w-full">
       {areas.map(({ area, parent, child }) => (
@@ -61,6 +74,7 @@ export default function AreaSelectors() {
           defaultSelected={selectedArea[area]}
           query={query[area]}
           disabled={parent ? isLoading[parent] : false}
+          reset={!selectedArea[area]}
           autoClose
           fullWidth
           onSelect={(selected) => {
