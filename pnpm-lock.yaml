@@ -71,7 +71,7 @@ importers:
         version: 0.541.0(react@19.2.1)
       next:
         specifier: ^15.5.7
-        version: 15.5.7(@babel/core@7.28.3)(@playwright/test@1.55.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+        version: 15.5.7(@babel/core@7.28.3)(@playwright/test@1.57.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -122,8 +122,8 @@ importers:
         specifier: 2.2.2
         version: 2.2.2
       '@playwright/test':
-        specifier: ^1.55.0
-        version: 1.55.0
+        specifier: ^1.57.0
+        version: 1.57.0
       '@tanstack/react-query-devtools':
         specifier: ^5.85.5
         version: 5.85.5(@tanstack/react-query@5.85.5(react@19.2.1))(react@19.2.1)
@@ -822,8 +822,8 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
-  '@playwright/test@1.55.0':
-    resolution: {integrity: sha512-04IXzPwHrW69XusN/SIdDdKZBzMfOT9UNT/YiJit/xpy2VuAoB8NHc8Aplb96zsWDddLnbkPL3TsmrS04ZU2xQ==}
+  '@playwright/test@1.57.0':
+    resolution: {integrity: sha512-6TyEnHgd6SArQO8UO2OMTxshln3QMWBtPGrOCgs3wVEmQmwyuNtB10IZMfmYDE0riwNR1cu4q+pPcxMVtaG3TA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -2355,13 +2355,13 @@ packages:
     resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
     engines: {node: '>=12'}
 
-  playwright-core@1.55.0:
-    resolution: {integrity: sha512-GvZs4vU3U5ro2nZpeiwyb0zuFaqb9sUiAJuyrWpcGouD8y9/HLgGbNRjIph7zU9D3hnPaisMl9zG9CgFi/biIg==}
+  playwright-core@1.57.0:
+    resolution: {integrity: sha512-agTcKlMw/mjBWOnD6kFZttAAGHgi/Nw0CZ2o6JqWSbMlI219lAFLZZCyqByTsvVAJq5XA5H8cA6PrvBRpBWEuQ==}
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.55.0:
-    resolution: {integrity: sha512-sdCWStblvV1YU909Xqx0DhOjPZE4/5lJsIS84IfN9dAZfcl/CIZ5O8l3o0j7hPMjDvqoTF8ZUcc+i/GL5erstA==}
+  playwright@1.57.0:
+    resolution: {integrity: sha512-ilYQj1s8sr2ppEJ2YVadYBN0Mb3mdo9J0wQ+UuDhzYqURwSoW4n1Xs5vs7ORwgDGmyEh33tRMeS8KhdkMoLXQw==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -3475,9 +3475,9 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@playwright/test@1.55.0':
+  '@playwright/test@1.57.0':
     dependencies:
-      playwright: 1.55.0
+      playwright: 1.57.0
 
   '@radix-ui/primitive@1.1.3': {}
 
@@ -4893,7 +4893,7 @@ snapshots:
       react: 19.2.1
       react-dom: 19.2.1(react@19.2.1)
 
-  next@15.5.7(@babel/core@7.28.3)(@playwright/test@1.55.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1):
+  next@15.5.7(@babel/core@7.28.3)(@playwright/test@1.57.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1):
     dependencies:
       '@next/env': 15.5.7
       '@swc/helpers': 0.5.15
@@ -4911,7 +4911,7 @@ snapshots:
       '@next/swc-linux-x64-musl': 15.5.7
       '@next/swc-win32-arm64-msvc': 15.5.7
       '@next/swc-win32-x64-msvc': 15.5.7
-      '@playwright/test': 1.55.0
+      '@playwright/test': 1.57.0
       sharp: 0.34.3
     transitivePeerDependencies:
       - '@babel/core'
@@ -4960,11 +4960,11 @@ snapshots:
 
   picomatch@4.0.3: {}
 
-  playwright-core@1.55.0: {}
+  playwright-core@1.57.0: {}
 
-  playwright@1.55.0:
+  playwright@1.57.0:
     dependencies:
-      playwright-core: 1.55.0
+      playwright-core: 1.57.0
     optionalDependencies:
       fsevents: 2.3.2
 
