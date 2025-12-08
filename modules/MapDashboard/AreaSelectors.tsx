@@ -81,6 +81,24 @@ export default function AreaSelectors() {
             changeSelectedArea(area, selected)
 
             if (child) {
+              const descendants = areas
+                .slice(areas.findIndex((a) => a.area === area) + 1)
+                .map((a) => a.area)
+
+              for (const a of descendants) {
+                changeSelectedArea(a, undefined)
+              }
+
+              setQuery((prevQuery) => {
+                const updated = { ...prevQuery }
+
+                descendants.forEach((a) => {
+                  updated[a] = {}
+                })
+
+                return updated
+              })
+
               setQuery((prevQuery) => ({
                 ...prevQuery,
                 [child]: {
