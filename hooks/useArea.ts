@@ -11,8 +11,12 @@ export function useArea<A extends Area, P extends string | Query<A>>(
   area: A,
   codeOrQuery?: P,
 ) {
+  const enabled = codeOrQuery !== undefined
+
   return useQuery({
     queryKey: ['area', area, codeOrQuery],
+    enabled,
+
     queryFn: async () => {
       const res = await getData(area, codeOrQuery)
 

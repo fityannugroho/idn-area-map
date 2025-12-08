@@ -29,9 +29,6 @@ export type ComboboxAreaProps<A extends FeatureArea> = Omit<
   defaultSelected?: GetArea<A>
   query: Query<A>
   onSelect?: (option: GetArea<A>) => void
-  /**
-   * Whether to reset the selected area when the component unmounts
-   */
   reset?: boolean
 }
 
@@ -46,25 +43,49 @@ export default function ComboboxArea<A extends FeatureArea>({
   const [selectedArea, setSelectedArea] = useState<GetArea<A> | undefined>(
     defaultSelected,
   )
-  const { data: areas = [], error } = useArea(area, {
-    ...query,
-    sortBy: 'name',
-  })
+
+  const isProvince = area === 'province'
+  const shouldSkipFetch = !isProvince && !query.parentCode && !query.name
+
+  const { data: areas = [], error } = useArea(
+    area,
+    shouldSkipFetch
+      ? undefined
+      : {
+          ...query,
+          sortBy: 'name',
+        },
+  )
 
   const options = useMemo(() => areas.map((a) => areaToOption<A>(a)), [areas])
 
-  if (error) {
-    toast.error(`Failed to fetch ${area} data`, {
-      description: error?.message,
-      closeButton: true,
-    })
-  }
+  useEffect(() => {
+    if (error) {
+      toast.error(`Failed to fetch ${area} data`, {
+        description: error?.message,
+        closeButton: true,
+      })
+    }
+  }, [error, area])
 
   useEffect(() => {
     if (reset) {
       setSelectedArea(undefined)
     }
   }, [reset])
+
+  if (shouldSkipFetch) {
+    return (
+      <Combobox
+        {...comboboxProps}
+        options={[]}
+        selected={undefined}
+        label={comboboxProps.label || ucFirstStr(area)}
+        placeholder={comboboxProps.placeholder || `Select ${area}`}
+        onSelect={() => {}}
+      />
+    )
+  }
 
   return (
     <Combobox
