@@ -81,24 +81,20 @@ export default function AreaSelectors() {
             changeSelectedArea(area, selected)
 
             if (child) {
-              const descendants = areas
-                .slice(areas.findIndex((a) => a.area === area) + 1)
-                .map((a) => a.area)
+              const descendants: FeatureArea[] = []
+              let next = child as FeatureArea | undefined
 
+              while (next) {
+                descendants.push(next)
+                next = getAreaRelations(next).child as FeatureArea | undefined
+              }
+
+              // Reset all descendant selections, useEffect will handle the query reset
               for (const a of descendants) {
                 changeSelectedArea(a, undefined)
               }
 
-              setQuery((prevQuery) => {
-                const updated = { ...prevQuery }
-
-                descendants.forEach((a) => {
-                  updated[a] = {}
-                })
-
-                return updated
-              })
-
+              // Update query for immediate child selector
               setQuery((prevQuery) => ({
                 ...prevQuery,
                 [child]: {
