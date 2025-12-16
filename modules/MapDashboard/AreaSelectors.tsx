@@ -78,6 +78,8 @@ export default function AreaSelectors() {
           autoClose
           fullWidth
           onSelect={(selected) => {
+            if (selectedArea[area]?.code === selected.code) return
+
             changeSelectedArea(area, selected)
 
             if (child) {
