@@ -27,9 +27,9 @@ export default function AreaSelectors() {
   )
 
   const defaultQuery = objectFromEntries(
-    areas.reduce<[FeatureArea, Query<FeatureArea>][]>(
+    areas.reduce<[FeatureArea, Query<FeatureArea> | undefined][]>(
       (acc, { area, parent }) => {
-        let query: Query<FeatureArea> = {}
+        let query: Query<FeatureArea> | undefined
 
         if (area === 'province') {
           query = { limit: MAX_PAGE_SIZE }
@@ -50,7 +50,7 @@ export default function AreaSelectors() {
   )
 
   const [query, setQuery] =
-    useState<{ [A in FeatureArea]: Query<A> }>(defaultQuery)
+    useState<{ [A in FeatureArea]?: Query<A> }>(defaultQuery)
 
   // Reset query to default when selectedArea is cleared
   // biome-ignore lint/correctness/useExhaustiveDependencies: only depends to selectedArea
@@ -95,7 +95,7 @@ export default function AreaSelectors() {
               if (parent && parent !== 'island' && !selectedArea[parent]) {
                 setQuery((prevQuery) => ({
                   ...prevQuery,
-                  [area]: { name },
+                  [area]: name ? { name } : undefined,
                 }))
               }
             }, 500),
