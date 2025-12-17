@@ -27,8 +27,20 @@ describe('useArea', () => {
 
   afterAll(() => mockServer.close())
 
-  test('does not fetch data when second argument is not provided', () => {
+  test('return array of data when second argument is not provided', async () => {
     const { result } = renderHook(() => useArea(Area.PROVINCE), { wrapper })
+
+    await waitFor(() => {
+      return expect(result.current.isSuccess).toBe(true)
+    })
+
+    expect(result.current.data).toEqual(mockData.province)
+  })
+
+  test('does not fetch data when second argument is null', () => {
+    const { result } = renderHook(() => useArea(Area.PROVINCE, null), {
+      wrapper,
+    })
 
     expect(result.current.fetchStatus).toBe('idle')
     expect(result.current.data).toBeUndefined()

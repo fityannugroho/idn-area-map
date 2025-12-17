@@ -27,9 +27,9 @@ export default function AreaSelectors() {
   )
 
   const defaultQuery = objectFromEntries(
-    areas.reduce<[FeatureArea, Query<FeatureArea> | undefined][]>(
+    areas.reduce<[FeatureArea, Query<FeatureArea> | null][]>(
       (acc, { area, parent }) => {
-        let query: Query<FeatureArea> | undefined
+        let query: Query<FeatureArea> | null = null
 
         if (area === 'province') {
           query = { limit: MAX_PAGE_SIZE }
@@ -50,7 +50,7 @@ export default function AreaSelectors() {
   )
 
   const [query, setQuery] =
-    useState<{ [A in FeatureArea]?: Query<A> }>(defaultQuery)
+    useState<{ [A in FeatureArea]: Query<A> | null }>(defaultQuery)
 
   // Reset query to default when selectedArea is cleared
   // biome-ignore lint/correctness/useExhaustiveDependencies: only depends to selectedArea

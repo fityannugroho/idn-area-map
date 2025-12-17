@@ -27,7 +27,7 @@ export type ComboboxAreaProps<A extends FeatureArea> = Omit<
 > & {
   area: A
   defaultSelected?: GetArea<A>
-  query?: Query<A>
+  query: Query<A> | null
   onSelect?: (option: GetArea<A>) => void
   reset?: boolean
 }
@@ -48,7 +48,7 @@ export default function ComboboxArea<A extends FeatureArea>({
   )
   const { data: areas = [], error } = useArea(
     area,
-    query ? { ...query, sortBy: 'name' } : undefined,
+    query ? { ...query, sortBy: 'name' } : null,
   )
 
   const options = useMemo(() => areas.map((a) => areaToOption<A>(a)), [areas])
