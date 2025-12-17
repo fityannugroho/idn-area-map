@@ -12,7 +12,7 @@ test.describe('meta tags', () => {
 
   test('has description', async ({ page }) => {
     await expect(
-      page.locator('head').locator('meta[name="description"]'),
+      page.locator('meta[name="description"]'),
     ).toHaveAttribute('content', config.appDescription)
   })
 })
