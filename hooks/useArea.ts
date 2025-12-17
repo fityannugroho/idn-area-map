@@ -7,6 +7,15 @@ import {
   type Query,
 } from '@/lib/data'
 
+/**
+ * Get area data from the API.
+ *
+ * Note: The request will be **disabled** if `codeOrQuery` is not provided.
+ * To fetch all data (without filter), you must explicitly pass an empty object `{}`.
+ *
+ * @param area The area type (e.g. `province`, `regency`, etc.)
+ * @param codeOrQuery The area code (string) to get specific data, or query params (object) to filter data.
+ */
 export function useArea<A extends Area, P extends string | Query<A>>(
   area: A,
   codeOrQuery?: P,

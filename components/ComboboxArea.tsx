@@ -37,6 +37,9 @@ export default function ComboboxArea<A extends FeatureArea>({
   defaultSelected,
   query,
   onSelect,
+  /**
+   * Whether to reset the selected area when the component unmounts
+   */
   reset,
   ...comboboxProps
 }: ComboboxAreaProps<A>) {
