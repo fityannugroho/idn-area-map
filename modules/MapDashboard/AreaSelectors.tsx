@@ -83,9 +83,25 @@ export default function AreaSelectors() {
               : `Nothing found`
           }
           onSelect={(selected) => {
+            if (selectedArea[area]?.code === selected.code) return
+
             changeSelectedArea(area, selected)
 
             if (child) {
+              const descendants: FeatureArea[] = []
+              let next = child as FeatureArea | undefined
+
+              while (next) {
+                descendants.push(next)
+                next = getAreaRelations(next).child as FeatureArea | undefined
+              }
+
+              // Reset all descendant selections, useEffect will handle the query reset
+              for (const a of descendants) {
+                changeSelectedArea(a, undefined)
+              }
+
+              // Update query for immediate child selector
               setQuery((prevQuery) => ({
                 ...prevQuery,
                 [child]: {
