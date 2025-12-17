@@ -14,32 +14,53 @@ test('province selector should load all provinces', async ({ page }) => {
   await expect(page.getByRole('option')).toHaveCount(38)
 })
 
-test('regency selector should load some regencies', async ({ page }) => {
+test('regency selector should not load any options initially', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Regency' })).toBeVisible()
   await page.getByRole('button', { name: 'Regency' }).click()
   await expect(page.getByPlaceholder('Search Regency')).toBeVisible()
 
+  // Ensure that no options are displayed initially
+  await expect(page.getByRole('option')).toHaveCount(0)
+  await expect(page.getByText('Select province first or type to search')).toBeVisible()
+
+  // Type something to trigger the search
+  await page.getByPlaceholder('Search Regency').fill('a')
+
   // Ensure that the number of options available matches the expected count
   await expect(page.getByRole('option')).toHaveCount(
     config.dataSource.area.pagination.defaultPageSize,
   )
 })
 
-test('district selector should load some districts', async ({ page }) => {
+test('district selector should not load any options initially', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'District' })).toBeVisible()
   await page.getByRole('button', { name: 'District' }).click()
   await expect(page.getByPlaceholder('Search District')).toBeVisible()
 
+  // Ensure that no options are displayed initially
+  await expect(page.getByRole('option')).toHaveCount(0)
+  await expect(page.getByText('Select regency first or type to search')).toBeVisible()
+
+  // Type something to trigger the search
+  await page.getByPlaceholder('Search District').fill('a')
+
   // Ensure that the number of options available matches the expected count
   await expect(page.getByRole('option')).toHaveCount(
     config.dataSource.area.pagination.defaultPageSize,
   )
 })
 
-test('village selector should load some villages', async ({ page }) => {
+test('village selector should not load any options initially', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Village' })).toBeVisible()
   await page.getByRole('button', { name: 'Village' }).click()
   await expect(page.getByPlaceholder('Search Village')).toBeVisible()
+
+  // Ensure that no options are displayed initially
+  await expect(page.getByRole('option')).toHaveCount(0)
+  await expect(page.getByText('Select district first or type to search')).toBeVisible()
+
+  // Type something to trigger the search
+  await page.getByPlaceholder('Search Village').fill('a')
 
   // Ensure that the number of options available matches the expected count
   await expect(page.getByRole('option')).toHaveCount(
@@ -113,6 +134,8 @@ test('should load all regencies of the selected province', async ({ page }) => {
 
 test('should load all districts of the selected regency', async ({ page }) => {
   await page.getByRole('button', { name: 'Regency' }).click()
+  // Search for the regency first
+  await page.getByPlaceholder('Search Regency').fill('jakarta')
 
   const regencyCode = (
     await page.getByRole('option').first().getAttribute('data-value')
@@ -135,6 +158,8 @@ test('should load all districts of the selected regency', async ({ page }) => {
 
 test('should load all villages of the selected district', async ({ page }) => {
   await page.getByRole('button', { name: 'District' }).click()
+  // Search for the district first
+  await page.getByPlaceholder('Search District').fill('gambir')
 
   const districtCode = (
     await page.getByRole('option').first().getAttribute('data-value')

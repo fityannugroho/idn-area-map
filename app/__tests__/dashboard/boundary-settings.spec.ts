@@ -32,6 +32,7 @@ test('should hide the province boundary when disabled', async ({ page }) => {
 test('should hide the regency boundary when disabled', async ({ page }) => {
   // Select a regency
   await page.getByRole('button', { name: 'Regency' }).click()
+  await page.getByPlaceholder('Search Regency').fill('jakarta')
   await page.getByRole('option').first().click()
   await expect(page.getByRole('main').locator('g path')).toBeVisible({
     timeout: 10_000,
@@ -48,6 +49,7 @@ test('should hide the regency boundary when disabled', async ({ page }) => {
 test('should hide the district boundary when disabled', async ({ page }) => {
   // Select a district
   await page.getByRole('button', { name: 'District' }).click()
+  await page.getByPlaceholder('Search District').fill('gambir')
   await page.getByRole('option').first().click()
   await expect(page.getByRole('main').locator('g path')).toBeVisible({
     timeout: 10_000,
@@ -64,6 +66,7 @@ test('should hide the district boundary when disabled', async ({ page }) => {
 test('should hide the village boundary when disabled', async ({ page }) => {
   // Select a village
   await page.getByRole('button', { name: 'Village' }).click()
+  await page.getByPlaceholder('Search Village').fill('gambir')
   await page.getByRole('option').first().click()
   await expect(page.getByRole('main').locator('g path')).toBeVisible({
     timeout: 10_000,
