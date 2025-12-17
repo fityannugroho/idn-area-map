@@ -27,9 +27,9 @@ export default function AreaSelectors() {
   )
 
   const defaultQuery = objectFromEntries(
-    areas.reduce<[FeatureArea, Query<FeatureArea>][]>(
+    areas.reduce<[FeatureArea, Query<FeatureArea> | null][]>(
       (acc, { area, parent }) => {
-        let query: Query<FeatureArea> = {}
+        let query: Query<FeatureArea> | null = null
 
         if (area === 'province') {
           query = { limit: MAX_PAGE_SIZE }
@@ -50,7 +50,7 @@ export default function AreaSelectors() {
   )
 
   const [query, setQuery] =
-    useState<{ [A in FeatureArea]: Query<A> }>(defaultQuery)
+    useState<{ [A in FeatureArea]: Query<A> | null }>(defaultQuery)
 
   // Reset query to default when selectedArea is cleared
   // biome-ignore lint/correctness/useExhaustiveDependencies: only depends to selectedArea
@@ -77,10 +77,31 @@ export default function AreaSelectors() {
           reset={!selectedArea[area]}
           autoClose
           fullWidth
+          emptyMessage={
+            parent && !query[area]
+              ? `Select ${parent} first or type to search`
+              : `Nothing found`
+          }
           onSelect={(selected) => {
+            if (selectedArea[area]?.code === selected.code) return
+
             changeSelectedArea(area, selected)
 
             if (child) {
+              const descendants: FeatureArea[] = []
+              let next = child as FeatureArea | undefined
+
+              while (next) {
+                descendants.push(next)
+                next = getAreaRelations(next).child as FeatureArea | undefined
+              }
+
+              // Reset all descendant selections, useEffect will handle the query reset
+              for (const a of descendants) {
+                changeSelectedArea(a, undefined)
+              }
+
+              // Update query for immediate child selector
               setQuery((prevQuery) => ({
                 ...prevQuery,
                 [child]: {
@@ -95,7 +116,7 @@ export default function AreaSelectors() {
               if (parent && parent !== 'island' && !selectedArea[parent]) {
                 setQuery((prevQuery) => ({
                   ...prevQuery,
-                  [area]: { name },
+                  [area]: name ? { name } : undefined,
                 }))
               }
             }, 500),
