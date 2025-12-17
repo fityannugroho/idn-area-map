@@ -37,6 +37,25 @@ describe('useArea', () => {
     expect(result.current.data).toEqual(mockData.province)
   })
 
+  test('does not fetch data when second argument is null', () => {
+    const { result } = renderHook(() => useArea(Area.PROVINCE, null), {
+      wrapper,
+    })
+
+    expect(result.current.fetchStatus).toBe('idle')
+    expect(result.current.data).toBeUndefined()
+  })
+
+  test('return array of data when second argument is provided as empty object', async () => {
+    const { result } = renderHook(() => useArea(Area.PROVINCE, {}), { wrapper })
+
+    await waitFor(() => {
+      return expect(result.current.isSuccess).toBe(true)
+    })
+
+    expect(result.current.data).toEqual(mockData.province)
+  })
+
   test('return array of data when query is given as second argument', async () => {
     const query = { name: 'sumatera' }
     const { result } = renderHook(() => useArea(Area.PROVINCE, query), {

@@ -27,11 +27,8 @@ export type ComboboxAreaProps<A extends FeatureArea> = Omit<
 > & {
   area: A
   defaultSelected?: GetArea<A>
-  query: Query<A>
+  query: Query<A> | null
   onSelect?: (option: GetArea<A>) => void
-  /**
-   * Whether to reset the selected area when the component unmounts
-   */
   reset?: boolean
 }
 
@@ -40,25 +37,30 @@ export default function ComboboxArea<A extends FeatureArea>({
   defaultSelected,
   query,
   onSelect,
+  /**
+   * Whether to reset the selected area when the component unmounts
+   */
   reset,
   ...comboboxProps
 }: ComboboxAreaProps<A>) {
   const [selectedArea, setSelectedArea] = useState<GetArea<A> | undefined>(
     defaultSelected,
   )
-  const { data: areas = [], error } = useArea(area, {
-    ...query,
-    sortBy: 'name',
-  })
+  const { data: areas = [], error } = useArea(
+    area,
+    query ? { ...query, sortBy: 'name' } : null,
+  )
 
   const options = useMemo(() => areas.map((a) => areaToOption<A>(a)), [areas])
 
-  if (error) {
-    toast.error(`Failed to fetch ${area} data`, {
-      description: error?.message,
-      closeButton: true,
-    })
-  }
+  useEffect(() => {
+    if (error) {
+      toast.error(`Failed to fetch ${area} data`, {
+        description: error?.message,
+        closeButton: true,
+      })
+    }
+  }, [error, area])
 
   useEffect(() => {
     if (reset) {
