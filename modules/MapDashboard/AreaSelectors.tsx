@@ -77,6 +77,11 @@ export default function AreaSelectors() {
           reset={!selectedArea[area]}
           autoClose
           fullWidth
+          emptyMessage={
+            parent && !query[area]
+              ? `Select ${parent} first or type to search`
+              : `Nothing found`
+          }
           onSelect={(selected) => {
             changeSelectedArea(area, selected)
 
