@@ -27,6 +27,7 @@ export const metadata: Metadata = {
     default: config.appName,
   },
   description,
+  referrer: 'strict-origin-when-cross-origin',
   robots: {
     index: true,
     follow: true,
