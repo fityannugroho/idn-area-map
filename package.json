@@ -1,6 +1,6 @@
 {
   "name": "idn-area-map",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "Map of Indonesia's administrative area",
   "main": "app/page.tsx",
   "scripts": {
