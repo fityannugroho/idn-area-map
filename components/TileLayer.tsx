@@ -17,7 +17,6 @@ const baseStyle = {
 }
 
 function getMapStyle(style: unknown) {
-  if (process.env.NODE_ENV !== 'development') return style
   if (process.env.NEXT_PUBLIC_STADIA_TILE_PROXY !== '1') return style
   if (!style || typeof style !== 'object') return style
 
