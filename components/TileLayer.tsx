@@ -4,6 +4,24 @@ import { useTheme } from 'next-themes'
 import { useEffect, useRef } from 'react'
 import { useMap } from 'react-leaflet'
 
+function getAttributions(style: unknown) {
+  if (!style || typeof style !== 'object') return []
+
+  const sources = (style as { sources?: Record<string, unknown> }).sources
+  if (!sources || typeof sources !== 'object') return []
+
+  const attributions = new Set<string>()
+  for (const source of Object.values(sources)) {
+    if (!source || typeof source !== 'object') continue
+    const attribution = (source as { attribution?: unknown }).attribution
+    if (typeof attribution === 'string' && attribution.trim()) {
+      attributions.add(attribution)
+    }
+  }
+
+  return Array.from(attributions)
+}
+
 function getMapStyle(style: unknown) {
   if (process.env.NEXT_PUBLIC_STADIA_TILE_PROXY !== '1') return style
   if (!style || typeof style !== 'object') return style
@@ -45,6 +63,7 @@ export default function TileLayer() {
   const map = useMap()
   const { resolvedTheme } = useTheme()
   const glRef = useRef<L.MaplibreGL | null>(null)
+  const attributionRef = useRef<string[]>([])
 
   useEffect(() => {
     map.attributionControl.setPrefix(
@@ -70,6 +89,12 @@ export default function TileLayer() {
           glRef.current.removeFrom(map)
           glRef.current = null
         }
+        if (map.attributionControl) {
+          for (const attribution of attributionRef.current) {
+            map.attributionControl.removeAttribution(attribution)
+          }
+        }
+        attributionRef.current = getAttributions(style)
 
         glRef.current = L.maplibreGL({
           style: style as never,
