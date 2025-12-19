@@ -2,15 +2,17 @@ import type { NextRequest } from 'next/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } },
+  { params }: RouteContext<'/api/stadia-tiles/[...path]'>,
 ) {
+  const { path } = await params
+
   const apiKey = process.env.STADIA_API_KEY
   if (!apiKey) {
     return new Response('Missing STADIA_API_KEY', { status: 500 })
   }
 
   const upstreamUrl = new URL(
-    `https://tiles.stadiamaps.com/tiles/${params.path.join('/')}`,
+    `https://tiles.stadiamaps.com/tiles/${path.join('/')}`,
   )
 
   const incomingUrl = new URL(request.url)
