@@ -4,18 +4,6 @@ import { useTheme } from 'next-themes'
 import { useEffect, useRef } from 'react'
 import { useMap } from 'react-leaflet'
 
-const baseStyle = {
-  version: 8,
-  sources: {},
-  layers: [
-    {
-      id: 'background',
-      type: 'background',
-      paint: { 'background-color': '#0b0b0b' },
-    },
-  ],
-}
-
 function getMapStyle(style: unknown) {
   if (process.env.NEXT_PUBLIC_STADIA_TILE_PROXY !== '1') return style
   if (!style || typeof style !== 'object') return style
@@ -59,14 +47,6 @@ export default function TileLayer() {
   const glRef = useRef<L.MaplibreGL | null>(null)
 
   useEffect(() => {
-    if (glRef.current) return
-
-    glRef.current = L.maplibreGL({
-      // We set the real style after mount to support dev-only URL rewriting.
-      style: baseStyle as never,
-    })
-    glRef.current.addTo(map)
-
     map.attributionControl.setPrefix(
       '<a href="https://leafletjs.com">Leaflet</a>',
     )
@@ -74,31 +54,42 @@ export default function TileLayer() {
 
   useEffect(() => {
     if (!resolvedTheme) return
-    if (!glRef.current) return
 
     const controller = new AbortController()
     const styleUrl = `/map-styles/${resolvedTheme}.json`
 
     const applyStyle = async () => {
-      const maplibreMap = await waitForMaplibreMap(
-        glRef.current as L.MaplibreGL,
-        controller.signal,
-      )
-      if (!maplibreMap) return
+      try {
+        const response = await fetch(styleUrl, { signal: controller.signal })
+        if (!response.ok) return
 
-      const response = await fetch(styleUrl, { signal: controller.signal })
-      if (!response.ok) return
+        const style = getMapStyle(await response.json())
+        if (controller.signal.aborted) return
 
-      const style = getMapStyle(await response.json())
-      if (controller.signal.aborted) return
+        if (glRef.current) {
+          glRef.current.removeFrom(map)
+          glRef.current = null
+        }
 
-      maplibreMap.setStyle(style as never)
+        glRef.current = L.maplibreGL({
+          style: style as never,
+        })
+        glRef.current.addTo(map)
+
+        await waitForMaplibreMap(
+          glRef.current as L.MaplibreGL,
+          controller.signal,
+        )
+      } catch (error) {
+        if ((error as Error).name === 'AbortError') return
+        throw error
+      }
     }
 
     applyStyle()
 
     return () => controller.abort()
-  }, [resolvedTheme])
+  }, [resolvedTheme, map])
 
   return null
 }
