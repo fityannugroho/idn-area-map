@@ -10,9 +10,9 @@
     "includes": [
       "**",
       "!**/node_modules",
-      "!**/dist",
-      "!**/coverage",
-      "!**/.next"
+      "!!**/dist",
+      "!!**/coverage",
+      "!!**/.next"
     ]
   },
   "formatter": {
@@ -40,6 +40,9 @@
     },
     "rules": {
       "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "error"
+      },
       "suspicious": {
         "noShadowRestrictedNames": "off"
       }
@@ -58,16 +61,9 @@
       "bracketSpacing": true
     }
   },
-  "overrides": [
-    {
-      "includes": ["app/globals.css"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noUnknownAtRules": "off"
-          }
-        }
-      }
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
-  ]
+  }
 }
