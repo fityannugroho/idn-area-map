@@ -91,10 +91,6 @@
     "vitest": "^3.2.4"
   },
   "pnpm": {
-    "overrides": {
-      "sharp": "0.34.3",
-      "staticmaps>sharp": "0.34.3"
-    },
     "supportedArchitectures": {
       "os": [
         "linux",
