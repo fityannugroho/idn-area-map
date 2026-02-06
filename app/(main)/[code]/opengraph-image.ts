@@ -1,11 +1,10 @@
 import { promises as fs } from 'node:fs'
 import { NextResponse } from 'next/server'
-// @ts-expect-error
-import simplify from 'simplify-geojson'
 import type { FeatureArea } from '@/lib/config'
 import { featureConfig } from '@/lib/config'
 import type { Area } from '@/lib/const'
 import { getBoundaryData } from '@/lib/data'
+import { simplifyBoundary } from '@/lib/geojson'
 import { generateMapboxStaticMap, isMapboxEnabled } from '@/lib/mapbox'
 import { determineAreaByCode } from '@/lib/utils'
 
@@ -96,7 +95,7 @@ export default async function Image({
 
   // Simplify the boundary to reduce coordinate count
   const boundary: GeoJSON.Feature<GeoJSON.MultiPolygon | GeoJSON.Polygon> =
-    simplify(resBoundary.data, config.simplification.tolerance)
+    simplifyBoundary(resBoundary.data, config.simplification.tolerance)
 
   // Generate Mapbox static map
   try {

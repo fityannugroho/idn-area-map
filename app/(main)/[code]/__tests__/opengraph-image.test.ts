@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { featureConfig } from '@/lib/config'
 import { Area } from '@/lib/const'
 import {
-  buildPathOverlayUrl,
   encodePolyline,
-  isMapboxEnabled,
   limitPolygons,
-  toSimplestyleGeoJSON,
   truncateCoordinates,
+} from '@/lib/geojson'
+import {
+  buildPathOverlayUrl,
+  isMapboxEnabled,
+  toSimplestyleGeoJSON,
 } from '@/lib/mapbox'
 import { determineAreaByCode } from '@/lib/utils'
 
