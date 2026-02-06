@@ -85,75 +85,36 @@ function truncateGeometryCoordinates(
 }
 
 /**
- * Count the number of coordinate positions in a polygon's rings
+ * Calculate a proxy for polygon area using its bounding box.
+ * Used for sorting polygons by perceived importance.
  */
-function countPositionInPolygon(coords: GeoJSON.Position[][]): number {
-  return coords.reduce((acc, ring) => acc + ring.length, 0)
-}
+function calculatePolygonAreaProxy(polygon: GeoJSON.Position[][]): number {
+  let minLon = Number.POSITIVE_INFINITY
+  let minLat = Number.POSITIVE_INFINITY
+  let maxLon = Number.NEGATIVE_INFINITY
+  let maxLat = Number.NEGATIVE_INFINITY
 
-function normalizeHexColor(color: string): string {
-  return color.startsWith('#') ? color.slice(1) : color
-}
-
-function ensureClosedRing(ring: GeoJSON.Position[]): GeoJSON.Position[] {
-  if (ring.length === 0) {
-    throw new Error('Polygon ring is empty')
+  for (const ring of polygon) {
+    for (const coord of ring) {
+      minLon = Math.min(minLon, coord[0])
+      maxLon = Math.max(maxLon, coord[0])
+      minLat = Math.min(minLat, coord[1])
+      maxLat = Math.max(maxLat, coord[1])
+    }
   }
 
-  const first = ring[0]
-  const last = ring[ring.length - 1]
-  if (first[0] === last[0] && first[1] === last[1]) {
-    return ring
-  }
-
-  return [...ring, first]
-}
-
-function encodeSignedValue(value: number): string {
-  let num = value < 0 ? ~(value << 1) : value << 1
-  let encoded = ''
-
-  while (num >= 0x20) {
-    encoded += String.fromCharCode((0x20 | (num & 0x1f)) + 63)
-    num >>= 5
-  }
-
-  encoded += String.fromCharCode(num + 63)
-  return encoded
-}
-
-export function encodePolyline(ring: GeoJSON.Position[]): string {
-  const closedRing = ensureClosedRing(ring)
-  let lastLat = 0
-  let lastLng = 0
-  let result = ''
-
-  for (const coord of closedRing) {
-    const lat = Math.round(coord[1] * 1e5)
-    const lng = Math.round(coord[0] * 1e5)
-    const deltaLat = lat - lastLat
-    const deltaLng = lng - lastLng
-
-    result += encodeSignedValue(deltaLat)
-    result += encodeSignedValue(deltaLng)
-
-    lastLat = lat
-    lastLng = lng
-  }
-
-  return result
+  return (maxLon - minLon) * (maxLat - minLat)
 }
 
 /**
- * Limit MultiPolygon to the largest N polygons by coordinate count.
- * Mirrors the current staticmaps maxPolygon behavior.
+ * Limit MultiPolygon to the largest N polygons by area.
  */
 export function limitPolygons(
   multiPolygon: GeoJSON.Feature<GeoJSON.MultiPolygon>,
   max = MAX_POLYGONS,
 ): GeoJSON.Feature<GeoJSON.MultiPolygon> {
   const sortedPolygons = [...multiPolygon.geometry.coordinates].sort(
-    (a, b) => countPositionInPolygon(b) - countPositionInPolygon(a),
+    (a, b) => calculatePolygonAreaProxy(b) - calculatePolygonAreaProxy(a),
   )
 
   return {
@@ -269,8 +230,61 @@ export function toSimplestyleGeoJSON(
   }
 }
 
+function normalizeHexColor(color: string): string {
+  return color.startsWith('#') ? color.slice(1) : color
+}
+
+function ensureClosedRing(ring: GeoJSON.Position[]): GeoJSON.Position[] {
+  if (ring.length === 0) {
+    throw new Error('Polygon ring is empty')
+  }
+
+  const first = ring[0]
+  const last = ring[ring.length - 1]
+  if (first[0] === last[0] && first[1] === last[1]) {
+    return ring
+  }
+
+  return [...ring, first]
+}
+
+function encodeSignedValue(value: number): string {
+  let num = value < 0 ? ~(value << 1) : value << 1
+  let encoded = ''
+
+  while (num >= 0x20) {
+    encoded += String.fromCharCode((0x20 | (num & 0x1f)) + 63)
+    num >>= 5
+  }
+
+  encoded += String.fromCharCode(num + 63)
+  return encoded
+}
+
+export function encodePolyline(ring: GeoJSON.Position[]): string {
+  const closedRing = ensureClosedRing(ring)
+  let lastLat = 0
+  let lastLng = 0
+  let result = ''
+
+  for (const coord of closedRing) {
+    const lat = Math.round(coord[1] * 1e5)
+    const lng = Math.round(coord[0] * 1e5)
+    const deltaLat = lat - lastLat
+    const deltaLng = lng - lastLng
+
+    result += encodeSignedValue(deltaLat)
+    result += encodeSignedValue(deltaLng)
+
+    lastLat = lat
+    lastLng = lng
+  }
+
+  return result
+}
+
 export function buildPathOverlayUrl(
-  ring: GeoJSON.Position[],
+  rings: GeoJSON.Position[][],
   featureConfig: FeatureConfig[keyof FeatureConfig],
   size: { width: number; height: number },
 ): string {
@@ -284,14 +298,21 @@ export function buildPathOverlayUrl(
   const fillColor = normalizeHexColor(fill)
   const strokeOpacity = 1
 
-  const truncatedRing = ring.map(
-    (coord) => truncateCoordinates(coord, 5) as GeoJSON.Position,
-  )
-  const encodedPolyline = encodeURIComponent(encodePolyline(truncatedRing))
+  // Mapbox supports multiple overlays separated by comma
+  const overlays = rings
+    .map((ring) => {
+      // For polyline encoding, 4 decimal places (~11m) is plenty for OG images
+      // and significantly reduces the encoded string length compared to 5
+      const truncatedRing = ring.map(
+        (coord) => truncateCoordinates(coord, 4) as GeoJSON.Position,
+      )
+      const encodedPolyline = encodeURIComponent(encodePolyline(truncatedRing))
+      return `path-2+${strokeColor}-${strokeOpacity}+${fillColor}-${fillOpacity}(${encodedPolyline})`
+    })
+    .join(',')
 
-  const overlay = `path-2+${strokeColor}-${strokeOpacity}+${fillColor}-${fillOpacity}`
   const url = new URL(
-    `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/${overlay}(${encodedPolyline})/auto/${size.width}x${size.height}`,
+    `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/${overlays}/auto/${size.width}x${size.height}`,
   )
   url.searchParams.set('access_token', token)
   url.searchParams.set('padding', '20')
@@ -381,18 +402,22 @@ function getBoundingBox(
   return [minLon, minLat, maxLon, maxLat]
 }
 
-function getLargestPolygonRing(
+/**
+ * Get the outer rings of the largest N polygons
+ */
+function getMajorRings(
   feature: GeoJSON.Feature<GeoJSON.MultiPolygon | GeoJSON.Polygon>,
-): GeoJSON.Position[] {
+  maxCount = 50,
+): GeoJSON.Position[][] {
   if (feature.geometry.type === 'Polygon') {
-    return feature.geometry.coordinates[0]
+    return [feature.geometry.coordinates[0]]
   }
 
   const sortedPolygons = [...feature.geometry.coordinates].sort(
-    (a, b) => countPositionInPolygon(b) - countPositionInPolygon(a),
+    (a, b) => calculatePolygonAreaProxy(b) - calculatePolygonAreaProxy(a),
   )
 
-  return sortedPolygons[0][0]
+  return sortedPolygons.slice(0, maxCount).map((p) => p[0])
 }
 
 function simplifyBoundary(
@@ -448,67 +473,73 @@ export async function generateMapboxStaticMap(
 ): Promise<Uint8Array> {
   // Filter out degenerate polygons first (those with < 4 coordinates)
   const filtered = filterDegeneratePolygons(boundary)
+  const isMulti = filtered.geometry.type === 'MultiPolygon'
+  const totalIslands = isMulti ? filtered.geometry.coordinates.length : 1
 
-  // Try with full polygon first
-  let limited = filtered
-  if (filtered.geometry.type === 'MultiPolygon') {
-    limited = limitPolygons(filtered as GeoJSON.Feature<GeoJSON.MultiPolygon>)
-  }
-
-  const styledGeoJson = toSimplestyleGeoJSON(limited, featureConfig)
-
-  let url = buildMapboxStaticUrl(styledGeoJson, size)
-
-  // If URL is too long, progressively reduce polygon count
-  if (
-    url.length > MAX_URL_LENGTH &&
-    filtered.geometry.type === 'MultiPolygon'
-  ) {
-    const attempts = [20, 10, 5, 3, 1]
-    for (const maxPolygons of attempts) {
-      const reduced = limitPolygons(
-        filtered as GeoJSON.Feature<GeoJSON.MultiPolygon>,
-        maxPolygons,
-      )
-      const styledReduced = toSimplestyleGeoJSON(reduced, featureConfig)
-      url = buildMapboxStaticUrl(styledReduced, size)
-
-      if (url.length <= MAX_URL_LENGTH) {
-        break
-      }
-    }
-  }
-
-  // Final fallback: use bbox without GeoJSON overlay
-  if (url.length > MAX_URL_LENGTH) {
-    const ring = getLargestPolygonRing(filtered)
-    const pathUrl = buildPathOverlayUrl(ring, featureConfig, size)
-
-    if (pathUrl.length <= MAX_URL_LENGTH) {
-      return fetchMapboxImage(pathUrl)
-    }
-
-    const attempts = buildSimplificationAttempts(
-      featureConfig.simplification.tolerance,
+  // 1. HIGH QUALITY: GeoJSON (Max 50 polygons)
+  let limitedGeo = filtered
+  if (isMulti) {
+    limitedGeo = limitPolygons(
+      filtered as GeoJSON.Feature<GeoJSON.MultiPolygon>,
+      50,
     )
-    for (const tolerance of attempts) {
-      const simplified = simplifyBoundary(filtered, tolerance)
-      const cleaned = filterDegeneratePolygons(simplified)
-      const simplifiedRing = getLargestPolygonRing(cleaned)
-      const simplifiedUrl = buildPathOverlayUrl(
-        simplifiedRing,
-        featureConfig,
-        size,
-      )
+  }
+  const styledGeoJson = toSimplestyleGeoJSON(limitedGeo, featureConfig)
+  const initialGeoUrl = buildMapboxStaticUrl(styledGeoJson, size)
 
-      if (simplifiedUrl.length <= MAX_URL_LENGTH) {
-        return fetchMapboxImage(simplifiedUrl)
-      }
-    }
-
-    const bbox = getBoundingBox(filtered.geometry)
-    url = buildBboxUrl(bbox, size)
+  // Use GeoJSON if it's single-polygon or fits all islands perfectly
+  if (
+    initialGeoUrl.length <= MAX_URL_LENGTH &&
+    (!isMulti || totalIslands <= 50)
+  ) {
+    return fetchMapboxImage(initialGeoUrl)
   }
 
-  return fetchMapboxImage(url)
+  // 2. HIGH COVERAGE: Encoded Polyline (Up to 100 islands)
+  // This is much more efficient than GeoJSON for archipelagos
+  if (isMulti) {
+    const islandCounts = [100, 75, 50, 30]
+    for (const count of islandCounts) {
+      const rings = getMajorRings(filtered, count)
+      const pathUrl = buildPathOverlayUrl(rings, featureConfig, size)
+      if (pathUrl.length <= MAX_URL_LENGTH) {
+        return fetchMapboxImage(pathUrl)
+      }
+    }
+  }
+
+  // 3. ADAPTIVE DETAIL: Progressive Simplification while keeping major islands
+  // Instead of dropping islands, we make them "coarser" to fit the URL
+  const simplificationAttempts = buildSimplificationAttempts(
+    featureConfig.simplification.tolerance,
+  )
+  for (const tolerance of simplificationAttempts) {
+    const simplified = simplifyBoundary(filtered, tolerance)
+    const cleaned = filterDegeneratePolygons(simplified)
+    // Try to keep at least 30 islands even if we have to simplify them
+    const rings = getMajorRings(cleaned, 30)
+    const simplifiedUrl = buildPathOverlayUrl(rings, featureConfig, size)
+
+    if (simplifiedUrl.length <= MAX_URL_LENGTH) {
+      return fetchMapboxImage(simplifiedUrl)
+    }
+  }
+
+  // 4. LOW COVERAGE: Reduce island count as a last resort (15, 10, 5, 3, 1)
+  if (isMulti) {
+    const emergencyCounts = [15, 10, 5, 3, 1]
+    for (const count of emergencyCounts) {
+      const rings = getMajorRings(filtered, count)
+      const pathUrl = buildPathOverlayUrl(rings, featureConfig, size)
+      if (pathUrl.length <= MAX_URL_LENGTH) {
+        return fetchMapboxImage(pathUrl)
+      }
+    }
+  }
+
+  // 5. ABSOLUTE FALLBACK: Bounding Box
+  const bbox = getBoundingBox(filtered.geometry)
+  const finalFallbackUrl = buildBboxUrl(bbox, size)
+
+  return fetchMapboxImage(finalFallbackUrl)
 }

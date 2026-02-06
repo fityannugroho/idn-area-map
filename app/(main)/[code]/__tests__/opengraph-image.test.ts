@@ -62,14 +62,14 @@ describe('mapbox utilities', () => {
         geometry: {
           type: 'MultiPolygon',
           coordinates: [
-            // Small polygon (2 coordinates)
+            // Tiny area (0.1 x 0.1 = 0.01)
             [
               [
                 [0, 0],
-                [1, 1],
+                [0.1, 0.1],
               ],
             ],
-            // Large polygon (4 coordinates)
+            // Large area (1 x 1 = 1)
             [
               [
                 [0, 0],
@@ -78,12 +78,12 @@ describe('mapbox utilities', () => {
                 [0, 1],
               ],
             ],
-            // Medium polygon (3 coordinates)
+            // Medium area (0.5 x 0.5 = 0.25)
             [
               [
                 [0, 0],
-                [2, 0],
-                [1, 1],
+                [0.5, 0],
+                [0.5, 0.5],
               ],
             ],
           ],
@@ -92,8 +92,7 @@ describe('mapbox utilities', () => {
 
       const limited = limitPolygons(multiPolygon, 2)
       expect(limited.geometry.coordinates).toHaveLength(2)
-      // Should keep the two largest (4 and 3 coordinates)
-      expect(limited.geometry.coordinates[0]).toHaveLength(1)
+      // Should keep the two largest by area (1.0 and 0.25)
       expect(limited.geometry.coordinates[0][0]).toHaveLength(4)
       expect(limited.geometry.coordinates[1][0]).toHaveLength(3)
     })
@@ -127,7 +126,7 @@ describe('mapbox utilities', () => {
 
       const config = featureConfig[Area.PROVINCE]
       if (isMapboxEnabled()) {
-        const url = buildPathOverlayUrl(ring, config, {
+        const url = buildPathOverlayUrl([ring], config, {
           width: 800,
           height: 400,
         })
@@ -136,7 +135,7 @@ describe('mapbox utilities', () => {
         expect(url).toContain('access_token=')
       } else {
         expect(() =>
-          buildPathOverlayUrl(ring, config, { width: 800, height: 400 }),
+          buildPathOverlayUrl([ring], config, { width: 800, height: 400 }),
         ).toThrow('Mapbox access token is not configured')
       }
     })
