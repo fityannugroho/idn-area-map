@@ -3,8 +3,13 @@ import { featureConfig } from '@/lib/config'
 import { Area } from '@/lib/const'
 import {
   encodePolyline,
+  filterDegeneratePolygons,
+  getBoundingBox,
+  getMajorRings,
   limitPolygons,
+  sortPolygonsByArea,
   truncateCoordinates,
+  truncateGeometryCoordinates,
 } from '@/lib/geojson'
 import {
   buildPathOverlayUrl,
@@ -49,10 +54,151 @@ describe('mapbox utilities', () => {
       expect(truncated).toEqual([123.4568, 45.6789])
     })
 
-    it('should default to 3 decimal places', () => {
+    it('should default to 4 decimal places', () => {
       const coords = [123.456789, 45.678912]
       const truncated = truncateCoordinates(coords)
       expect(truncated).toEqual([123.4568, 45.6789])
+    })
+  })
+
+  describe('truncateGeometryCoordinates', () => {
+    it('should truncate all coordinates in a polygon', () => {
+      const polygon: GeoJSON.Polygon = {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [123.456789, 45.678912],
+            [123.456789, 45.678912],
+          ],
+        ],
+      }
+      const truncated = truncateGeometryCoordinates(
+        polygon,
+        2,
+      ) as GeoJSON.Polygon
+      expect(truncated.coordinates[0][0]).toEqual([123.46, 45.68])
+    })
+  })
+
+  describe('sortPolygonsByArea', () => {
+    it('should sort polygons by area proxy descending', () => {
+      const polygons: GeoJSON.Position[][][] = [
+        [
+          [
+            [0, 0],
+            [1, 1],
+          ],
+        ], // Proxy area 1.0
+        [
+          [
+            [0, 0],
+            [2, 2],
+          ],
+        ], // Proxy area 4.0
+        [
+          [
+            [0, 0],
+            [0.5, 0.5],
+          ],
+        ], // Proxy area 0.25
+      ]
+      const sorted = sortPolygonsByArea(polygons)
+      expect(sorted[0][0][1]).toEqual([2, 2])
+      expect(sorted[1][0][1]).toEqual([1, 1])
+      expect(sorted[2][0][1]).toEqual([0.5, 0.5])
+    })
+  })
+
+  describe('filterDegeneratePolygons', () => {
+    it('should filter out degenerate rings in a polygon', () => {
+      const feature: GeoJSON.Feature<GeoJSON.Polygon> = {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [0, 0],
+              [1, 0],
+              [1, 1],
+              [0, 0],
+            ], // Valid (4 points)
+            [
+              [0, 0],
+              [1, 1],
+            ], // Degenerate (2 points)
+          ],
+        },
+      }
+      const filtered = filterDegeneratePolygons(
+        feature,
+      ) as GeoJSON.Feature<GeoJSON.Polygon>
+      expect(filtered.geometry.coordinates).toHaveLength(1)
+    })
+
+    it('should throw if no valid rings remain', () => {
+      const feature: GeoJSON.Feature<GeoJSON.Polygon> = {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [0, 0],
+              [1, 1],
+            ],
+          ],
+        },
+      }
+      expect(() => filterDegeneratePolygons(feature)).toThrow(
+        'No valid polygon rings',
+      )
+    })
+  })
+
+  describe('getBoundingBox', () => {
+    it('should calculate bbox for a polygon', () => {
+      const polygon: GeoJSON.Polygon = {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [100, 0],
+            [105, 10],
+          ],
+        ],
+      }
+      const bbox = getBoundingBox(polygon)
+      expect(bbox).toEqual([100, 0, 105, 10])
+    })
+  })
+
+  describe('getMajorRings', () => {
+    it('should return only the outer rings', () => {
+      const feature: GeoJSON.Feature<GeoJSON.MultiPolygon> = {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'MultiPolygon',
+          coordinates: [
+            [
+              [
+                [0, 0],
+                [1, 1],
+              ],
+              [
+                [0.1, 0.1],
+                [0.2, 0.2],
+              ],
+            ], // Polygon with hole
+          ],
+        },
+      }
+      const rings = getMajorRings(feature)
+      expect(rings).toHaveLength(1)
+      expect(rings[0]).toEqual([
+        [0, 0],
+        [1, 1],
+      ])
     })
   })
 
@@ -190,10 +336,10 @@ describe('mapbox utilities', () => {
       const config = featureConfig[Area.PROVINCE]
       const styled = toSimplestyleGeoJSON(boundary, config)
 
-      // Check that coordinates are truncated to 3 decimal places
+      // Check that coordinates are truncated to 4 decimal places
       const coords = (styled.geometry as GeoJSON.Polygon).coordinates[0]
-      expect(coords[0][0]).toBe(106.123)
-      expect(coords[0][1]).toBe(-6.235)
+      expect(coords[0][0]).toBe(106.1235)
+      expect(coords[0][1]).toBe(-6.2346)
     })
   })
 

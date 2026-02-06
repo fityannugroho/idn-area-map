@@ -7,6 +7,7 @@ import {
   getMajorRings,
   limitPolygons,
   simplifyBoundary,
+  sortPolygonsByArea,
   truncateCoordinates,
   truncateGeometryCoordinates,
 } from './geojson'
@@ -70,8 +71,8 @@ export function toSimplestyleGeoJSON(
       fill,
       'fill-opacity': fillOpacity,
     },
-    // Truncate coordinates to 3 decimals (~111m precision) to save URL space
-    geometry: truncateGeometryCoordinates(boundary.geometry, 3) as
+    // Truncate coordinates to 4 decimals (~11m precision) to save URL space
+    geometry: truncateGeometryCoordinates(boundary.geometry, 4) as
       | GeoJSON.MultiPolygon
       | GeoJSON.Polygon,
   }
@@ -95,6 +96,7 @@ export function buildPathOverlayUrl(
   const strokeColor = normalizeHexColor(featureConfig.color)
   const fillColor = normalizeHexColor(fill)
   const strokeOpacity = 1
+  const opacity = Number(fillOpacity.toFixed(2))
 
   // Mapbox supports multiple overlays separated by comma
   const overlays = rings
@@ -105,7 +107,7 @@ export function buildPathOverlayUrl(
         (coord) => truncateCoordinates(coord, 4) as GeoJSON.Position,
       )
       const encodedPolyline = encodeURIComponent(encodePolyline(truncatedRing))
-      return `path-2+${strokeColor}-${strokeOpacity}+${fillColor}-${fillOpacity}(${encodedPolyline})`
+      return `path-2+${strokeColor}-${strokeOpacity}+${fillColor}-${opacity}(${encodedPolyline})`
     })
     .join(',')
 
@@ -210,12 +212,20 @@ export async function generateMapboxStaticMap(
   const isMulti = filtered.geometry.type === 'MultiPolygon'
   const totalIslands = isMulti ? filtered.geometry.coordinates.length : 1
 
+  // Pre-sort polygons by area once to avoid redundant sorting in subsequent stages
+  const sortedCoords = isMulti
+    ? sortPolygonsByArea(
+        filtered.geometry.coordinates as GeoJSON.Position[][][],
+      )
+    : undefined
+
   // 1. HIGH QUALITY: GeoJSON (Max 50 polygons)
   let limitedGeo = filtered
   if (isMulti) {
     limitedGeo = limitPolygons(
       filtered as GeoJSON.Feature<GeoJSON.MultiPolygon>,
       50,
+      sortedCoords,
     )
   }
   const styledGeoJson = toSimplestyleGeoJSON(limitedGeo, featureConfig)
@@ -234,7 +244,7 @@ export async function generateMapboxStaticMap(
   if (isMulti) {
     const islandCounts = [100, 75, 50, 30]
     for (const count of islandCounts) {
-      const rings = getMajorRings(filtered, count)
+      const rings = getMajorRings(filtered, count, sortedCoords)
       const pathUrl = buildPathOverlayUrl(rings, featureConfig, size)
       if (pathUrl.length <= MAX_URL_LENGTH) {
         return fetchMapboxImage(pathUrl)
@@ -247,10 +257,15 @@ export async function generateMapboxStaticMap(
   const simplificationAttempts = buildSimplificationAttempts(
     featureConfig.simplification.tolerance,
   )
+  let lastSimplified: typeof filtered | undefined
+
   for (const tolerance of simplificationAttempts) {
     const simplified = simplifyBoundary(filtered, tolerance)
     const cleaned = filterDegeneratePolygons(simplified)
+    lastSimplified = cleaned
+
     // Try to keep at least 30 islands even if we have to simplify them
+    // Note: We don't use sortedCoords here because the geometry has changed
     const rings = getMajorRings(cleaned, 30)
     const simplifiedUrl = buildPathOverlayUrl(rings, featureConfig, size)
 
@@ -262,8 +277,13 @@ export async function generateMapboxStaticMap(
   // 4. LOW COVERAGE: Reduce island count as a last resort (15, 10, 5, 3, 1)
   if (isMulti) {
     const emergencyCounts = [15, 10, 5, 3, 1]
+
     for (const count of emergencyCounts) {
-      const rings = getMajorRings(filtered, count)
+      // Use simplified geometry if Stage 3 failed, to maximize chance of fitting
+      const rings = lastSimplified
+        ? getMajorRings(lastSimplified, count)
+        : getMajorRings(filtered, count, sortedCoords)
+
       const pathUrl = buildPathOverlayUrl(rings, featureConfig, size)
       if (pathUrl.length <= MAX_URL_LENGTH) {
         return fetchMapboxImage(pathUrl)

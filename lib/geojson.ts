@@ -89,15 +89,27 @@ export function calculatePolygonAreaProxy(
 }
 
 /**
+ * Sort polygons by area proxy descending.
+ */
+export function sortPolygonsByArea(
+  polygons: GeoJSON.Position[][][],
+): GeoJSON.Position[][][] {
+  return [...polygons].sort(
+    (a, b) => calculatePolygonAreaProxy(b) - calculatePolygonAreaProxy(a),
+  )
+}
+
+/**
  * Limit MultiPolygon to the largest N polygons by area.
  */
 export function limitPolygons(
   multiPolygon: GeoJSON.Feature<GeoJSON.MultiPolygon>,
   max = 30,
+  preSortedCoordinates?: GeoJSON.Position[][][],
 ): GeoJSON.Feature<GeoJSON.MultiPolygon> {
-  const sortedPolygons = [...multiPolygon.geometry.coordinates].sort(
-    (a, b) => calculatePolygonAreaProxy(b) - calculatePolygonAreaProxy(a),
-  )
+  const sortedPolygons =
+    preSortedCoordinates ||
+    sortPolygonsByArea(multiPolygon.geometry.coordinates)
 
   return {
     ...multiPolygon,
@@ -250,14 +262,14 @@ export function getBoundingBox(
 export function getMajorRings(
   feature: GeoJSON.Feature<GeoJSON.MultiPolygon | GeoJSON.Polygon>,
   maxCount = 50,
+  preSortedCoordinates?: GeoJSON.Position[][][],
 ): GeoJSON.Position[][] {
   if (feature.geometry.type === 'Polygon') {
     return [feature.geometry.coordinates[0]]
   }
 
-  const sortedPolygons = [...feature.geometry.coordinates].sort(
-    (a, b) => calculatePolygonAreaProxy(b) - calculatePolygonAreaProxy(a),
-  )
+  const sortedPolygons =
+    preSortedCoordinates || sortPolygonsByArea(feature.geometry.coordinates)
 
   return sortedPolygons.slice(0, maxCount).map((p) => p[0])
 }
