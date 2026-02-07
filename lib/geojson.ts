@@ -278,7 +278,12 @@ export function simplifyBoundary(
   boundary: GeoJSON.Feature<GeoJSON.MultiPolygon | GeoJSON.Polygon>,
   tolerance: number,
 ): GeoJSON.Feature<GeoJSON.MultiPolygon | GeoJSON.Polygon> {
-  return simplify(boundary, tolerance) as GeoJSON.Feature<
-    GeoJSON.MultiPolygon | GeoJSON.Polygon
-  >
+  try {
+    return simplify(boundary, tolerance) as GeoJSON.Feature<
+      GeoJSON.MultiPolygon | GeoJSON.Polygon
+    >
+  } catch (_error) {
+    // If simplification fails, return the original boundary
+    return boundary
+  }
 }

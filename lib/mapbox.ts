@@ -98,21 +98,43 @@ export function buildPathOverlayUrl(
   const strokeOpacity = 1
   const opacity = Number(fillOpacity.toFixed(2))
 
+  // Calculate base URL length (without overlays)
+  const baseUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static//auto/${size.width}x${size.height}?access_token=${token}&padding=20&attribution=false&logo=false`
+  const baseUrlLength = baseUrl.length
+
   // Mapbox supports multiple overlays separated by comma
-  const overlays = rings
-    .map((ring) => {
-      // For polyline encoding, 4 decimal places (~11m) is plenty for OG images
-      // and significantly reduces the encoded string length compared to 5
-      const truncatedRing = ring.map(
-        (coord) => truncateCoordinates(coord, 4) as GeoJSON.Position,
-      )
-      const encodedPolyline = encodeURIComponent(encodePolyline(truncatedRing))
-      return `path-2+${strokeColor}-${strokeOpacity}+${fillColor}-${opacity}(${encodedPolyline})`
-    })
-    .join(',')
+  // Build incrementally and check URL length to avoid exceeding MAX_URL_LENGTH
+  const overlays: string[] = []
+  let currentUrlLength = baseUrlLength
+
+  for (const ring of rings) {
+    // For polyline encoding, 4 decimal places (~11m) is plenty for OG images
+    // and significantly reduces the encoded string length compared to 5
+    const truncatedRing = ring.map(
+      (coord) => truncateCoordinates(coord, 4) as GeoJSON.Position,
+    )
+    const encodedPolyline = encodeURIComponent(encodePolyline(truncatedRing))
+    const overlay = `path-2+${strokeColor}-${strokeOpacity}+${fillColor}-${opacity}(${encodedPolyline})`
+
+    // Check if adding this overlay would exceed the limit (account for comma separator)
+    const separatorLength = overlays.length > 0 ? 1 : 0
+    if (currentUrlLength + separatorLength + overlay.length > MAX_URL_LENGTH) {
+      // Stop adding more overlays - we've hit the limit
+      break
+    }
+
+    overlays.push(overlay)
+    currentUrlLength += separatorLength + overlay.length
+  }
+
+  if (overlays.length === 0) {
+    throw new Error(
+      'No rings fit within the Mapbox URL length limit at this simplification level',
+    )
+  }
 
   const url = new URL(
-    `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/${overlays}/auto/${size.width}x${size.height}`,
+    `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/${overlays.join(',')}/auto/${size.width}x${size.height}`,
   )
   url.searchParams.set('access_token', token)
   url.searchParams.set('padding', '20')
@@ -220,23 +242,27 @@ export async function generateMapboxStaticMap(
     : undefined
 
   // 1. HIGH QUALITY: GeoJSON (Max 50 polygons)
-  let limitedGeo = filtered
-  if (isMulti) {
-    limitedGeo = limitPolygons(
-      filtered as GeoJSON.Feature<GeoJSON.MultiPolygon>,
-      50,
-      sortedCoords,
-    )
-  }
-  const styledGeoJson = toSimplestyleGeoJSON(limitedGeo, featureConfig)
-  const initialGeoUrl = buildMapboxStaticUrl(styledGeoJson, size)
+  try {
+    let limitedGeo = filtered
+    if (isMulti) {
+      limitedGeo = limitPolygons(
+        filtered as GeoJSON.Feature<GeoJSON.MultiPolygon>,
+        50,
+        sortedCoords,
+      )
+    }
+    const styledGeoJson = toSimplestyleGeoJSON(limitedGeo, featureConfig)
+    const initialGeoUrl = buildMapboxStaticUrl(styledGeoJson, size)
 
-  // Use GeoJSON if it's single-polygon or fits all islands perfectly
-  if (
-    initialGeoUrl.length <= MAX_URL_LENGTH &&
-    (!isMulti || totalIslands <= 50)
-  ) {
-    return fetchMapboxImage(initialGeoUrl)
+    // Use GeoJSON if it's single-polygon or fits all islands perfectly
+    if (
+      initialGeoUrl.length <= MAX_URL_LENGTH &&
+      (!isMulti || totalIslands <= 50)
+    ) {
+      return await fetchMapboxImage(initialGeoUrl)
+    }
+  } catch (_error) {
+    // Fall back to next stage
   }
 
   // 2. HIGH COVERAGE: Encoded Polyline (Up to 100 islands)
@@ -244,10 +270,14 @@ export async function generateMapboxStaticMap(
   if (isMulti) {
     const islandCounts = [100, 75, 50, 30]
     for (const count of islandCounts) {
-      const rings = getMajorRings(filtered, count, sortedCoords)
-      const pathUrl = buildPathOverlayUrl(rings, featureConfig, size)
-      if (pathUrl.length <= MAX_URL_LENGTH) {
-        return fetchMapboxImage(pathUrl)
+      try {
+        const rings = getMajorRings(filtered, count, sortedCoords)
+        const pathUrl = buildPathOverlayUrl(rings, featureConfig, size)
+        if (pathUrl.length <= MAX_URL_LENGTH) {
+          return await fetchMapboxImage(pathUrl)
+        }
+      } catch (_error) {
+        // Fall back to next count or stage
       }
     }
   }
@@ -260,17 +290,21 @@ export async function generateMapboxStaticMap(
   let lastSimplified: typeof filtered | undefined
 
   for (const tolerance of simplificationAttempts) {
-    const simplified = simplifyBoundary(filtered, tolerance)
-    const cleaned = filterDegeneratePolygons(simplified)
-    lastSimplified = cleaned
+    try {
+      const simplified = simplifyBoundary(filtered, tolerance)
+      const cleaned = filterDegeneratePolygons(simplified)
+      lastSimplified = cleaned
 
-    // Try to keep at least 30 islands even if we have to simplify them
-    // Note: We don't use sortedCoords here because the geometry has changed
-    const rings = getMajorRings(cleaned, 30)
-    const simplifiedUrl = buildPathOverlayUrl(rings, featureConfig, size)
+      // Try to keep at least 30 islands even if we have to simplify them
+      // Note: We don't use sortedCoords here because the geometry has changed
+      const rings = getMajorRings(cleaned, 30)
+      const simplifiedUrl = buildPathOverlayUrl(rings, featureConfig, size)
 
-    if (simplifiedUrl.length <= MAX_URL_LENGTH) {
-      return fetchMapboxImage(simplifiedUrl)
+      if (simplifiedUrl.length <= MAX_URL_LENGTH) {
+        return await fetchMapboxImage(simplifiedUrl)
+      }
+    } catch (_error) {
+      // Fall back to next tolerance or stage
     }
   }
 
@@ -279,21 +313,30 @@ export async function generateMapboxStaticMap(
     const emergencyCounts = [15, 10, 5, 3, 1]
 
     for (const count of emergencyCounts) {
-      // Use simplified geometry if Stage 3 failed, to maximize chance of fitting
-      const rings = lastSimplified
-        ? getMajorRings(lastSimplified, count)
-        : getMajorRings(filtered, count, sortedCoords)
+      try {
+        // Use simplified geometry if Stage 3 failed, to maximize chance of fitting
+        const rings = lastSimplified
+          ? getMajorRings(lastSimplified, count)
+          : getMajorRings(filtered, count, sortedCoords)
 
-      const pathUrl = buildPathOverlayUrl(rings, featureConfig, size)
-      if (pathUrl.length <= MAX_URL_LENGTH) {
-        return fetchMapboxImage(pathUrl)
+        const pathUrl = buildPathOverlayUrl(rings, featureConfig, size)
+        if (pathUrl.length <= MAX_URL_LENGTH) {
+          return await fetchMapboxImage(pathUrl)
+        }
+      } catch (_error) {
+        // Fall back to next count or stage
       }
     }
   }
 
   // 5. ABSOLUTE FALLBACK: Bounding Box
-  const bbox = getBoundingBox(filtered.geometry)
-  const finalFallbackUrl = buildBboxUrl(bbox, size)
+  try {
+    const bbox = getBoundingBox(filtered.geometry)
+    const finalFallbackUrl = buildBboxUrl(bbox, size)
 
-  return fetchMapboxImage(finalFallbackUrl)
+    return await fetchMapboxImage(finalFallbackUrl)
+  } catch (error) {
+    console.error('Mapbox Absolute Fallback (BBox) failed:', error)
+    throw error // If even the bbox fails, we have to throw
+  }
 }

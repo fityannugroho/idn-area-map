@@ -1,10 +1,8 @@
 import { promises as fs } from 'node:fs'
 import { NextResponse } from 'next/server'
-import type { FeatureArea } from '@/lib/config'
-import { featureConfig } from '@/lib/config'
+import { type FeatureArea, featureConfig } from '@/lib/config'
 import type { Area } from '@/lib/const'
 import { getBoundaryData } from '@/lib/data'
-import { simplifyBoundary } from '@/lib/geojson'
 import { generateMapboxStaticMap, isMapboxEnabled } from '@/lib/mapbox'
 import { determineAreaByCode } from '@/lib/utils'
 
@@ -51,6 +49,24 @@ export default async function Image({
     return NextResponse.json({ message: 'Invalid area code' }, { status: 400 })
   }
 
+  // Areas without feature configuration (like islands) don't have boundary data
+  if (!(area in featureConfig)) {
+    try {
+      const fallbackImage = await getFallbackImage()
+      const body = new Uint8Array(fallbackImage)
+      return new NextResponse(body, {
+        headers: {
+          'content-type': contentType,
+        },
+      })
+    } catch (error) {
+      return NextResponse.json(
+        { message: (error as Error).message },
+        { status: 503 },
+      )
+    }
+  }
+
   // If Mapbox is not enabled, return static fallback
   if (!isMapboxEnabled()) {
     try {
@@ -61,10 +77,10 @@ export default async function Image({
           'content-type': contentType,
         },
       })
-    } catch (_error) {
+    } catch (error) {
       // If fallback fails, return error
       return NextResponse.json(
-        { message: 'OG image generation not configured' },
+        { message: (error as Error).message },
         { status: 503 },
       )
     }
@@ -93,13 +109,14 @@ export default async function Image({
     }
   }
 
-  // Simplify the boundary to reduce coordinate count
-  const boundary: GeoJSON.Feature<GeoJSON.MultiPolygon | GeoJSON.Polygon> =
-    simplifyBoundary(resBoundary.data, config.simplification.tolerance)
-
   // Generate Mapbox static map
+  // Let generateMapboxStaticMap handle progressive simplification
   try {
-    const imgBuffer = await generateMapboxStaticMap(boundary, config, size)
+    const imgBuffer = await generateMapboxStaticMap(
+      resBoundary.data,
+      config,
+      size,
+    )
     const body = new Uint8Array(imgBuffer)
 
     return new NextResponse(body, {
@@ -118,9 +135,9 @@ export default async function Image({
           'content-type': contentType,
         },
       })
-    } catch (_fallbackError) {
+    } catch (fallbackError) {
       return NextResponse.json(
-        { message: 'Failed to generate OG image' },
+        { message: (fallbackError as Error).message },
         { status: 500 },
       )
     }
