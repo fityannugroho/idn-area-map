@@ -16,12 +16,19 @@ export type Config = Readonly<{
       url: string
     }
   }
+  mapbox: {
+    accessToken: string | undefined
+  }
 }>
 
 export const config: Config = {
   appName: 'idn-area Map',
   appDescription: 'Map of Indonesia Area',
-  appUrl: process.env.NEXT_PUBLIC_VERCEL_URL ?? 'http://localhost:3000',
+  appUrl:
+    process.env.NEXT_PUBLIC_APP_URL ??
+    process.env.NEXT_PUBLIC_VERCEL_URL ??
+    process.env.NEXT_PUBLIC_CF_PAGES_URL ??
+    'http://localhost:3000',
   dataSource: {
     area: {
       url:
@@ -44,6 +51,9 @@ export const config: Config = {
         process.env.NEXT_PUBLIC_DATA_SOURCE_BOUNDARY_URL ??
         'https://raw.githubusercontent.com/fityannugroho/idn-area-boundary/main/data',
     },
+  },
+  mapbox: {
+    accessToken: process.env.MAPBOX_ACCESS_TOKEN,
   },
 } as const
 
