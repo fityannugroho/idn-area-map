@@ -24,7 +24,11 @@ export type Config = Readonly<{
 export const config: Config = {
   appName: 'idn-area Map',
   appDescription: 'Map of Indonesia Area',
-  appUrl: process.env.NEXT_PUBLIC_VERCEL_URL ?? 'http://localhost:3000',
+  appUrl:
+    process.env.NEXT_PUBLIC_APP_URL ??
+    process.env.NEXT_PUBLIC_VERCEL_URL ??
+    process.env.NEXT_PUBLIC_CF_PAGES_URL ??
+    'http://localhost:3000',
   dataSource: {
     area: {
       url:
