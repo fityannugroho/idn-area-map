@@ -4,6 +4,7 @@ import { config } from '@/lib/config'
 import { cn } from '@/lib/utils'
 import './globals.css'
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { ThemeProvider } from 'next-themes'
 import QueryProvider from '@/components/QueryProvider'
 import { Toaster } from '@/components/ui/sonner'
@@ -71,6 +72,13 @@ export default function RootLayout({
             <QueryProvider>{children}</QueryProvider>
             <Toaster />
           </ThemeProvider>
+          {config.umami.websiteId && (
+            <Script
+              src={config.umami.scriptUrl}
+              data-website-id={config.umami.websiteId}
+              strategy="lazyOnload"
+            />
+          )}
         </body>
       </html>
     </StrictMode>
