@@ -19,6 +19,10 @@ export type Config = Readonly<{
   mapbox: {
     accessToken: string | undefined
   }
+  umami: {
+    websiteId: string | undefined
+    scriptUrl: string
+  }
 }>
 
 export const config: Config = {
@@ -54,6 +58,11 @@ export const config: Config = {
   },
   mapbox: {
     accessToken: process.env.MAPBOX_ACCESS_TOKEN,
+  },
+  umami: {
+    websiteId: process.env.UMAMI_WEBSITE_ID,
+    scriptUrl:
+      process.env.UMAMI_SCRIPT_URL || 'https://cloud.umami.is/script.js',
   },
 } as const
 
