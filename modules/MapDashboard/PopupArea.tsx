@@ -8,6 +8,7 @@ import {
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import type { ComponentPropsWithoutRef } from 'react'
+import { useCallback } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
@@ -50,6 +51,15 @@ export default function PopupArea<Area extends FeatureArea>({
   latLng,
 }: PopupAreaProps<Area>) {
   const { data, status, error } = useArea(area, code)
+
+  const handleCopyLink = useCallback((areaCode: string) => {
+    try {
+      navigator.clipboard.writeText(`${window.location.origin}/${areaCode}`)
+      toast.success('Link copied to clipboard', { duration: 3_000 })
+    } catch (_error) {
+      toast.error('Failed to copy link to clipboard', { closeButton: true })
+    }
+  }, [])
 
   if (status === 'pending') {
     return (
@@ -113,22 +123,7 @@ export default function PopupArea<Area extends FeatureArea>({
             avoidCollisions
             onCloseAutoFocus={(e) => e.preventDefault()}
           >
-            <DropdownMenuItem
-              onClick={() => {
-                try {
-                  navigator.clipboard.writeText(
-                    `${window.location.origin}/${data.code}`,
-                  )
-                  toast.success('Link copied to clipboard', {
-                    duration: 3_000, // 3 seconds
-                  })
-                } catch (_error) {
-                  toast.error('Failed to copy link to clipboard', {
-                    closeButton: true,
-                  })
-                }
-              }}
-            >
+            <DropdownMenuItem onClick={() => handleCopyLink(data.code)}>
               <LinkIcon />
               Copy link
             </DropdownMenuItem>

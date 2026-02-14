@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { useCallback } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,6 +34,17 @@ const MapMarker = dynamic(() => import('@/components/MapMarker'), {
 export default function IslandMarkers() {
   const { loading } = useMapDashboard()
   const { filteredIslands: islands = [], showMarkers } = useIslandsFilter()
+
+  const handleCopyCoordinate = useCallback((coordinate: string) => {
+    try {
+      navigator.clipboard.writeText(coordinate)
+      toast.success('Coordinate copied to clipboard', { duration: 3_000 })
+    } catch (_error) {
+      toast.error('Failed to copy coordinate to clipboard', {
+        closeButton: true,
+      })
+    }
+  }, [])
 
   if (!showMarkers) return null
 
@@ -100,18 +112,7 @@ export default function IslandMarkers() {
                   onCloseAutoFocus={(e) => e.preventDefault()}
                 >
                   <DropdownMenuItem
-                    onClick={() => {
-                      try {
-                        navigator.clipboard.writeText(island.coordinate)
-                        toast.success('Coordinate copied to clipboard', {
-                          duration: 3_000, // 3 seconds
-                        })
-                      } catch (_error) {
-                        toast.error('Failed to copy coordinate to clipboard', {
-                          closeButton: true,
-                        })
-                      }
-                    }}
+                    onClick={() => handleCopyCoordinate(island.coordinate)}
                   >
                     <ClipboardIcon />
                     Copy coordinate

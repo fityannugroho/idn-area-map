@@ -42,30 +42,37 @@ export function IslandsFilterProvider({
     setFilterState((s) => ({ ...s, ...f }))
   }
 
-  const counts = useMemo(() => {
-    const total = islands.length
-    const populated = islands.filter((i) => i.isPopulated).length
-    const outermostSmall = islands.filter((i) => i.isOutermostSmall).length
-    // compute shown using OR semantics when both toggles true
-    const shown = islands.filter((i) => {
-      if (!filter.populated && !filter.outermostSmall) return true
-      return (
-        (filter.populated && i.isPopulated) ||
-        (filter.outermostSmall && i.isOutermostSmall)
-      )
-    }).length
+  const { counts, filteredIslands } = useMemo(() => {
+    let populated = 0
+    let outermostSmall = 0
+    const filtered: Island[] = []
 
-    return { total, shown, populated, outermostSmall }
-  }, [islands, filter])
+    const filterActive = filter.populated || filter.outermostSmall
 
-  const filteredIslands = useMemo(() => {
-    if (!filter.populated && !filter.outermostSmall) return islands
-    return islands.filter(
-      (i) =>
-        (filter.populated && i.isPopulated) ||
-        (filter.outermostSmall && i.isOutermostSmall),
-    )
-  }, [islands, filter])
+    for (const island of islands) {
+      if (island.isPopulated) populated++
+      if (island.isOutermostSmall) outermostSmall++
+
+      if (!filterActive) {
+        filtered.push(island)
+      } else if (
+        (filter.populated && island.isPopulated) ||
+        (filter.outermostSmall && island.isOutermostSmall)
+      ) {
+        filtered.push(island)
+      }
+    }
+
+    return {
+      counts: {
+        total: islands.length,
+        shown: filtered.length,
+        populated,
+        outermostSmall,
+      },
+      filteredIslands: filtered,
+    }
+  }, [islands, filter.populated, filter.outermostSmall])
 
   const value: ContextValue = {
     filter,
