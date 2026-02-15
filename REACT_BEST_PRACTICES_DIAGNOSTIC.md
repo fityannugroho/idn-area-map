@@ -20,10 +20,11 @@ Comprehensive analysis of the codebase against React and Next.js 15 best practic
 **Total Issues Found:** 14  
 **Critical Issues:** 4 ✅ Fixed  
 **High-Medium Issues:** 4 ✅ Fixed  
-**Medium Issues:** 3 (Confidence 0.45-0.65)  
-**Low Priority:** 3 (Confidence < 0.45)
+**Medium Issues:** 2 Valid / 1 False Positive  
+**Low Priority:** 3 (1 False Positive, 2 Low)
+**FALSE POSITIVES:** 2 (Issues #9, #12 - patterns are correct)
 
-**Overall Assessment:** Codebase is **generally solid** but has several **performance bottlenecks** and **2 broken functionalities** (debounce issues) that require immediate attention.
+**Overall Assessment:** Codebase is **generally solid** with **intentional design patterns** for handling React dependency tracking limitations. Only genuine issues have been fixed.
 
 ---
 
@@ -574,12 +575,14 @@ const { counts, filteredIslands } = useMemo(() => {
 
 ## 🟢 MEDIUM ISSUES (Confidence 0.45-0.65)
 
-### Issue 9: Non-Primitive Effect Dependencies
-**Confidence Score: 0.55** | **Priority: MEDIUM** | **Type: Code Smell**
+### ~~Issue 9: Non-Primitive Effect Dependencies~~
+**Confidence Score: 0.55** | **Priority: MEDIUM** | **Type: Code Smell** | **Status: ⚠️ NOT VALID**
 
 **Location:** `modules/MapDashboard/AreaSelectors.tsx:57-66`
 
-**Evidence:**
+**Verdict: FALSE POSITIVE**
+
+**Analysis:**
 ```typescript
 // biome-ignore lint/correctness/useExhaustiveDependencies: only depends to selectedArea
 useEffect(() => {
@@ -594,41 +597,36 @@ useEffect(() => {
 }, [selectedArea])  // Missing: areas, defaultQuery
 ```
 
-**Root Cause:**
-- Linter warning suppressed
-- `areas` and `defaultQuery` not in dependencies
-- `areas` is memoized with [] deps (stable) ✓
-- `defaultQuery` recomputed every render based on `selectedArea`
+**Why This is INTENTIONAL (NOT A BUG):**
 
-**Impact:**
-- Code smell: suppressing lint warnings
-- Logic likely works correctly in this case
-- Fragile: future refactors might break
-- Potential stale closure bugs
-
-**Fix Strategy:**
+`defaultQuery` is **derived from** `selectedArea`:
 ```typescript
-// Option 1: Add all dependencies
-useEffect(() => {
-  for (const { area } of areas) {
-    if (!selectedArea[area]) {
-      setQuery((prevQuery) => ({
-        ...prevQuery,
-        [area]: defaultQuery[area],
-      }))
+const defaultQuery = objectFromEntries(
+  areas.reduce((acc, { area, parent }) => {
+    if (parent && parent !== 'island' && selectedArea[parent]) {
+      query = { parentCode: selectedArea[parent]?.code, limit: MAX_PAGE_SIZE }
     }
-  }
-}, [selectedArea, areas, defaultQuery])
-
-// Option 2: Refactor to remove effect
-// Move logic to event handlers or derived state
-
-// Option 3: Extract primitive dependencies
-const selectedAreaKeys = Object.keys(selectedArea)
-useEffect(() => {
-  // ... use selectedAreaKeys instead of selectedArea object
-}, [selectedAreaKeys, areas, defaultQuery])
+    // ... more logic
+  }, [])
+)
 ```
+
+**The Problem with Adding `defaultQuery` to Dependencies:**
+
+1. User selects province → `selectedArea` changes
+2. Re-render → `defaultQuery` object recomputed (NEW reference)
+3. Effect sees `defaultQuery` changed → runs `setQuery()`
+4. Re-render → `defaultQuery` recomputed again (ANOTHER new reference)
+5. Effect sees change again → **INFINITE LOOP** ♻️
+
+**Why Linter Suppression is Correct:**
+
+The effect intentionally synchronizes state only when `selectedArea` changes, not when `defaultQuery` recomputes. This is a **derived state pattern** where:
+- `defaultQuery` is computed from `selectedArea`
+- Effect resets `query` when parent selections change
+- Adding derived values to deps would break the pattern
+
+**Recommendation:** ✅ **KEEP SUPPRESSION** - Pattern is correct and necessary.
 
 ---
 
@@ -726,12 +724,14 @@ export default memo(
 
 ## ⚪ LOW PRIORITY ISSUES (Confidence < 0.45)
 
-### Issue 12: Event Handler Ref Pattern Complexity
-**Confidence Score: 0.40** | **Priority: LOW** | **Type: Complexity**
+### ~~Issue 12: Event Handler Ref Pattern Complexity~~
+**Confidence Score: 0.40** | **Priority: LOW** | **Type: Complexity** | **Status: ⚠️ NOT VALID**
 
 **Location:** `modules/MapDashboard/BoundaryLayers.tsx:16-36`
 
-**Evidence:**
+**Verdict: FALSE POSITIVE - Pattern is NECESSARY**
+
+**Analysis:**
 ```typescript
 // Keep a ref to the latest `loading` callback so stable handlers can call it
 const loadingRef = useRef(loading)
@@ -742,7 +742,7 @@ useEffect(() => {
 // Store stable per-area handlers so their identity doesn't change across renders
 const handlersRef = useRef<Record<string, (isLoading: boolean) => void>>({})
 
-// Inside map:
+// In render loop:
 if (!handlersRef.current[area]) {
   handlersRef.current[area] = (isLoading: boolean) =>
     loadingRef.current(area, isLoading)
@@ -750,31 +750,50 @@ if (!handlersRef.current[area]) {
 const onLoading = handlersRef.current[area]
 ```
 
-**Root Cause:**
-- Complex workaround for unstable `loading` callback from context
-- Pattern works correctly but adds indirection
-- Symptom of Issue 6 (context value recreation)
+**Why This Pattern is CRITICAL:**
 
-**Impact:**
-- Code complexity
-- Harder to understand and maintain
-- No functional bugs
-- If Issue 6 is fixed, this pattern can be simplified
-
-**Fix Strategy:**
-Fix root cause (Issue 6) first, then simplify:
+This pattern solves a real problem: AreaBoundary has this effect:
 ```typescript
-// After context is memoized, can use loading directly:
-<AreaBoundary
-  onLoading={(isLoading) => loading(area, isLoading)}
-/>
+// In AreaBoundary.tsx:54-56
+useEffect(() => {
+  onLoading?.(boundary.status === 'pending')
+}, [boundary.status, onLoading])
+```
 
-// Or extract to useCallback:
+**The Infinite Loop Problem with `useCallback` "Simplification":**
+
+Naive "fix":
+```typescript
 const handleLoading = useCallback(
   (isLoading: boolean) => loading(area, isLoading),
   [loading, area]
 )
 ```
+
+**Why this causes infinite loop:**
+
+1. User selects province → `selectedArea` changes
+2. DashboardProvider re-renders → context updates
+3. BoundaryLayers gets new `loading` from context
+4. useCallback creates NEW function (dependency changed!)
+5. AreaBoundary's effect sees `onLoading` changed
+6. Effect runs: `onLoading(false)` → calls `loading(area, false)`
+7. `loading` updates `isLoading` state → provider re-renders
+8. **INFINITE LOOP** ♻️
+
+**Why Ref Pattern Works:**
+
+| Aspect | useCallback | Ref Pattern |
+|--------|-----------|-----------|
+| **Handler reference** | ❌ Changes with context updates | ✅ Stable (created once per area) |
+| **Calls latest `loading`?** | ✅ Yes (closure) | ✅ Yes (via `loadingRef.current`) |
+| **AreaBoundary effect triggers?** | ❌ Every context update | ✅ Only on boundary status change |
+| **Infinite loop?** | ❌ YES | ✅ NO |
+
+**Key Insight:**
+The ref pattern creates a **stable callback identity** while still calling the latest `loading` function. This prevents unnecessary effect triggers while maintaining closure-based data access.
+
+**Recommendation:** ✅ **KEEP REF PATTERN** - Necessary for correct behavior.
 
 ---
 
@@ -934,27 +953,25 @@ The codebase demonstrates many solid practices:
   - ✅ Fixed: 4 iterations reduced to 1 (4000 → 1000 for 1000 islands)
 
 ### Phase 3: Code Quality (Week 3)
-**Goal:** Clean up code smells
+**Goal:** Investigate code smells
 
-- [ ] **Issue 9:** Fix effect dependencies (0.55)
-  - Remove lint suppression
-  - Add proper dependencies
-  
-- [ ] **Issue 10:** Fix TileLayer ref pattern (0.50)
-  - Use lazy initialization
-  
+- [x] **Issue 9:** Effect dependencies (0.55)
+   - ✅ INVESTIGATED: False positive - pattern is intentional derived state handling
+   - Linter suppression is correct and necessary
+   
+- [x] **Issue 10:** Fix TileLayer ref pattern (0.50)
+   - ✅ Fixed: Uses lazy initialization with if (!glRef.current) check
+   
 - [ ] **Issue 11:** Add selective React.memo (0.45)
-  - Profile first
-  - Memo expensive components only
+   - Profile first
+   - Memo expensive components only
 
-### Phase 4: Cleanup (Week 3)
-**Goal:** Simplify code
-
-- [ ] **Issue 12:** Simplify ref patterns (0.40)
-  - After Issue 6 is fixed
-  
+- [x] **Issue 12:** Ref pattern complexity (0.40)
+   - ✅ INVESTIGATED: False positive - pattern prevents infinite loops with context
+   - Ref pattern is necessary, useCallback would break functionality
+   
 - [ ] **Issue 13:** Memoize hook returns (0.35)
-  - If profiling shows need
+   - If profiling shows need
 
 ---
 
