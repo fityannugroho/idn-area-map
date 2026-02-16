@@ -7,13 +7,18 @@ import { useMap } from 'react-leaflet'
 export default function TileLayer() {
   const map = useMap()
   const { resolvedTheme } = useTheme()
-  const glRef = useRef<L.MaplibreGL>(
-    L.maplibreGL({
+  const glRef = useRef<L.MaplibreGL | null>(null)
+
+  // Lazy initialization to avoid creating MaplibreGL instance on every render
+  if (!glRef.current) {
+    glRef.current = L.maplibreGL({
       style: `/map-styles/${resolvedTheme}.json`,
-    }),
-  )
+    })
+  }
 
   useEffect(() => {
+    if (!glRef.current) return
+
     const maplibreMap = glRef.current.getMaplibreMap()
 
     if (!maplibreMap) {

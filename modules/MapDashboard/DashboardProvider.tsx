@@ -1,7 +1,7 @@
 'use client'
 
 import type { LatLngBounds } from 'leaflet'
-import { type PropsWithChildren, useCallback, useState } from 'react'
+import { type PropsWithChildren, useCallback, useMemo, useState } from 'react'
 import {
   type DashboardContext,
   MapDashboardContext,
@@ -59,17 +59,29 @@ export default function MapDashboardProvider({
     setSelected({})
   }, [])
 
-  const value: DashboardContext = {
-    selectedArea,
-    changeSelectedArea,
-    isLoading,
-    loading,
-    boundaryVisibility,
-    showBoundary,
-    areaBounds,
-    setAreaBounds,
-    clear,
-  }
+  const value = useMemo<DashboardContext>(
+    () => ({
+      selectedArea,
+      changeSelectedArea,
+      isLoading,
+      loading,
+      boundaryVisibility,
+      showBoundary,
+      areaBounds,
+      setAreaBounds,
+      clear,
+    }),
+    [
+      selectedArea,
+      changeSelectedArea,
+      isLoading,
+      loading,
+      boundaryVisibility,
+      showBoundary,
+      areaBounds,
+      clear,
+    ],
+  )
 
   return <MapDashboardContext value={value}>{children}</MapDashboardContext>
 }

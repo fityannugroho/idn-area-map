@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { config } from './config'
 import { type Area, endpoints, type GetArea, parentArea } from './const'
 
@@ -50,7 +51,10 @@ export type GetDataReturnError = {
  * Get data from the API.
  * Provide the `code` to get specific data or provide the `query` to get multiple data.
  */
-export async function getData<A extends Area, P extends string | Query<A>>(
+export const getData = cache(async function getData<
+  A extends Area,
+  P extends string | Query<A>,
+>(
   area: A,
   codeOrQuery?: P,
 ): Promise<
@@ -114,7 +118,7 @@ export async function getData<A extends Area, P extends string | Query<A>>(
   }
 
   return await res.json()
-}
+})
 
 type BoundaryResponse = {
   statusCode: number
@@ -122,7 +126,7 @@ type BoundaryResponse = {
   data: GeoJSON.Feature<GeoJSON.MultiPolygon> | undefined
 }
 
-export async function getBoundaryData(
+export const getBoundaryData = cache(async function getBoundaryData(
   area: Area,
   code: string,
 ): Promise<BoundaryResponse> {
@@ -146,4 +150,4 @@ export async function getBoundaryData(
     message: res.statusText,
     data: res.ok ? await res.json() : undefined,
   }
-}
+})

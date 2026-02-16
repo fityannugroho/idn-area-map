@@ -1,5 +1,6 @@
 import type { Metadata, ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
+import { cache } from 'react'
 import { config } from '@/lib/config'
 import type { Area } from '@/lib/const'
 import { type GetSpecificDataReturn, getData } from '@/lib/data'
@@ -12,7 +13,7 @@ type Props = {
   }>
 }
 
-async function getAreaData(
+const getAreaData = cache(async function getAreaData(
   area: Area,
   areaCode: string,
 ): Promise<GetSpecificDataReturn<Area>['data']> {
@@ -26,7 +27,7 @@ async function getAreaData(
   }
 
   return res.data
-}
+})
 
 export async function generateMetadata(
   props: Props,
