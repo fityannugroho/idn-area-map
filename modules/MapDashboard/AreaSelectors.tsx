@@ -52,6 +52,17 @@ export default function AreaSelectors() {
   const [query, setQuery] =
     useState<{ [A in FeatureArea]: Query<A> | null }>(defaultQuery)
 
+  const debouncedSetQuery = useMemo(
+    () =>
+      debounce((area: FeatureArea, name: string) => {
+        setQuery((prevQuery) => ({
+          ...prevQuery,
+          [area]: name ? { name } : undefined,
+        }))
+      }, 500),
+    [],
+  )
+
   // Reset query to default when selectedArea is cleared
   // biome-ignore lint/correctness/useExhaustiveDependencies: only depends to selectedArea
   useEffect(() => {
@@ -112,14 +123,11 @@ export default function AreaSelectors() {
             }
           }}
           inputProps={{
-            onValueChange: debounce((name) => {
+            onValueChange: (name) => {
               if (parent && parent !== 'island' && !selectedArea[parent]) {
-                setQuery((prevQuery) => ({
-                  ...prevQuery,
-                  [area]: name ? { name } : undefined,
-                }))
+                debouncedSetQuery(area, name)
               }
-            }, 500),
+            },
           }}
         />
       ))}

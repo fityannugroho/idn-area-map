@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useMemo } from 'react'
 import AreaBoundary from '@/components/AreaBoundary'
 import { useArea } from '@/hooks/useArea'
 import { config } from '@/lib/config'
@@ -21,6 +22,7 @@ export type BoundaryLayersProps = {
 
 const MIN_OPACITY = 0.1
 const MAX_OPACITY = 0.7
+const EXPONENT = 2
 
 export default function BoundaryLayers({
   election,
@@ -37,54 +39,72 @@ export default function BoundaryLayers({
     election,
   })
 
-  const { getVotesByArea, status: electionDataStatus } = useElectionResults({
+  const {
+    data: electionData,
+    getVotesByArea,
+    status: electionDataStatus,
+  } = useElectionResults({
     election,
     level: election === 'governor' ? 'province' : 'regency',
     areaCode: parentCode,
   })
 
-  if (
-    areaStatus !== 'success' ||
-    governorDataStatus !== 'success' ||
-    electionDataStatus !== 'success'
-  ) {
+  const isReady =
+    areaStatus === 'success' &&
+    governorDataStatus === 'success' &&
+    electionDataStatus === 'success'
+
+  // Pre-compute candidates (stable reference from React Query structural sharing)
+  const candidates = isReady ? getCandidates(parentCode) : undefined
+
+  // Memoize expensive vote computation across all child areas
+  // biome-ignore lint/correctness/useExhaustiveDependencies: getVotesByArea is an unstable closure over electionData; we track electionData directly for correctness
+  const computedAreas = useMemo(() => {
+    if (!candidates || !electionData) return null
+
+    const candidateIds = Object.keys(candidates)
+
+    return childAreas.map((_childArea) => {
+      const votes = getVotesByArea(_childArea.code)
+
+      const numericVotes = candidateIds.map((id) => ({
+        id,
+        val: votes[id] as number,
+      }))
+
+      // Sort descending to get winner and runner-up
+      numericVotes.sort((a, b) => b.val - a.val)
+      const winnerId = numericVotes[0]?.id
+      const winnerVal = numericVotes[0].val
+      const runnerUpVal = numericVotes[1]?.val ?? 0
+
+      const total = numericVotes.reduce((s, x) => s + x.val, 0)
+
+      // Compute margin = winnerShare - runnerUpShare, in [0,1]
+      const winnerShare = winnerVal / total
+      const runnerUpShare = runnerUpVal / total
+      const margin = Math.max(0, winnerShare - runnerUpShare)
+
+      // Emphasize large margins using power > 1
+      const transformed = Math.max(0, Math.min(1, margin)) ** EXPONENT
+
+      return {
+        area: _childArea,
+        votes,
+        winnerId,
+        fillOpacity: MIN_OPACITY + (MAX_OPACITY - MIN_OPACITY) * transformed,
+      }
+    })
+  }, [childAreas, candidates, electionData])
+
+  if (!computedAreas || !candidates) {
     return null
   }
 
-  const candidates = getCandidates(parentCode)
-
-  // Render all inner areas with the data
   return (
     <>
-      {childAreas.map((_childArea) => {
-        const votes = getVotesByArea(_childArea.code)
-
-        // Prepare numeric votes for sorting
-        const candidateIds = Object.keys(candidates)
-        const numericVotes = candidateIds.map((id) => ({
-          id,
-          val: votes[id],
-        }))
-
-        // Sort descending to get winner and runner-up
-        numericVotes.sort((a, b) => b.val - a.val)
-        const winnerId = numericVotes[0]?.id
-        const winnerVal = numericVotes[0].val
-        const runnerUpVal = numericVotes[1]?.val ?? 0
-
-        // Total numeric votes
-        const total = numericVotes.reduce((s, x) => s + x.val, 0)
-
-        // Compute margin = winnerShare - runnerUpShare, in [0,1]
-        const winnerShare = winnerVal / total
-        const runnerUpShare = runnerUpVal / total
-        const margin = Math.max(0, winnerShare - runnerUpShare)
-
-        // Emphasize large margins using power > 1 (exponent = 2)
-        const EXPONENT = 2
-        const transformed = Math.max(0, Math.min(1, margin)) ** EXPONENT
-
-        return (
+      {computedAreas.map(
+        ({ area: _childArea, votes, winnerId, fillOpacity }) => (
           <AreaBoundary
             area={childArea}
             key={_childArea.code}
@@ -92,8 +112,7 @@ export default function BoundaryLayers({
             pathOptions={{
               color: `var(--chart-${candidates[winnerId].nomor_urut})`,
               fillColor: `var(--chart-${candidates[winnerId].nomor_urut})`,
-              fillOpacity:
-                MIN_OPACITY + (MAX_OPACITY - MIN_OPACITY) * transformed,
+              fillOpacity,
             }}
             eventHandlers={{
               add: (e) => {
@@ -114,8 +133,8 @@ export default function BoundaryLayers({
               />
             </Popup>
           </AreaBoundary>
-        )
-      })}
+        ),
+      )}
     </>
   )
 }
