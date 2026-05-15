@@ -1,0 +1,6 @@
+allowBuilds:
+  msw: true
+  sharp: true
+auditConfig:
+  ignoreGhsas:
+    - GHSA-qx2v-qp2m-jg93
