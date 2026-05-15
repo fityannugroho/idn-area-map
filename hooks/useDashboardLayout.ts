@@ -1,13 +1,13 @@
 import type { Map as LeafletMap } from 'leaflet'
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
-import type { ImperativePanelHandle } from 'react-resizable-panels'
+import type { PanelImperativeHandle } from 'react-resizable-panels'
 import { debounce } from '@/lib/utils'
 
 export function useDashboardLayout() {
   const [orientation, setOrientation] = useState<'horizontal' | 'vertical'>(
     'horizontal',
   )
-  const sidebarRef = useRef<ImperativePanelHandle>(null)
+  const sidebarRef = useRef<PanelImperativeHandle>(null)
   const mapRef = useRef<LeafletMap | null>(null)
 
   useLayoutEffect(() => {

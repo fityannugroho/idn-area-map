@@ -100,8 +100,8 @@ export default function VotesChart({
               const radius =
                 props.innerRadius +
                 (props.outerRadius - props.innerRadius) * 0.5
-              const x = props.cx + radius * Math.cos(-props.midAngle * RADIAN)
-              const y = props.cy + radius * Math.sin(-props.midAngle * RADIAN)
+              const x = props.cx + radius * Math.cos(-(props.midAngle ?? 0) * RADIAN)
+              const y = props.cy + radius * Math.sin(-(props.midAngle ?? 0) * RADIAN)
 
               return (
                 <text

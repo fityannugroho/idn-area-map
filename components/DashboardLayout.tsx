@@ -26,7 +26,7 @@ export default function DashboardLayout({
 
   return (
     <ResizablePanelGroup
-      direction={orientation}
+      orientation={orientation}
       className="min-h-[calc(100vh-3.875rem)]"
     >
       <ResizablePanel
@@ -34,7 +34,7 @@ export default function DashboardLayout({
         minSize={16}
         collapsible
         className="h-full"
-        ref={sidebarRef}
+        panelRef={sidebarRef}
         style={{ overflowY: 'auto' }}
       >
         <Sidebar />
