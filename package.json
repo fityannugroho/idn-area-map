@@ -67,8 +67,7 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.0",
-    "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.9.3"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
@@ -85,6 +84,7 @@
     "@vitest/coverage-v8": "^4.1.6",
     "jsdom": "^29.1.1",
     "msw": "^2.14.6",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.6"
   },
   "pnpm": {
