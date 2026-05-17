@@ -28,6 +28,7 @@
   ],
   "author": "fityannugroho <fityannugroho@gmail.com> (https://github.com/fityannugroho)",
   "license": "MIT",
+  "packageManager": "pnpm@11.1.1",
   "bugs": {
     "url": "https://github.com/fityannugroho/idn-area-map/issues"
   },
