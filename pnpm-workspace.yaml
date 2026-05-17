@@ -1,3 +1,5 @@
+packages:
+  - '.'
 allowBuilds:
   msw: true
   sharp: true
