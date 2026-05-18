@@ -1,10 +1,10 @@
 packages:
   - '.'
 allowBuilds:
-  esbuild: set this to true or false
+  esbuild: true
   msw: true
   sharp: true
-  workerd: set this to true or false
+  workerd: true
 auditConfig:
   ignoreGhsas:
     - GHSA-qx2v-qp2m-jg93
