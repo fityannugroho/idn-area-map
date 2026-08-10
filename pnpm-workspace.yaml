@@ -5,6 +5,17 @@ allowBuilds:
   msw: true
   sharp: true
   workerd: true
-auditConfig:
-  ignoreGhsas:
-    - GHSA-qx2v-qp2m-jg93
+supportedArchitectures:
+  os:
+    - linux
+    - win32
+    - darwin
+  cpu:
+    - x64
+    - arm64
+overrides:
+  undici@<8: '>=7.29.0 <8'
+  vite@<9: '>=8.0.16 <9'
+  nanoid@<4: '>=3.3.17 <4'
+  sharp@<1: '>=0.35.0 <1'
+  postcss@<8.5.23: '>=8.5.23 <9'
