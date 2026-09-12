@@ -17,11 +17,3 @@ overrides:
   nanoid@<4: '>=3.3.17 <4'
   sharp@<1: '>=0.35.0 <1'
   postcss@<8.5.23: '>=8.5.23 <9'
-  # GHSA-jrc7-96c5-q579: @maplibre/maplibre-gl-leaflet 0.1.x peers maplibre-gl
-  # ^5.0.0, so natural resolution cannot reach the patched >=6.4.1. Scope the
-  # pin to that parent; v6 is covered by its peer range since 0.1.4.
-  '@maplibre/maplibre-gl-leaflet>maplibre-gl': '>=6.4.1 <7'
-  # GHSA-w5vr-8v7q-w6rv: next 16.3.x pins baseline-browser-mapping ^2.9.19,
-  # which cannot reach the patched >=2.11.0. Scope the pin to next; the API
-  # is data-only (browserslist mapping) so the minor lift is safe.
-  'next>baseline-browser-mapping': '>=2.11.0 <3'

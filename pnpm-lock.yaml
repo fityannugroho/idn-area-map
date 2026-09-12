@@ -10,8 +10,6 @@ overrides:
   nanoid@<4: '>=3.3.17 <4'
   sharp@<1: '>=0.35.0 <1'
   postcss@<8.5.23: '>=8.5.23 <9'
-  '@maplibre/maplibre-gl-leaflet>maplibre-gl': '>=6.4.1 <7'
-  next>baseline-browser-mapping: '>=2.11.0 <3'
 
 importers:
 
@@ -574,7 +572,7 @@ packages:
     peerDependencies:
       '@types/leaflet': ^1.9.0
       leaflet: ^1.9.3
-      maplibre-gl: '>=6.4.1 <7'
+      maplibre-gl: ^2.4.0 || ^3.3.1 || ^4.3.2 || ^5.0.0 || ^6.0.0
 
   '@maplibre/maplibre-gl-style-spec@26.4.2':
     resolution: {integrity: sha512-6J0vZqMZvRAJKtdWJdDGHEh1YJ2ZHG08/GOur8gCArYhO8ZkM//OXqtI2AAEz4jc2G+Wq4MfcePg8qNK5TZ4Kg==}
