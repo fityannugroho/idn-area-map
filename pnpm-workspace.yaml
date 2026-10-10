@@ -11,6 +11,9 @@ supportedArchitectures:
   cpu:
     - x64
     - arm64
+# dependency-upgrade pick younger than the 24h policy window
+minimumReleaseAgeExclude:
+  - lucide-react@1.55.0
 overrides:
   undici@<8: '>=7.29.1 <8'
   vite@<9: '>=8.0.16 <9'
